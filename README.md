@@ -42,8 +42,11 @@ curriculum.
 - The grace token refills after 7 clean consecutive check-ins.
 
 Progress is stored **locally in the browser** (`localStorage`) — no accounts,
-no backend, instant deploys. The cohort backend (auth, live leaderboard,
-showcase wall, journey-map cohort stats) is the natural v2.
+no backend, instant deploys. Users only ever see their own progress; the owner
+sees aggregate visitors via Vercel Web Analytics. The cohort backend (auth,
+live leaderboard, owner/admin dashboard, showcase wall) is the natural v2 —
+see **[ARCHITECTURE.md](ARCHITECTURE.md)** for the access model and the
+multi-challenge structure (`lib/challenges/`).
 
 ## Develop
 

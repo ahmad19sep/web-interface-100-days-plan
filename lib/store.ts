@@ -11,7 +11,13 @@
 //  - the grace token refills after 7 clean consecutive check-ins
 
 import { useSyncExternalStore } from "react";
-import { COHORT_START_DATE, DAYS, PROJECTS, type Project } from "./plan";
+import {
+  CHALLENGE,
+  COHORT_START_DATE,
+  DAYS,
+  PROJECTS,
+  type Project,
+} from "./plan";
 
 export type Reminder = "morning" | "evening" | "none";
 export type Visibility = "public" | "private";
@@ -33,7 +39,10 @@ export interface ProgressState {
   notes: Record<number, string>;
 }
 
-const KEY = "hundred-days-modern-ai-v1";
+// Progress is namespaced per challenge, so future challenges get their own
+// independent track in the same browser.
+const KEY = `track:${CHALLENGE.id}:v1`;
+const LEGACY_KEY = "hundred-days-modern-ai-v1";
 const EMPTY: ProgressState = {
   onboarded: false,
   name: "",
@@ -67,7 +76,16 @@ function loadOnce() {
   if (loaded || typeof window === "undefined") return;
   loaded = true;
   try {
-    const raw = localStorage.getItem(KEY);
+    let raw = localStorage.getItem(KEY);
+    // one-time migration from the pre-namespaced key
+    if (!raw) {
+      const legacy = localStorage.getItem(LEGACY_KEY);
+      if (legacy) {
+        raw = legacy;
+        localStorage.setItem(KEY, legacy);
+        localStorage.removeItem(LEGACY_KEY);
+      }
+    }
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<ProgressState>;
       if (parsed && typeof parsed === "object") {
