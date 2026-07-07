@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#0D1117}
+  body{font-family:'Inter',system-ui,sans-serif;color:#ECE6DA;-webkit-font-smoothing:antialiased}
+  a{color:#35D399;text-decoration:none}
+  a:hover{color:#5BE3B0}
+  ::selection{background:rgba(53,211,153,.28)}
+  @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(245,181,75,.55)}70%{box-shadow:0 0 0 7px rgba(245,181,75,0)}100%{box-shadow:0 0 0 0 rgba(245,181,75,0)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes toastIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes flick{0%,100%{opacity:1}50%{opacity:.72}}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important}}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#262E39;border-radius:20px}
+  ::-webkit-scrollbar-track{background:transparent}
+</style>
+</helmet>
+<div style="min-height:100vh;background:radial-gradient(1200px 600px at 78% -8%, rgba(53,211,153,.06), transparent 60%),#0D1117">
+
+  <!-- ===================== LANDING ===================== -->
+  <sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+  <div style="max-width:1280px;margin:0 auto;padding:0 40px 90px">
+    <nav style="display:flex;align-items:center;justify-content:space-between;height:78px;position:sticky;top:0;z-index:20;background:rgba(13,17,23,.82);backdrop-filter:blur(10px);border-bottom:1px solid #1B222B;margin:0 -40px;padding:0 40px">
+      <div style="display:flex;align-items:center;gap:11px">
+        <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(150deg,#35D399,#16A97E);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;color:#062018;font-size:15px">A</div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15.5px;letter-spacing:-.01em">100 Days of Modern AI</div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#5D6672;border:1px solid #232B35;border-radius:6px;padding:2px 7px;margin-left:4px">AI RADAR</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:30px">
+        <div style="display:flex;gap:26px;font-size:13.5px;color:#9AA3AF">
+          <a style="color:#9AA3AF" href="#" onClick="{{ noop }}">How it works</a>
+          <a style="color:#9AA3AF" href="#" onClick="{{ noop }}">The 8 projects</a>
+          <a style="color:#9AA3AF" href="#" onClick="{{ noop }}">Creator</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button style="background:none;border:none;color:#C6CDD6;font-family:inherit;font-size:13.5px;cursor:pointer;font-weight:500" onClick="{{ goDashboard }}">Log in</button>
+          <button style="background:linear-gradient(150deg,#35D399,#1DBA89);border:none;color:#062018;font-family:inherit;font-weight:600;font-size:13.5px;padding:10px 16px;border-radius:10px;cursor:pointer" onClick="{{ goOnboarding }}">Start the challenge</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- hero -->
+    <section style="display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;padding:74px 0 40px">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(53,211,153,.09);border:1px solid rgba(53,211,153,.22);color:#5BE3B0;font-size:12.5px;font-weight:500;padding:6px 12px;border-radius:100px;margin-bottom:24px">
+          <span style="width:6px;height:6px;border-radius:50%;background:#35D399;box-shadow:0 0 8px #35D399"></span>
+          Cohort live now · Day 37 of 100
+        </div>
+        <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:57px;line-height:1.03;letter-spacing:-.025em;margin-bottom:22px">100 days.<br>8 real projects.<br><span style="color:#35D399">Modern AI, built by hand.</span></h1>
+        <p style="font-size:17px;line-height:1.6;color:#9AA3AF;max-width:480px;margin-bottom:32px">A daily training log for a public learning challenge. Watch the lesson, ship the build, check in. Keep your streak alive — one day at a time, at your own pace.</p>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:34px">
+          <button style="background:linear-gradient(150deg,#35D399,#1DBA89);border:none;color:#062018;font-family:inherit;font-weight:600;font-size:15px;padding:14px 24px;border-radius:12px;cursor:pointer" onClick="{{ goOnboarding }}">Start Day 1 — free</button>
+          <button style="background:#161C24;border:1px solid #262E39;color:#ECE6DA;font-family:inherit;font-weight:500;font-size:15px;padding:14px 22px;border-radius:12px;cursor:pointer" onClick="{{ goDashboard }}">See the dashboard</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:26px">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:26px;color:#ECE6DA">14,208</div>
+            <div style="font-size:12.5px;color:#6C7581">learners on the track</div>
+          </div>
+          <div style="width:1px;height:34px;background:#232B35"></div>
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:26px;color:#ECE6DA">1.2M</div>
+            <div style="font-size:12.5px;color:#6C7581">check-ins logged</div>
+          </div>
+          <div style="width:1px;height:34px;background:#232B35"></div>
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:26px;color:#35D399">89k</div>
+            <div style="font-size:12.5px;color:#6C7581">projects shipped</div>
+          </div>
+        </div>
+      </div>
+      <!-- journey preview -->
+      <div style="background:linear-gradient(180deg,#12181F,#0F141A);border:1px solid #212934;border-radius:20px;padding:24px;box-shadow:0 30px 60px -30px rgba(0,0,0,.6)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px">Your journey map</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6C7581">37 / 100</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:6px">
+          <sc-for list="{{ days }}" as="d" hint-placeholder-count="100">
+            <div title="{{ d.tip }}" style="{{ d.cellStyle }}"></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:16px;font-size:11.5px;color:#6C7581">
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#2AB98A"></span>Done</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#F5B54B"></span>Today</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:#1C2530"></span>Locked</span>
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;border:1px dashed #3A4552"></span>Rest</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- how it works -->
+    <section style="padding:64px 0 24px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#35D399;letter-spacing:.08em;margin-bottom:10px">HOW IT WORKS</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;letter-spacing:-.02em;margin-bottom:34px">Three moves, every day.</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+        <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:26px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6C7581;margin-bottom:16px">01</div>
+          <div style="width:40px;height:40px;border-radius:11px;background:rgba(53,211,153,.1);display:flex;align-items:center;justify-content:center;margin-bottom:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#35D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17px;margin-bottom:8px">Watch the lesson</div>
+          <div style="font-size:14px;line-height:1.6;color:#8A93A0">A focused daily video on one modern-AI concept. 15–30 minutes, no filler.</div>
+        </div>
+        <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:26px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6C7581;margin-bottom:16px">02</div>
+          <div style="width:40px;height:40px;border-radius:11px;background:rgba(53,211,153,.1);display:flex;align-items:center;justify-content:center;margin-bottom:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#35D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"></path></svg></div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17px;margin-bottom:8px">Build the task</div>
+          <div style="font-size:14px;line-height:1.6;color:#8A93A0">A concrete build with a clear "done-when". Every 12–14 days becomes a shippable project.</div>
+        </div>
+        <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:26px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6C7581;margin-bottom:16px">03</div>
+          <div style="width:40px;height:40px;border-radius:11px;background:rgba(53,211,153,.1);display:flex;align-items:center;justify-content:center;margin-bottom:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#35D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17px;margin-bottom:8px">Check in</div>
+          <div style="font-size:14px;line-height:1.6;color:#8A93A0">Mark the day complete, log a note, keep the streak alive. One grace token has your back.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 projects -->
+    <section style="padding:56px 0 24px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#35D399;letter-spacing:.08em;margin-bottom:10px">THE OUTPUT</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;letter-spacing:-.02em;margin-bottom:34px">Eight projects you'll actually ship.</h2>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+        <sc-for list="{{ projects }}" as="p" hint-placeholder-count="8">
+          <div style="background:#12181F;border:1px solid #212934;border-radius:14px;padding:20px;min-height:132px;display:flex;flex-direction:column;justify-content:space-between">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#35D399;margin-bottom:10px">{{ p.tag }}</div>
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin-bottom:6px">{{ p.name }}</div>
+              <div style="font-size:12.5px;line-height:1.5;color:#7C858F">{{ p.blurb }}</div>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5D6672;margin-top:12px">{{ p.days }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- weekly rhythm + creator -->
+    <section style="display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:56px 0 24px">
+      <div style="background:linear-gradient(150deg,rgba(245,181,75,.08),#12181F);border:1px solid #2A2A22;border-radius:18px;padding:30px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#F5B54B;letter-spacing:.06em;margin-bottom:12px">WEEKLY RHYTHM</div>
+        <h3 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:23px;letter-spacing:-.02em;margin-bottom:12px">Every 7th day, you rest.</h3>
+        <p style="font-size:14.5px;line-height:1.6;color:#9AA3AF;margin-bottom:20px">No new task. A recap checklist, a look at the community showcase, and space to catch your breath. Discipline includes rest.</p>
+        <div style="display:flex;gap:6px">
+          <div style="flex:1;height:34px;border-radius:7px;background:#1C2530;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6C7581">D1</div>
+          <div style="flex:1;height:34px;border-radius:7px;background:#1C2530;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6C7581">D2</div>
+          <div style="flex:1;height:34px;border-radius:7px;background:#1C2530;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6C7581">D3</div>
+          <div style="flex:1;height:34px;border-radius:7px;background:#1C2530;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6C7581">D4</div>
+          <div style="flex:1;height:34px;border-radius:7px;background:#1C2530;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6C7581">D5</div>
+          <div style="flex:1;height:34px;border-radius:7px;background:#1C2530;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6C7581">D6</div>
+          <div style="flex:1;height:34px;border-radius:7px;background:rgba(245,181,75,.14);border:1px dashed rgba(245,181,75,.5);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:#F5B54B">R</div>
+        </div>
+      </div>
+      <div style="background:#12181F;border:1px solid #212934;border-radius:18px;padding:30px;display:flex;flex-direction:column">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#35D399;letter-spacing:.06em;margin-bottom:12px">THE CREATOR</div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(150deg,#35D399,#16A97E);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;color:#062018;font-size:20px">A</div>
+          <div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17px">Ahmad · AI Radar</div>
+            <div style="font-size:13px;color:#8A93A0">@aixahmad · teaching modern AI, in public</div>
+          </div>
+        </div>
+        <div style="flex:1;background:#0C1116;border:1px solid #1E262F;border-radius:12px;display:flex;align-items:center;justify-content:center;min-height:150px;position:relative;overflow:hidden">
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(53,211,153,.08),transparent)"></div>
+          <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.1);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1"><svg width="20" height="20" viewBox="0 0 24 24" fill="#ECE6DA"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+          <div style="position:absolute;bottom:12px;left:14px;font-size:12.5px;color:#C6CDD6;z-index:1">Latest: “Day 37 — Building an eval harness”</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- join CTA -->
+    <section style="margin-top:56px;background:linear-gradient(150deg,rgba(53,211,153,.1),rgba(29,186,137,.03));border:1px solid rgba(53,211,153,.22);border-radius:22px;padding:52px;text-align:center">
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:34px;letter-spacing:-.025em;margin-bottom:14px">Your Day 1 starts when you say so.</h2>
+      <p style="font-size:16px;color:#9AA3AF;max-width:520px;margin:0 auto 28px">Start today, or align with the live cohort. Either way, the track is yours — your streak, your notes, your pace.</p>
+      <button style="background:linear-gradient(150deg,#35D399,#1DBA89);border:none;color:#062018;font-family:inherit;font-weight:600;font-size:15px;padding:15px 30px;border-radius:12px;cursor:pointer" onClick="{{ goOnboarding }}">Start the challenge</button>
+      <div style="margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:#5D6672">
+        <span>© 2026 AI Radar · 100 Days of Modern AI</span>
+        <span style="font-family:'JetBrains Mono',monospace">Latin script only · built in public</span>
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  <!-- ONBOARDING -->
+  <sc-if value="{{ isOnboarding }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px">
+    <div style="width:100%;max-width:560px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(150deg,#35D399,#16A97E);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;color:#062018;font-size:14px">A</div><span style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px">Set up your track</span></div>
+        <button onClick="{{ goLanding }}" style="background:none;border:none;color:#6C7581;font-family:inherit;font-size:13px;cursor:pointer">Cancel</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:26px"><span style="flex:1;height:4px;border-radius:100px;background:#35D399"></span><span style="flex:1;height:4px;border-radius:100px;background:#35D399"></span><span style="flex:1;height:4px;border-radius:100px;background:#35D399"></span></div>
+      <div style="background:#12181F;border:1px solid #212934;border-radius:20px;padding:30px">
+        <!-- step 1 -->
+        <div style="margin-bottom:26px">
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin-bottom:4px">1 · When do you start?</div>
+          <div style="font-size:13px;color:#8A93A0;margin-bottom:14px">Your Day 1 is personal — it doesn't have to match anyone else.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="background:rgba(53,211,153,.08);border:1.5px solid rgba(53,211,153,.5);border-radius:12px;padding:16px;cursor:pointer"><div style="font-size:14px;font-weight:600;color:#35D399;margin-bottom:3px">Start today</div><div style="font-size:12px;color:#8A93A0">Begin Day 1 right now</div></div>
+            <div style="background:#0F141A;border:1.5px solid #1E262F;border-radius:12px;padding:16px;cursor:pointer"><div style="font-size:14px;font-weight:600;margin-bottom:3px">Align with cohort</div><div style="font-size:12px;color:#8A93A0">Jump in at Day 40 with everyone</div></div>
+          </div>
+        </div>
+        <!-- step 2 -->
+        <div style="margin-bottom:26px">
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin-bottom:4px">2 · Daily reminder</div>
+          <div style="font-size:13px;color:#8A93A0;margin-bottom:14px">One gentle nudge a day. Pick a time you're usually free.</div>
+          <div style="display:flex;gap:8px">
+            <span style="font-size:13px;padding:9px 15px;border-radius:100px;background:#0F141A;border:1px solid #1E262F;color:#9AA3AF;cursor:pointer">Morning</span>
+            <span style="font-size:13px;padding:9px 15px;border-radius:100px;background:rgba(53,211,153,.1);border:1px solid rgba(53,211,153,.4);color:#35D399;cursor:pointer">Evening · 8:30 PM</span>
+            <span style="font-size:13px;padding:9px 15px;border-radius:100px;background:#0F141A;border:1px solid #1E262F;color:#9AA3AF;cursor:pointer">No reminder</span>
+          </div>
+        </div>
+        <!-- step 3 -->
+        <div style="margin-bottom:28px">
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin-bottom:4px">3 · Profile visibility</div>
+          <div style="font-size:13px;color:#8A93A0;margin-bottom:14px">You can change this anytime. Notes always stay private.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="background:rgba(53,211,153,.08);border:1.5px solid rgba(53,211,153,.5);border-radius:12px;padding:16px;cursor:pointer"><div style="font-size:14px;font-weight:600;color:#35D399;margin-bottom:3px">Public</div><div style="font-size:12px;color:#8A93A0">Appear on the leaderboard</div></div>
+            <div style="background:#0F141A;border:1.5px solid #1E262F;border-radius:12px;padding:16px;cursor:pointer"><div style="font-size:14px;font-weight:600;margin-bottom:3px">Private</div><div style="font-size:12px;color:#8A93A0">Just for you</div></div>
+          </div>
+        </div>
+        <button onClick="{{ goDashboard }}" style="width:100%;background:linear-gradient(150deg,#35D399,#1DBA89);border:none;color:#062018;font-family:inherit;font-weight:700;font-size:15px;padding:15px;border-radius:12px;cursor:pointer">Start Day 1 →</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- SHARE CARD -->
+  <sc-if value="{{ isShare }}" hint-placeholder-val="{{ false }}">
+  <div style="min-height:100vh;padding:36px 40px">
+    <button onClick="{{ goProfile }}" style="display:flex;align-items:center;gap:7px;background:none;border:none;color:#8A93A0;font-family:inherit;font-size:13px;cursor:pointer;margin-bottom:24px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>Back to profile</button>
+    <div style="max-width:1000px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:30px">
+        <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;letter-spacing:-.02em;margin-bottom:6px">Your progress card</h1>
+        <p style="font-size:14px;color:#8A93A0">Auto-generated, on-brand. Post it and pull someone else into the challenge.</p>
+      </div>
+
+      <!-- 1200x630 -->
+      <div style="margin-bottom:14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#6C7581;letter-spacing:.06em">1200 × 630 · LANDSCAPE</div>
+      <div style="width:100%;aspect-ratio:1200/630;border-radius:18px;overflow:hidden;border:1px solid #212934;background:radial-gradient(700px 400px at 82% -20%,rgba(53,211,153,.14),transparent 60%),linear-gradient(160deg,#0F151C,#0A0E13);position:relative;margin-bottom:36px">
+        <div style="position:absolute;inset:0;padding:52px 56px;display:flex;flex-direction:column;justify-content:space-between">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:12px"><div style="width:40px;height:40px;border-radius:11px;background:linear-gradient(150deg,#35D399,#16A97E);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;color:#062018;font-size:18px">A</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:19px">100 Days of Modern AI</div></div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#6C7581">AI RADAR · @aixahmad</div>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:34px">
+            <div><div style="font-family:'JetBrains Mono',monospace;font-size:15px;color:#6C7581;letter-spacing:.12em;margin-bottom:2px">DAY</div><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:150px;line-height:.82;letter-spacing:-.04em;color:#35D399">037</div></div>
+            <div style="padding-bottom:16px"><div style="font-family:'JetBrains Mono',monospace;font-size:34px;color:#3A4552;letter-spacing:-.02em">/ 100</div></div>
+            <div style="flex:1;padding-bottom:14px">
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;margin-bottom:10px">Saad Khan</div>
+              <div style="display:flex;gap:22px"><div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:22px;color:#F5B54B">🔥 12</div><div style="font-size:12px;color:#6C7581">streak</div></div><div><div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:22px;color:#ECE6DA">2/8</div><div style="font-size:12px;color:#6C7581">projects</div></div></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(50,1fr);gap:3px">
+            <sc-for list="{{ days }}" as="d" hint-placeholder-count="100">
+              <div style="{{ d.shareStyle }}"></div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+        <!-- 1080x1080 -->
+        <div>
+          <div style="margin-bottom:14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#6C7581;letter-spacing:.06em">1080 × 1080 · SQUARE</div>
+          <div style="width:100%;aspect-ratio:1/1;border-radius:18px;overflow:hidden;border:1px solid #212934;background:radial-gradient(500px 400px at 50% -10%,rgba(53,211,153,.14),transparent 60%),linear-gradient(160deg,#0F151C,#0A0E13);position:relative">
+            <div style="position:absolute;inset:0;padding:44px;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;margin-bottom:auto"><div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(150deg,#35D399,#16A97E);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;color:#062018;font-size:16px">A</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px">100 Days of Modern AI</div></div>
+              <div style="text-align:center;margin:auto 0"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#6C7581;letter-spacing:.12em">DAY</div><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:140px;line-height:.85;letter-spacing:-.04em;color:#35D399">037</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#3A4552">/ 100</div></div>
+              <div style="margin-top:auto"><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;margin-bottom:12px">Saad Khan · 🔥 12-day streak</div><div style="display:grid;grid-template-columns:repeat(20,1fr);gap:4px"><sc-for list="{{ days }}" as="d" hint-placeholder-count="100"><div style="{{ d.shareStyle }}"></div></sc-for></div></div>
+            </div>
+          </div>
+        </div>
+        <div style="padding-top:34px">
+          <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:22px;margin-bottom:14px">
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;margin-bottom:14px">Share it</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <button onClick="{{ noop }}" style="background:linear-gradient(150deg,#35D399,#1DBA89);border:none;color:#062018;font-family:inherit;font-weight:600;font-size:14px;padding:13px;border-radius:11px;cursor:pointer">Download PNG</button>
+              <button onClick="{{ noop }}" style="background:#161C24;border:1px solid #262E39;color:#ECE6DA;font-family:inherit;font-weight:500;font-size:14px;padding:13px;border-radius:11px;cursor:pointer">Copy image</button>
+              <button onClick="{{ noop }}" style="background:#161C24;border:1px solid #262E39;color:#ECE6DA;font-family:inherit;font-weight:500;font-size:14px;padding:13px;border-radius:11px;cursor:pointer">Share to X / LinkedIn</button>
+            </div>
+          </div>
+          <div style="font-size:12.5px;color:#6C7581;line-height:1.6;padding:0 4px">The card auto-updates with your current day, streak, and journey map every time you generate it. Green = done, amber = today.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!--FULLBLEED-->
+
+  <!-- ===================== APP SHELL ===================== -->
+  <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;min-height:100vh">
+    <!-- sidebar -->
+    <aside style="width:250px;flex-shrink:0;border-right:1px solid #1B222B;background:#0F141A;padding:24px 16px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh">
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 8px 22px">
+        <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(150deg,#35D399,#16A97E);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:800;color:#062018;font-size:14px">A</div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13.5px;line-height:1.15">100 Days<br><span style="color:#6C7581;font-weight:400;font-size:11px">of Modern AI</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <sc-for list="{{ nav }}" as="n" hint-placeholder-count="6">
+          <button onClick="{{ n.go }}" style="{{ n.style }}">
+            <span style="width:18px;display:flex" dangerouslySetInnerHTML="{{ n.icon }}"></span>
+            <span>{{ n.label }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="margin-top:auto;padding:14px;background:#12181F;border:1px solid #202832;border-radius:12px">
+        <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onClick="{{ goProfile }}">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(150deg,#7C6CF5,#5B4BD6);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;color:#fff">SK</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Saad Khan</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#35D399">Day 37 · 🔥 12</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- main -->
+    <main style="flex:1;min-width:0;max-width:1030px;margin:0 auto;padding:34px 46px 80px">
+
+      <!-- DASHBOARD -->
+      <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div>
+            <div style="font-size:14px;color:#8A93A0">Assalam-o-alaikum, Saad</div>
+            <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;letter-spacing:-.02em">Today</h1>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="display:flex;align-items:center;gap:8px;background:#161C24;border:1px solid #262E39;border-radius:100px;padding:8px 14px">
+              <span style="font-size:15px">🔥</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#F5B54B">12</span>
+              <span style="font-size:12px;color:#8A93A0">day streak</span>
+              <span style="width:1px;height:16px;background:#2A323D;margin:0 2px"></span>
+              <span style="font-size:12px;color:#35D399">🛡 1 grace</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- dash state switch (demo control) -->
+        <sc-if value="{{ showStateTabs }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:center;gap:6px;margin:16px 0 22px">
+          <span style="font-size:11px;color:#5D6672;margin-right:4px">Demo states:</span>
+          <sc-for list="{{ dashTabs }}" as="t" hint-placeholder-count="4">
+            <button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+        </sc-if>
+
+        <!-- TODAY state -->
+        <sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:300px 1fr;gap:20px;animation:fadeUp .3s ease">
+            <!-- day counter card -->
+            <div style="background:linear-gradient(180deg,#12181F,#0E1319);border:1px solid #212934;border-radius:20px;padding:28px 26px;display:flex;flex-direction:column">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6C7581;letter-spacing:.1em;margin-bottom:6px">MY DAY</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:88px;line-height:.9;letter-spacing:-.04em;color:#35D399">037</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:15px;color:#6C7581;margin-top:4px">/ 100</div>
+              <div style="height:1px;background:#1E262F;margin:22px 0"></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:12px"><span style="font-size:13px;color:#8A93A0">Progress</span><span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#ECE6DA">37%</span></div>
+              <div style="height:8px;background:#1C2530;border-radius:100px;overflow:hidden;margin-bottom:20px"><div style="width:37%;height:100%;background:linear-gradient(90deg,#1DBA89,#35D399);border-radius:100px"></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#8A93A0"><span>Projects shipped</span><span style="font-family:'JetBrains Mono',monospace;color:#ECE6DA">2 / 8</span></div>
+            </div>
+            <!-- today task card -->
+            <div style="background:#12181F;border:1px solid #212934;border-radius:20px;padding:28px;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(245,181,75,.14);color:#F5B54B;padding:4px 10px;border-radius:6px">TODAY'S BUILD</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(53,211,153,.1);color:#35D399;padding:4px 10px;border-radius:6px">P2 · Eval harness</span>
+              </div>
+              <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:24px;letter-spacing:-.02em;margin-bottom:10px">Build a tiny eval harness for your RAG bot</h2>
+              <p style="font-size:14.5px;line-height:1.6;color:#9AA3AF;margin-bottom:20px">Score retrieval quality on a 10-question set. Log precision@k and eyeball failure cases — you can't improve what you don't measure.</p>
+              <div style="display:flex;gap:10px;margin-bottom:20px">
+                <div style="flex:1;background:#0F141A;border:1px solid #1E262F;border-radius:12px;padding:14px">
+                  <div style="font-size:11.5px;color:#6C7581;margin-bottom:6px">📺 Lesson</div>
+                  <div style="font-size:13.5px;font-weight:500">Eval harnesses from scratch</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#35D399;margin-top:4px">~22 min</div>
+                </div>
+                <div style="flex:1;background:#0F141A;border:1px solid #1E262F;border-radius:12px;padding:14px">
+                  <div style="font-size:11.5px;color:#6C7581;margin-bottom:6px">✓ Done when</div>
+                  <div style="font-size:13.5px;font-weight:500;line-height:1.4">precision@3 printed for all 10 questions</div>
+                </div>
+              </div>
+              <div style="margin-top:auto;display:flex;gap:12px">
+                <button onClick="{{ checkIn }}" style="flex:1;background:linear-gradient(150deg,#35D399,#1DBA89);border:none;color:#062018;font-family:inherit;font-weight:700;font-size:15px;padding:15px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#062018" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>Check in — mark Day 37 done</button>
+                <button onClick="{{ goDay }}" style="background:#161C24;border:1px solid #262E39;color:#ECE6DA;font-family:inherit;font-weight:500;font-size:14px;padding:15px 18px;border-radius:12px;cursor:pointer">Notes</button>
+                <button onClick="{{ goDay }}" style="background:#161C24;border:1px solid #262E39;color:#ECE6DA;font-family:inherit;font-weight:500;font-size:14px;padding:15px 18px;border-radius:12px;cursor:pointer">Watch</button>
+              </div>
+            </div>
+          </div>
+          <!-- recent + up next -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;animation:fadeUp .4s ease">
+            <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:22px">
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;margin-bottom:16px">This week</div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:12px"><span style="width:22px;height:22px;border-radius:6px;background:#1DBA89;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#062018" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span><span style="font-size:13.5px;flex:1">Day 36 · Chunking strategies</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6C7581">done</span></div>
+                <div style="display:flex;align-items:center;gap:12px"><span style="width:22px;height:22px;border-radius:6px;background:#1DBA89;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#062018" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span><span style="font-size:13.5px;flex:1">Day 35 · Reranking basics</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6C7581">done</span></div>
+                <div style="display:flex;align-items:center;gap:12px"><span style="width:22px;height:22px;border-radius:6px;background:rgba(245,181,75,.16);border:1px solid rgba(245,181,75,.5);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:#F5B54B">37</span><span style="font-size:13.5px;flex:1;color:#F5B54B">Day 37 · Eval harness</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#F5B54B">today</span></div>
+                <div style="display:flex;align-items:center;gap:12px;opacity:.5"><span style="width:22px;height:22px;border-radius:6px;background:#1C2530"></span><span style="font-size:13.5px;flex:1">Day 38 · Improving retrieval</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6C7581">locked</span></div>
+              </div>
+            </div>
+            <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:22px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px">Journey map</div><button onClick="{{ goJourney }}" style="background:none;border:none;color:#35D399;font-family:inherit;font-size:12.5px;cursor:pointer">Open full →</button></div>
+              <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:5px">
+                <sc-for list="{{ days }}" as="d" hint-placeholder-count="100">
+                  <div onClick="{{ d.open }}" title="{{ d.tip }}" style="{{ d.miniStyle }}"></div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <!-- CATCH-UP state -->
+        <sc-if value="{{ isCatchup }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:fadeUp .3s ease">
+            <div style="display:flex;align-items:flex-start;gap:14px;background:linear-gradient(150deg,rgba(53,211,153,.08),#12181F);border:1px solid rgba(53,211,153,.2);border-radius:16px;padding:20px 22px;margin-bottom:20px">
+              <div style="width:38px;height:38px;flex-shrink:0;border-radius:11px;background:rgba(53,211,153,.12);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#35D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"></path><path d="M12 7v5l3 2"></path></svg></div>
+              <div>
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin-bottom:4px">The cohort is on Day 40 — you're on Day 37. No stress.</div>
+                <div style="font-size:13.5px;color:#9AA3AF;line-height:1.55">Everyone moves at their own pace. We'll keep centering your next incomplete day — pick up right where you left off. Your streak and grace token are untouched.</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:300px 1fr;gap:20px">
+              <div style="background:linear-gradient(180deg,#12181F,#0E1319);border:1px solid #212934;border-radius:20px;padding:28px 26px">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6C7581;letter-spacing:.1em;margin-bottom:6px">MY NEXT DAY</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:88px;line-height:.9;letter-spacing:-.04em;color:#35D399">037</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:15px;color:#6C7581;margin-top:4px">/ 100</div>
+                <div style="height:1px;background:#1E262F;margin:22px 0"></div>
+                <div style="font-size:13px;color:#8A93A0;line-height:1.6">Calendar Day 40 · <span style="color:#F5B54B">3 days to catch up</span>. Do one a day and you're back in sync by the weekend.</div>
+              </div>
+              <div style="background:#12181F;border:1px solid #212934;border-radius:20px;padding:28px;display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(53,211,153,.1);color:#35D399;padding:4px 10px;border-radius:6px">P2 · Eval harness</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6C7581">resume here</span>
+                </div>
+                <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:24px;letter-spacing:-.02em;margin-bottom:10px">Build a tiny eval harness for your RAG bot</h2>
+                <p style="font-size:14.5px;line-height:1.6;color:#9AA3AF;margin-bottom:20px">You left off here on Wednesday. The video is queued and your notes are saved. Just finish the build and check in.</p>
+                <div style="margin-top:auto;display:flex;gap:12px">
+                  <button onClick="{{ checkIn }}" style="flex:1;background:linear-gradient(150deg,#35D399,#1DBA89);border:none;color:#062018;font-family:inherit;font-weight:700;font-size:15px;padding:15px;border-radius:12px;cursor:pointer">Resume Day 37</button>
+                  <button onClick="{{ goDay }}" style="background:#161C24;border:1px solid #262E39;color:#ECE6DA;font-family:inherit;font-weight:500;font-size:14px;padding:15px 18px;border-radius:12px;cursor:pointer">Open detail</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- REST DAY state -->
+        <sc-if value="{{ isRest }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:fadeUp .3s ease">
+            <div style="background:linear-gradient(150deg,rgba(245,181,75,.09),#12181F);border:1px solid #2A2A22;border-radius:20px;padding:34px;text-align:center;margin-bottom:20px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#F5B54B;letter-spacing:.1em;margin-bottom:10px">REST DAY · DAY 35</div>
+              <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;letter-spacing:-.02em;margin-bottom:10px">No new task today. Breathe.</h2>
+              <p style="font-size:15px;color:#9AA3AF;max-width:460px;margin:0 auto">Every 7th day is for recap and rest. Skim your notes, see what the community shipped, and come back fresh tomorrow. Your streak counts rest days too.</p>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+              <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:24px">
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin-bottom:16px">Week 5 recap checklist</div>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <label style="display:flex;align-items:center;gap:12px;font-size:14px;cursor:pointer"><span style="width:20px;height:20px;border-radius:6px;background:#1DBA89;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#062018" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span><span style="color:#8A93A0;text-decoration:line-through">Re-read your chunking notes</span></label>
+                  <label style="display:flex;align-items:center;gap:12px;font-size:14px;cursor:pointer"><span style="width:20px;height:20px;border-radius:6px;background:#1DBA89;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#062018" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span><span style="color:#8A93A0;text-decoration:line-through">Push this week's code to GitHub</span></label>
+                  <label style="display:flex;align-items:center;gap:12px;font-size:14px;cursor:pointer"><span style="width:20px;height:20px;border-radius:6px;border:1.5px solid #2A323D"></span><span>Write one paragraph: what clicked?</span></label>
+                  <label style="display:flex;align-items:center;gap:12px;font-size:14px;cursor:pointer"><span style="width:20px;height:20px;border-radius:6px;border:1.5px solid #2A323D"></span><span>Note one thing to revisit next week</span></label>
+                </div>
+              </div>
+              <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:24px;display:flex;flex-direction:column">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px">Community showcase</div><button onClick="{{ goLeaderboard }}" style="background:none;border:none;color:#35D399;font-family:inherit;font-size:12.5px;cursor:pointer">See wall →</button></div>
+                <div style="display:flex;flex-direction:column;gap:12px;flex:1">
+                  <div style="display:flex;align-items:center;gap:12px;background:#0F141A;border:1px solid #1E262F;border-radius:12px;padding:12px"><div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(150deg,#7C6CF5,#5B4BD6)"></div><div style="flex:1"><div style="font-size:13.5px;font-weight:500">Ayesha shipped P2 — RAG over 400 PDFs</div><div style="font-size:12px;color:#6C7581">Day 34 · 128 likes</div></div></div>
+                  <div style="display:flex;align-items:center;gap:12px;background:#0F141A;border:1px solid #1E262F;border-radius:12px;padding:12px"><div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(150deg,#35D399,#16A97E)"></div><div style="flex:1"><div style="font-size:13.5px;font-weight:500">Bilal's eval harness caught a 30% regression</div><div style="font-size:12px;color:#6C7581">Day 33 · 94 likes</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- STREAK PAUSED state -->
+        <sc-if value="{{ isPaused }}" hint-placeholder-val="{{ false }}">
+          <div style="animation:fadeUp .3s ease">
+            <div style="display:flex;align-items:flex-start;gap:14px;background:#12181F;border:1px solid #2A323D;border-radius:16px;padding:22px;margin-bottom:20px">
+              <div style="width:38px;height:38px;flex-shrink:0;border-radius:11px;background:#1C2530;display:flex;align-items:center;justify-content:center;font-size:18px">⏸</div>
+              <div style="flex:1">
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;margin-bottom:4px">Your streak is paused — not lost.</div>
+                <div style="font-size:13.5px;color:#9AA3AF;line-height:1.55">You used your grace token on Tuesday, then missed Wednesday too. Your 12-day streak is safely on hold. Check in today to bring it back to life — nothing resets to zero here.</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:300px 1fr;gap:20px">
+              <div style="background:linear-gradient(180deg,#12181F,#0E1319);border:1px solid #212934;border-radius:20px;padding:28px 26px">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6C7581;letter-spacing:.1em;margin-bottom:6px">STREAK</div>
+                <div style="display:flex;align-items:baseline;gap:8px"><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:64px;line-height:.9;letter-spacing:-.04em;color:#6C7581">12</div><div style="font-size:15px;color:#6C7581">paused</div></div>
+                <div style="height:1px;background:#1E262F;margin:20px 0"></div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#8A93A0;margin-bottom:8px"><span style="opacity:.5">🛡</span> Grace token spent</div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#8A93A0">Refills after 7 clean check-ins</div>
+              </div>
+              <div style="background:#12181F;border:1px solid #212934;border-radius:20px;padding:28px;display:flex;flex-direction:column">
+                <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:23px;letter-spacing:-.02em;margin-bottom:10px">Bring your streak back to life</h2>
+                <p style="font-size:14.5px;line-height:1.6;color:#9AA3AF;margin-bottom:20px">One check-in un-pauses everything. You'll resume at 12 and keep climbing — the missed days just don't count against you.</p>
+                <div style="margin-top:auto;display:flex;gap:12px">
+                  <button onClick="{{ checkIn }}" style="flex:1;background:linear-gradient(150deg,#35D399,#1DBA89);border:none;color:#062018;font-family:inherit;font-weight:700;font-size:15px;padding:15px;border-radius:12px;cursor:pointer">Check in — resume streak</button>
+                  <button onClick="{{ goJourney }}" style="background:#161C24;border:1px solid #262E39;color:#ECE6DA;font-family:inherit;font-weight:500;font-size:14px;padding:15px 18px;border-radius:12px;cursor:pointer">View journey</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <!-- JOURNEY MAP -->
+      <sc-if value="{{ isJourney }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px">
+          <div>
+            <div style="font-size:14px;color:#8A93A0">Your 100-day track</div>
+            <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;letter-spacing:-.02em">Journey map</h1>
+          </div>
+          <div style="display:flex;gap:22px">
+            <div><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:#35D399">36</div><div style="font-size:11.5px;color:#6C7581">days done</div></div>
+            <div><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:#F5B54B">37</div><div style="font-size:11.5px;color:#6C7581">today</div></div>
+            <div><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:#ECE6DA">63</div><div style="font-size:11.5px;color:#6C7581">to go</div></div>
+          </div>
+        </div>
+        <div style="background:linear-gradient(180deg,#12181F,#0F141A);border:1px solid #212934;border-radius:20px;padding:30px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+            <div style="display:flex;gap:18px;font-size:12px;color:#8A93A0">
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#2AB98A"></span>Done</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:rgba(245,181,75,.16);border:1.5px solid #F5B54B"></span>Today</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:#1C2530"></span>Locked</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;border:1px dashed #3A4552"></span>Rest day</span>
+            </div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#9AA3AF;cursor:pointer" onClick="{{ toggleCohort }}">
+              <span style="width:34px;height:20px;border-radius:100px;background:{{ cohortTrack }};position:relative;transition:.2s"><span style="position:absolute;top:2px;left:{{ cohortKnob }};width:16px;height:16px;border-radius:50%;background:#ECE6DA;transition:.2s"></span></span>
+              Show cohort line
+            </label>
+          </div>
+          <div style="position:relative">
+            <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:9px">
+              <sc-for list="{{ days }}" as="d" hint-placeholder-count="100">
+                <div onClick="{{ d.open }}" title="{{ d.tip }}" style="{{ d.journeyStyle }}">
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:12px;{{ d.numStyle }}">{{ d.n }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ showCohort }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;left:0;right:0;top:calc(40% - 1px);height:2px;background:repeating-linear-gradient(90deg,#F5B54B 0 8px,transparent 8px 14px);pointer-events:none">
+                <div style="position:absolute;right:0;top:-22px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#F5B54B;background:#0D1117;padding:2px 6px;border-radius:5px">cohort · Day 40</div>
+              </div>
+            </sc-if>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:22px;font-size:12.5px;color:#6C7581"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6C7581" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>Tap any completed or current day to open its detail, notes, and video.</div>
+        </div>
+      </sc-if>
+
+      <!-- DAY DETAIL -->
+      <sc-if value="{{ isDay }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ goJourney }}" style="display:flex;align-items:center;gap:7px;background:none;border:none;color:#8A93A0;font-family:inherit;font-size:13px;cursor:pointer;margin-bottom:18px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>Back to journey map</button>
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start">
+          <div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+              <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:44px;letter-spacing:-.03em;color:#35D399">037</div>
+              <div style="padding-top:6px">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6C7581">/ 100</div>
+                <div style="display:flex;gap:8px;margin-top:4px"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(53,211,153,.1);color:#35D399;padding:3px 9px;border-radius:6px">P2 · Eval harness</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(245,181,75,.14);color:#F5B54B;padding:3px 9px;border-radius:6px">TODAY</span></div>
+              </div>
+            </div>
+            <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:28px;letter-spacing:-.02em;margin-bottom:22px">Build a tiny eval harness for your RAG bot</h1>
+            <div style="background:#0C1116;border:1px solid #1E262F;border-radius:14px;display:flex;align-items:center;justify-content:center;min-height:230px;position:relative;overflow:hidden;margin-bottom:22px">
+              <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(53,211,153,.08),transparent)"></div>
+              <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.1);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1;cursor:pointer"><svg width="24" height="24" viewBox="0 0 24 24" fill="#ECE6DA"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+              <div style="position:absolute;bottom:14px;left:16px;z-index:1"><div style="font-size:13.5px;color:#ECE6DA;font-weight:500">Eval harnesses from scratch</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#35D399;margin-top:3px">AI Radar · 22:14</div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px">
+              <div style="background:#12181F;border:1px solid #212934;border-radius:14px;padding:18px">
+                <div style="font-size:11.5px;color:#6C7581;margin-bottom:8px">📖 THE BUILD</div>
+                <div style="font-size:14px;line-height:1.6;color:#C6CDD6">Write a script that runs 10 fixed questions through your retriever and prints precision@3 for each, plus an average.</div>
+              </div>
+              <div style="background:#12181F;border:1px solid #212934;border-radius:14px;padding:18px">
+                <div style="font-size:11.5px;color:#6C7581;margin-bottom:8px">✓ DONE WHEN</div>
+                <div style="font-size:14px;line-height:1.6;color:#C6CDD6">precision@3 is printed for all 10 questions and you can name your worst failure case.</div>
+              </div>
+            </div>
+            <div style="background:#12181F;border:1px solid #212934;border-radius:14px;padding:20px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px">Your notes</div><span style="font-size:11.5px;color:#6C7581">🔒 Private</span></div>
+              <div style="background:#0F141A;border:1px solid #1E262F;border-radius:10px;padding:14px;font-size:13.5px;line-height:1.6;color:#9AA3AF;min-height:88px">precision@3 avg = 0.63. Worst case: the "refund policy" question — retriever pulls the shipping doc every time. Might need better chunk boundaries. TODO: try semantic chunking tomorrow.<span style="display:inline-block;width:2px;height:15px;background:#35D399;margin-left:2px;vertical-align:middle;animation:flick 1.1s infinite"></span></div>
+            </div>
+          </div>
+          <div style="position:sticky;top:24px;display:flex;flex-direction:column;gap:14px">
+            <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:20px">
+              <button onClick="{{ checkIn }}" style="width:100%;background:linear-gradient(150deg,#35D399,#1DBA89);border:none;color:#062018;font-family:inherit;font-weight:700;font-size:14.5px;padding:14px;border-radius:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#062018" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>Mark Day 37 done</button>
+              <a href="#" onClick="{{ noop }}" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#161C24;border:1px solid #262E39;color:#ECE6DA;font-size:13.5px;padding:12px;border-radius:11px;box-sizing:border-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3-.3 6.2-1.5 6.2-6.7A5.2 5.2 0 0 0 20 4.8 4.8 4.8 0 0 0 19.9 1S18.7.6 16 2.5a13.4 13.4 0 0 0-7 0C6.3.6 5.1 1 5.1 1A4.8 4.8 0 0 0 5 4.8 5.2 5.2 0 0 0 3.7 8.4c0 5.2 3.2 6.4 6.2 6.7a3.4 3.4 0 0 0-.9 2.6V22"></path></svg>Open the GitHub folder</a>
+            </div>
+            <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:20px">
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;margin-bottom:14px">Around today</div>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;cursor:pointer" onClick="{{ goDay }}"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6C7581;width:26px">036</span><span style="width:8px;height:8px;border-radius:2px;background:#2AB98A"></span><span style="font-size:13px;flex:1">Chunking strategies</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:rgba(245,181,75,.08);cursor:pointer"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#F5B54B;width:26px">037</span><span style="width:8px;height:8px;border-radius:2px;background:#F5B54B"></span><span style="font-size:13px;flex:1;color:#F5B54B">Eval harness</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;opacity:.5"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6C7581;width:26px">038</span><span style="width:8px;height:8px;border-radius:2px;background:#1C2530"></span><span style="font-size:13px;flex:1">Improving retrieval</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- PROJECTS -->
+      <sc-if value="{{ isProjects }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px">
+          <div>
+            <div style="font-size:14px;color:#8A93A0">What you'll ship across 100 days</div>
+            <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;letter-spacing:-.02em">Projects</h1>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;background:#161C24;border:1px solid #262E39;border-radius:100px;padding:8px 14px"><span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#35D399">2</span><span style="font-size:12px;color:#8A93A0">/ 8 shipped · Capstone locked</span></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+          <sc-for list="{{ projectCards }}" as="p" hint-placeholder-count="9">
+            <div onClick="{{ p.open }}" style="{{ p.cardStyle }}">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;color:{{ p.tagColor }}">{{ p.tag }}</span>
+                <span style="{{ p.badgeStyle }}">{{ p.badge }}</span>
+              </div>
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:17px;margin-bottom:6px">{{ p.name }}</div>
+              <div style="font-size:12.5px;line-height:1.5;color:#7C858F;margin-bottom:18px;min-height:38px">{{ p.blurb }}</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span style="font-size:11.5px;color:#6C7581">{{ p.days }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#9AA3AF">{{ p.frac }}</span></div>
+              <div style="height:6px;background:#1C2530;border-radius:100px;overflow:hidden"><div style="{{ p.barStyle }}"></div></div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- PROJECT DETAIL -->
+      <sc-if value="{{ isProjectDetail }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ goProjects }}" style="display:flex;align-items:center;gap:7px;background:none;border:none;color:#8A93A0;font-family:inherit;font-size:13px;cursor:pointer;margin-bottom:18px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>All projects</button>
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start">
+          <div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:#F5B54B;background:rgba(245,181,75,.14);padding:5px 12px;border-radius:8px">P2</span><span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#F5B54B;background:rgba(245,181,75,.1);padding:5px 10px;border-radius:6px">IN PROGRESS</span></div>
+            <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:28px;letter-spacing:-.02em;margin-bottom:10px">RAG bot + eval</h1>
+            <p style="font-size:15px;line-height:1.6;color:#9AA3AF;max-width:560px;margin-bottom:24px">Build a retrieval-augmented bot over your own documents, then measure it honestly with an eval harness. By the end you'll have a bot you trust — and the numbers to prove it.</p>
+            <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:22px">
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;margin-bottom:16px">Days 13–26 · 14 days</div>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <sc-for list="{{ p2days }}" as="d" hint-placeholder-count="7">
+                  <div onClick="{{ d.open }}" style="display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:9px;cursor:pointer;background:{{ d.rowBg }}">
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:{{ d.numColor }};width:30px">{{ d.label }}</span>
+                    <span style="{{ d.dotStyle }}"></span>
+                    <span style="font-size:13.5px;flex:1;color:{{ d.textColor }}">{{ d.title }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6C7581">{{ d.status }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="position:sticky;top:24px;display:flex;flex-direction:column;gap:14px">
+            <div style="background:linear-gradient(180deg,#12181F,#0E1319);border:1px solid #212934;border-radius:16px;padding:22px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#6C7581;letter-spacing:.08em;margin-bottom:10px">YOUR PROGRESS</div>
+              <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:14px"><span style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:34px;color:#35D399">4</span><span style="font-size:14px;color:#6C7581">/ 14 days</span></div>
+              <div style="height:8px;background:#1C2530;border-radius:100px;overflow:hidden;margin-bottom:6px"><div style="width:29%;height:100%;background:linear-gradient(90deg,#1DBA89,#35D399);border-radius:100px"></div></div>
+              <div style="font-size:12px;color:#6C7581">29% · on Day 37 of the calendar</div>
+            </div>
+            <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:22px">
+              <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;margin-bottom:14px">Ship-it checklist</div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <label style="display:flex;align-items:center;gap:11px;font-size:13px;cursor:pointer"><span style="width:19px;height:19px;border-radius:6px;background:#1DBA89;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#062018" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span><span style="color:#8A93A0;text-decoration:line-through">Ingest + chunk docs</span></label>
+                <label style="display:flex;align-items:center;gap:11px;font-size:13px;cursor:pointer"><span style="width:19px;height:19px;border-radius:6px;background:#1DBA89;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#062018" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span><span style="color:#8A93A0;text-decoration:line-through">Working retrieval loop</span></label>
+                <label style="display:flex;align-items:center;gap:11px;font-size:13px;cursor:pointer"><span style="width:19px;height:19px;border-radius:6px;border:1.5px solid #2A323D"></span><span>Eval harness (today)</span></label>
+                <label style="display:flex;align-items:center;gap:11px;font-size:13px;cursor:pointer"><span style="width:19px;height:19px;border-radius:6px;border:1.5px solid #2A323D"></span><span>Deploy + demo link</span></label>
+              </div>
+              <button onClick="{{ goDay }}" style="width:100%;margin-top:18px;background:#161C24;border:1px solid #262E39;color:#ECE6DA;font-family:inherit;font-weight:500;font-size:13.5px;padding:12px;border-radius:11px;cursor:pointer">Go to today's task</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- LEADERBOARD -->
+      <sc-if value="{{ isLeaderboard }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:22px">
+          <div style="font-size:14px;color:#8A93A0">Ranked by consistency — never speed</div>
+          <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;letter-spacing:-.02em">Leaderboard &amp; community</h1>
+        </div>
+        <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:22px;align-items:start">
+          <div style="background:#12181F;border:1px solid #212934;border-radius:18px;padding:22px">
+            <div style="display:flex;gap:6px;margin-bottom:18px">
+              <button onClick="{{ noop }}" style="font-family:inherit;font-size:12px;padding:7px 14px;border-radius:100px;cursor:pointer;border:1px solid rgba(53,211,153,.4);background:rgba(53,211,153,.1);color:#35D399">This week</button>
+              <button onClick="{{ noop }}" style="font-family:inherit;font-size:12px;padding:7px 14px;border-radius:100px;cursor:pointer;border:1px solid #232B35;background:transparent;color:#8A93A0">All time</button>
+              <button onClick="{{ noop }}" style="font-family:inherit;font-size:12px;padding:7px 14px;border-radius:100px;cursor:pointer;border:1px solid #232B35;background:transparent;color:#8A93A0">🇵🇰 My country</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <sc-for list="{{ leaders }}" as="u" hint-placeholder-count="8">
+                <div style="{{ u.rowStyle }}">
+                  <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;color:{{ u.rankColor }};width:26px">{{ u.rank }}</span>
+                  <div style="width:34px;height:34px;border-radius:50%;background:{{ u.avatar }};display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;color:#fff;flex-shrink:0">{{ u.initials }}</div>
+                  <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.name }}</div><div style="font-size:11.5px;color:#6C7581;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.country }} · Day {{ u.day }}</div></div>
+                  <div style="text-align:right;flex-shrink:0"><div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#F5B54B;white-space:nowrap">🔥 {{ u.streak }}</div><div style="font-size:11px;color:#6C7581;white-space:nowrap">{{ u.total }} days</div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#12181F;border:1px solid #212934;border-radius:18px;padding:22px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px">Weekly showcase wall</div><span style="font-size:11.5px;color:#6C7581">opt-in</span></div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ showcase }}" as="c" hint-placeholder-count="4">
+                <div style="background:#0F141A;border:1px solid #1E262F;border-radius:12px;overflow:hidden">
+                  <div style="height:96px;background:{{ c.thumb }};display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(255,255,255,.55)">{{ c.tag }}</div>
+                  <div style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+                    <div style="width:26px;height:26px;border-radius:50%;background:{{ c.avatar }};flex-shrink:0"></div>
+                    <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.title }}</div><div style="font-size:11px;color:#6C7581">{{ c.who }}</div></div>
+                    <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:#8A93A0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F5B54B" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.5 1-1a5.5 5.5 0 0 0 0-7.9z"></path></svg>{{ c.likes }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- PROFILE -->
+      <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:flex-start;gap:20px;margin-bottom:26px">
+          <div style="width:80px;height:80px;border-radius:22px;background:linear-gradient(150deg,#7C6CF5,#5B4BD6);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;color:#fff;flex-shrink:0">SK</div>
+          <div style="flex:1;padding-top:4px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px"><h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:24px;letter-spacing:-.02em">Saad Khan</h1><span style="font-size:11px;color:#6C7581;border:1px solid #232B35;border-radius:6px;padding:2px 8px">Public profile</span></div>
+            <div style="font-size:13.5px;color:#8A93A0;margin-bottom:12px">Joined Dec 2, 2025 · Karachi, Pakistan</div>
+            <a href="#" onClick="{{ noop }}" style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#9AA3AF"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.6 2 12.3c0 4.5 2.9 8.3 6.8 9.7.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.4-3.4-1.4-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.3-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .3.3.7 1 .7 2v3c0 .3.2.6.7.5A10.3 10.3 0 0 0 22 12.3C22 6.6 17.5 2 12 2z"></path></svg>github.com/saadk</a>
+          </div>
+          <button onClick="{{ goShare }}" style="background:#161C24;border:1px solid #262E39;color:#ECE6DA;font-family:inherit;font-weight:500;font-size:13.5px;padding:11px 16px;border-radius:11px;cursor:pointer;display:flex;align-items:center;gap:8px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"></path></svg>Share card</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
+          <div style="background:#12181F;border:1px solid #212934;border-radius:14px;padding:20px"><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:30px;color:#F5B54B">12</div><div style="font-size:12.5px;color:#6C7581;margin-top:4px">🔥 current streak</div></div>
+          <div style="background:#12181F;border:1px solid #212934;border-radius:14px;padding:20px"><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:30px;color:#35D399">36</div><div style="font-size:12.5px;color:#6C7581;margin-top:4px">days done</div></div>
+          <div style="background:#12181F;border:1px solid #212934;border-radius:14px;padding:20px"><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:30px;color:#ECE6DA">2</div><div style="font-size:12.5px;color:#6C7581;margin-top:4px">projects shipped</div></div>
+          <div style="background:#12181F;border:1px solid #212934;border-radius:14px;padding:20px"><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:30px;color:#ECE6DA">41</div><div style="font-size:12.5px;color:#6C7581;margin-top:4px">longest streak</div></div>
+        </div>
+        <div style="background:#12181F;border:1px solid #212934;border-radius:18px;padding:24px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px"><div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px">Journey map</div><button onClick="{{ goJourney }}" style="background:none;border:none;color:#35D399;font-family:inherit;font-size:12.5px;cursor:pointer">Open full →</button></div>
+          <div style="display:grid;grid-template-columns:repeat(20,1fr);gap:5px">
+            <sc-for list="{{ days }}" as="d" hint-placeholder-count="100">
+              <div title="{{ d.tip }}" style="{{ d.miniStyle }}"></div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- SETTINGS -->
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:22px">
+          <div style="font-size:14px;color:#8A93A0">Your track, your rules</div>
+          <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;letter-spacing:-.02em">Settings</h1>
+        </div>
+        <div style="max-width:640px;display:flex;flex-direction:column;gap:14px">
+          <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:22px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14.5px;font-weight:600;margin-bottom:3px">Daily reminder</div><div style="font-size:13px;color:#8A93A0">A gentle nudge to check in — never a guilt trip.</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;background:#0F141A;border:1px solid #262E39;border-radius:9px;padding:8px 14px">08:30 PM</div></div>
+          </div>
+          <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:22px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14.5px;font-weight:600;margin-bottom:3px">Public profile</div><div style="font-size:13px;color:#8A93A0">Show your streak and shipped projects on the leaderboard.</div></div><span style="width:44px;height:26px;border-radius:100px;background:rgba(53,211,153,.5);position:relative;flex-shrink:0"><span style="position:absolute;top:3px;left:21px;width:20px;height:20px;border-radius:50%;background:#ECE6DA"></span></span></div>
+          </div>
+          <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:22px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14.5px;font-weight:600;margin-bottom:3px">Private notes</div><div style="font-size:13px;color:#8A93A0">Your journal entries stay yours by default.</div></div><span style="width:44px;height:26px;border-radius:100px;background:rgba(53,211,153,.5);position:relative;flex-shrink:0"><span style="position:absolute;top:3px;left:21px;width:20px;height:20px;border-radius:50%;background:#ECE6DA"></span></span></div>
+          </div>
+          <div style="background:#12181F;border:1px solid #212934;border-radius:16px;padding:22px">
+            <div style="font-size:14.5px;font-weight:600;margin-bottom:12px">Account</div>
+            <div style="display:flex;gap:10px"><button onClick="{{ noop }}" style="background:#161C24;border:1px solid #262E39;color:#ECE6DA;font-family:inherit;font-size:13px;padding:10px 16px;border-radius:10px;cursor:pointer">Edit profile</button><button onClick="{{ goLanding }}" style="background:#161C24;border:1px solid #262E39;color:#8A93A0;font-family:inherit;font-size:13px;padding:10px 16px;border-radius:10px;cursor:pointer">Log out</button></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- 100-DAY COMPLETION -->
+      <sc-if value="{{ isComplete }}" hint-placeholder-val="{{ false }}">
+        <div style="max-width:720px;margin:10px auto;animation:fadeUp .4s ease">
+          <div style="background:linear-gradient(180deg,#12181F,#0E1319);border:1px solid rgba(53,211,153,.28);border-radius:24px;padding:44px;text-align:center;position:relative;overflow:hidden">
+            <div style="position:absolute;inset:0;background:radial-gradient(500px 240px at 50% -10%,rgba(53,211,153,.12),transparent 70%)"></div>
+            <div style="position:relative">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#35D399;letter-spacing:.14em;margin-bottom:20px">CHALLENGE COMPLETE</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:100px;line-height:.85;letter-spacing:-.04em;color:#35D399;margin-bottom:6px">100</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:16px;color:#6C7581;margin-bottom:26px">/ 100 days · done</div>
+              <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;letter-spacing:-.02em;margin-bottom:12px">You finished the 100 days.</h1>
+              <p style="font-size:15.5px;color:#9AA3AF;max-width:440px;margin:0 auto 28px">Saad Khan · Dec 2025 – Mar 2026. Eight projects shipped, a capstone built, and a habit that's now yours. This is the hard part most people never reach.</p>
+              <div style="display:flex;justify-content:center;gap:34px;margin-bottom:32px">
+                <div><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:26px;color:#ECE6DA">9</div><div style="font-size:12px;color:#6C7581">projects</div></div>
+                <div><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:26px;color:#F5B54B">🔥 58</div><div style="font-size:12px;color:#6C7581">best streak</div></div>
+                <div><div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:26px;color:#ECE6DA">112</div><div style="font-size:12px;color:#6C7581">days elapsed</div></div>
+              </div>
+              <div style="display:flex;justify-content:center;gap:12px">
+                <button onClick="{{ goShare }}" style="background:linear-gradient(150deg,#35D399,#1DBA89);border:none;color:#062018;font-family:inherit;font-weight:600;font-size:14.5px;padding:13px 24px;border-radius:12px;cursor:pointer">Get your share card</button>
+                <button onClick="{{ goProfile }}" style="background:#161C24;border:1px solid #262E39;color:#ECE6DA;font-family:inherit;font-weight:500;font-size:14.5px;padding:13px 22px;border-radius:12px;cursor:pointer">View profile</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!--APPSCREENS-->
+
+    </main>
+  </div>
+  </sc-if>
+
+  <!-- toast -->
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:50;background:#12181F;border:1px solid rgba(53,211,153,.4);border-radius:14px;padding:14px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 20px 40px -16px rgba(0,0,0,.7);animation:toastIn .3s ease">
+      <span style="width:28px;height:28px;border-radius:50%;background:#1DBA89;display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#062018" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span>
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px">Shabash! Day 37 logged.</div>
+        <div style="font-size:12.5px;color:#8A93A0">Streak → 13 🔥 · see you tomorrow</div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:720},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;landing&quot;,&quot;options&quot;:[&quot;landing&quot;,&quot;onboarding&quot;,&quot;dashboard&quot;,&quot;journey&quot;,&quot;day&quot;,&quot;projects&quot;,&quot;projectDetail&quot;,&quot;leaderboard&quot;,&quot;profile&quot;,&quot;settings&quot;,&quot;share&quot;,&quot;complete&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Prototype&quot;},&quot;showStateTabs&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Prototype&quot;}}">
+class Component extends DCLogic {
+  state = { screen: null, dashState: 'today', toast: false, showCohort: false };
+
+  icon(name){
+    const s='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+    const p={
+      today:'<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>',
+      journey:'<rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect>',
+      projects:'<path d="M3 7h18M3 12h18M3 17h18"></path>',
+      leaderboard:'<path d="M6 20V10M12 20V4M18 20v-6"></path>',
+      profile:'<circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path>',
+      settings:'<circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path>'
+    };
+    return { __html: s + (p[name]||'') + '</svg>' };
+  }
+
+  buildDays(current){
+    const arr=[];
+    for(let n=1;n<=100;n++){
+      const rest = n%7===0;
+      let st = n<current ? 'done' : (n===current ? 'current' : 'locked');
+      const restDone = rest && st==='done';
+      // big-cell (preview/journey) style
+      let bg, border='1px solid transparent', extra='';
+      if(st==='done') bg = rest ? '#164034' : '#2AB98A';
+      else if(st==='current'){ bg='rgba(245,181,75,.16)'; border='1.5px solid #F5B54B'; extra=';animation:pulseRing 2s infinite'; }
+      else bg = rest ? 'transparent' : '#1C2530';
+      let cellBorder = border;
+      if(rest && st!=='current') cellBorder='1px dashed #3A4552';
+      const cellStyle = 'aspect-ratio:1;border-radius:5px;background:'+bg+';border:'+cellBorder+extra+';cursor:pointer';
+      // mini-cell (dashboard) style
+      const miniStyle = 'aspect-ratio:1;border-radius:4px;background:'+bg+';border:'+cellBorder+extra+';cursor:pointer';
+      // journey (large, numbered) style
+      const journeyStyle = 'aspect-ratio:1;border-radius:9px;display:flex;align-items:center;justify-content:center;background:'+bg+';border:'+cellBorder+extra+';cursor:pointer';
+      let numColor;
+      if(st==='done') numColor = rest ? '#5FC7A4' : '#08281E';
+      else if(st==='current') numColor = '#F5B54B';
+      else numColor = '#4A5460';
+      const numStyle = 'color:'+numColor+(st==='done'&&!rest?';font-weight:700':'');
+      // share-card cell
+      let sbg;
+      if(st==='done') sbg = rest ? 'rgba(53,211,153,.28)' : '#35D399';
+      else if(st==='current') sbg = '#F5B54B';
+      else sbg = 'rgba(255,255,255,.07)';
+      const shareStyle = 'aspect-ratio:1;border-radius:2px;background:'+sbg;
+      const tip = 'Day '+n+(rest?' · Rest day':'')+' · '+st;
+      arr.push({ n, rest, state:st, restDone, cellStyle, miniStyle, journeyStyle, numStyle, shareStyle, tip, label:('00'+n).slice(-3),
+        open: ()=>this.setState({ screen:'day', selectedDay:n }) });
+    }
+    return arr;
+  }
+
+  navItems(screen){
+    const items=[
+      {key:'dashboard',label:'Today',icon:'today',go:()=>this.setState({screen:'dashboard'})},
+      {key:'journey',label:'Journey map',icon:'journey',go:()=>this.setState({screen:'journey'})},
+      {key:'projects',label:'Projects',icon:'projects',go:()=>this.setState({screen:'projects'})},
+      {key:'leaderboard',label:'Leaderboard',icon:'leaderboard',go:()=>this.setState({screen:'leaderboard'})},
+      {key:'profile',label:'Profile',icon:'profile',go:()=>this.setState({screen:'profile'})},
+      {key:'settings',label:'Settings',icon:'settings',go:()=>this.setState({screen:'settings'})}
+    ];
+    const map={projectDetail:'projects',day:'journey',complete:'profile'};
+    const active = map[screen]||screen;
+    return items.map(it=>{
+      const on = it.key===active;
+      const style='display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:500;'+
+        (on?'background:rgba(53,211,153,.1);color:#35D399;':'background:none;color:#9AA3AF;');
+      return { ...it, style, icon:this.icon(it.icon) };
+    });
+  }
+
+  dashStateTabs(){
+    const tabs=[
+      {key:'today',label:'Today'},
+      {key:'catchup',label:'Behind / catch-up'},
+      {key:'rest',label:'Rest day'},
+      {key:'paused',label:'Streak paused'}
+    ];
+    return tabs.map(t=>{
+      const on=t.key===this.state.dashState;
+      const style='font-family:inherit;font-size:12px;padding:7px 13px;border-radius:100px;cursor:pointer;border:1px solid '+(on?'rgba(53,211,153,.4)':'#232B35')+';background:'+(on?'rgba(53,211,153,.1)':'transparent')+';color:'+(on?'#35D399':'#8A93A0');
+      return { ...t, style, go:()=>this.setState({dashState:t.key}) };
+    });
+  }
+
+  projectList(){
+    return [
+      {tag:'P1',name:'Prompt playground',blurb:'Structured prompting + a reusable template lib.',days:'Days 1–12'},
+      {tag:'P2',name:'RAG bot + eval',blurb:'Retrieval over your docs, measured properly.',days:'Days 13–26'},
+      {tag:'P3',name:'Agent with tools',blurb:'A loop that plans, calls tools, and self-checks.',days:'Days 27–38'},
+      {tag:'P4',name:'Fine-tune a small model',blurb:'LoRA on a focused task, evaluated honestly.',days:'Days 39–50'},
+      {tag:'P5',name:'Multimodal app',blurb:'Vision + text in one working product.',days:'Days 51–62'},
+      {tag:'P6',name:'Structured extraction',blurb:'Messy input → clean, typed JSON at scale.',days:'Days 63–74'},
+      {tag:'P7',name:'Realtime voice',blurb:'Streaming speech in, speech out, low latency.',days:'Days 75–86'},
+      {tag:'P8',name:'Ship to production',blurb:'Deploy, monitor, and cost-control an AI app.',days:'Days 87–100'}
+    ];
+  }
+
+  projectCards(){
+    const raw=[
+      {tag:'P1',name:'Prompt playground',blurb:'Structured prompting + a reusable template lib.',days:'Days 1–12',done:12,total:12,st:'shipped'},
+      {tag:'P2',name:'RAG bot + eval',blurb:'Retrieval over your docs, measured properly.',days:'Days 13–26',done:4,total:14,st:'progress'},
+      {tag:'P3',name:'Agent with tools',blurb:'A loop that plans, calls tools, and self-checks.',days:'Days 27–38',done:0,total:12,st:'locked'},
+      {tag:'P4',name:'Fine-tune a small model',blurb:'LoRA on a focused task, evaluated honestly.',days:'Days 39–50',done:0,total:12,st:'locked'},
+      {tag:'P5',name:'Multimodal app',blurb:'Vision + text in one working product.',days:'Days 51–62',done:0,total:12,st:'locked'},
+      {tag:'P6',name:'Structured extraction',blurb:'Messy input to clean, typed JSON at scale.',days:'Days 63–74',done:0,total:12,st:'locked'},
+      {tag:'P7',name:'Realtime voice',blurb:'Streaming speech in, speech out, low latency.',days:'Days 75–86',done:0,total:12,st:'locked'},
+      {tag:'P8',name:'Ship to production',blurb:'Deploy, monitor, and cost-control an AI app.',days:'Days 87–98',done:0,total:12,st:'locked'},
+      {tag:'C',name:'Capstone project',blurb:'Combine it all into one flagship build to show off.',days:'Days 99–100',done:0,total:2,st:'locked'}
+    ];
+    return raw.map(p=>{
+      const pct=Math.round(p.done/p.total*100);
+      let tagColor='#35D399', badge, badgeStyle, barColor='#35D399', border='#212934', op='1';
+      const bs='font-family:\'JetBrains Mono\',monospace;font-size:10.5px;padding:3px 9px;border-radius:6px;';
+      if(p.st==='shipped'){ badge='SHIPPED'; badgeStyle=bs+'background:rgba(53,211,153,.12);color:#35D399'; }
+      else if(p.st==='progress'){ tagColor='#F5B54B'; barColor='#F5B54B'; border='rgba(245,181,75,.3)'; badge='IN PROGRESS'; badgeStyle=bs+'background:rgba(245,181,75,.14);color:#F5B54B'; }
+      else { tagColor='#5D6672'; op='.62'; badge='LOCKED'; badgeStyle=bs+'background:#1C2530;color:#6C7581'; }
+      const cardStyle='background:#12181F;border:1px solid '+border+';border-radius:16px;padding:20px;cursor:pointer;opacity:'+op;
+      const barStyle='width:'+pct+'%;height:100%;background:'+barColor+';border-radius:100px';
+      const clickable = p.st!=='locked';
+      return { ...p, tagColor, badge, badgeStyle, cardStyle, barStyle, frac:p.done+'/'+p.total, open:()=>this.setState({screen:clickable?'projectDetail':'projects'}) };
+    });
+  }
+
+  p2days(){
+    const rows=[
+      {n:31,title:'Set up the doc corpus',status:'done'},
+      {n:32,title:'Baseline retrieval',status:'done'},
+      {n:35,title:'Reranking basics',status:'done'},
+      {n:36,title:'Chunking strategies',status:'done'},
+      {n:37,title:'Eval harness',status:'current'},
+      {n:38,title:'Improving retrieval',status:'locked'},
+      {n:39,title:'Ship + demo link',status:'locked'}
+    ];
+    return rows.map(r=>{
+      let numColor='#6C7581', textColor='#ECE6DA', dotBg='#2AB98A', rowBg='transparent', status='done';
+      if(r.status==='current'){ numColor='#F5B54B'; textColor='#F5B54B'; dotBg='#F5B54B'; rowBg='rgba(245,181,75,.08)'; status='today'; }
+      else if(r.status==='locked'){ numColor='#4A5460'; textColor='#6C7581'; dotBg='#1C2530'; status='locked'; }
+      const dotStyle='width:8px;height:8px;border-radius:2px;flex-shrink:0;background:'+dotBg;
+      return { ...r, label:('00'+r.n).slice(-3), numColor, textColor, dotStyle, rowBg, status, open:()=>this.setState({screen:'day',selectedDay:r.n}) };
+    });
+  }
+
+  leaderList(){
+    const raw=[
+      {rank:1,name:'Ayesha Nadeem',country:'🇵🇰 Pakistan',day:44,streak:44,total:44,initials:'AN',avatar:'linear-gradient(150deg,#35D399,#16A97E)'},
+      {rank:2,name:'Rohan Mehta',country:'🇮🇳 India',day:41,streak:41,total:43,initials:'RM',avatar:'linear-gradient(150deg,#F5B54B,#D98A2B)'},
+      {rank:3,name:'Bilal Aslam',country:'🇵🇰 Pakistan',day:40,streak:38,total:40,initials:'BA',avatar:'linear-gradient(150deg,#7C6CF5,#5B4BD6)'},
+      {rank:4,name:'Sana Iqbal',country:'🇵🇰 Pakistan',day:39,streak:33,total:39,initials:'SI',avatar:'linear-gradient(150deg,#EC6A9C,#C13E77)'},
+      {rank:5,name:'Aditya Rao',country:'🇮🇳 India',day:38,streak:30,total:38,initials:'AR',avatar:'linear-gradient(150deg,#4AA8FF,#2B7FD6)'},
+      {rank:12,name:'Saad Khan (you)',country:'🇵🇰 Pakistan',day:37,streak:12,total:36,initials:'SK',avatar:'linear-gradient(150deg,#7C6CF5,#5B4BD6)',me:true},
+      {rank:13,name:'Hamza Tariq',country:'🇵🇰 Pakistan',day:35,streak:12,total:34,initials:'HT',avatar:'linear-gradient(150deg,#35D399,#1DBA89)'}
+    ];
+    return raw.map(u=>{
+      const base='display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;';
+      const rowStyle = u.me ? base+'background:rgba(53,211,153,.08);border:1px solid rgba(53,211,153,.28)' : base+'background:transparent;border:1px solid transparent';
+      const rankColor = u.rank===1?'#F5B54B':(u.rank<=3?'#ECE6DA':'#6C7581');
+      return { ...u, rowStyle, rankColor };
+    });
+  }
+
+  showcaseList(){
+    return [
+      {tag:'P2 · RAG',title:'RAG over 400 legal PDFs',who:'Ayesha · Day 34',likes:128,thumb:'linear-gradient(135deg,#1DBA89,#0E5C46)',avatar:'linear-gradient(150deg,#35D399,#16A97E)'},
+      {tag:'P2 · EVAL',title:'Eval harness caught a 30% regression',who:'Bilal · Day 33',likes:94,thumb:'linear-gradient(135deg,#7C6CF5,#3A2E9E)',avatar:'linear-gradient(150deg,#7C6CF5,#5B4BD6)'},
+      {tag:'P1 · PROMPT',title:'Prompt template library, open-sourced',who:'Sana · Day 30',likes:76,thumb:'linear-gradient(135deg,#F5B54B,#B06F1E)',avatar:'linear-gradient(150deg,#EC6A9C,#C13E77)'},
+      {tag:'P2 · RAG',title:'Voice-note RAG for Urdu lectures',who:'Rohan · Day 32',likes:61,thumb:'linear-gradient(135deg,#4AA8FF,#1E5C99)',avatar:'linear-gradient(150deg,#4AA8FF,#2B7FD6)'}
+    ];
+  }
+
+  renderVals(){
+    const s=this.state.screen || this.props.startScreen || 'landing';
+    const appScreens=['dashboard','journey','day','projects','projectDetail','leaderboard','profile','settings','complete'];
+    const current=37;
+    return {
+      screen:s,
+      isLanding:s==='landing',
+      isOnboarding:s==='onboarding',
+      isApp:appScreens.includes(s),
+      isDashboard:s==='dashboard',
+      isJourney:s==='journey',
+      isDay:s==='day',
+      isProjects:s==='projects',
+      isProjectDetail:s==='projectDetail',
+      isLeaderboard:s==='leaderboard',
+      isProfile:s==='profile',
+      isSettings:s==='settings',
+      isShare:s==='share',
+      isComplete:s==='complete',
+      isToday:this.state.dashState==='today',
+      isCatchup:this.state.dashState==='catchup',
+      isRest:this.state.dashState==='rest',
+      isPaused:this.state.dashState==='paused',
+      days:this.buildDays(current),
+      nav:this.navItems(s),
+      dashTabs:this.dashStateTabs(),
+      projects:this.projectList(),
+      projectCards:this.projectCards(),
+      p2days:this.p2days(),
+      leaders:this.leaderList(),
+      showcase:this.showcaseList(),
+      toast:this.state.toast,
+      showStateTabs:this.props.showStateTabs !== false,
+      showCohort:this.state.showCohort,
+      cohortTrack:this.state.showCohort?'rgba(245,181,75,.5)':'#232B35',
+      cohortKnob:this.state.showCohort?'16px':'2px',
+      toggleCohort:()=>this.setState(s=>({showCohort:!s.showCohort})),
+      selectedDay:this.state.selectedDay||current,
+      noop:(e)=>{ if(e&&e.preventDefault) e.preventDefault(); },
+      goLanding:()=>this.setState({screen:'landing'}),
+      goOnboarding:()=>this.setState({screen:'onboarding'}),
+      goDashboard:()=>this.setState({screen:'dashboard'}),
+      goJourney:()=>this.setState({screen:'journey'}),
+      goDay:()=>this.setState({screen:'day'}),
+      goProjects:()=>this.setState({screen:'projects'}),
+      goProjectDetail:()=>this.setState({screen:'projectDetail'}),
+      goLeaderboard:()=>this.setState({screen:'leaderboard'}),
+      goProfile:()=>this.setState({screen:'profile'}),
+      goSettings:()=>this.setState({screen:'settings'}),
+      goShare:()=>this.setState({screen:'share'}),
+      goComplete:()=>this.setState({screen:'complete'}),
+      checkIn:()=>{ this.setState({toast:true}); clearTimeout(this._t); this._t=setTimeout(()=>this.setState({toast:false}),3200); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+@import "tailwindcss";
+
+/* ── Design tokens (design_handoff_100_days_ai) ─────────────────────────── */
+:root {
+  --bg: #0d1117;
+  --panel: #0f141a;
+  --card: #12181f;
+  --card2: #161c24;
+  --inset: #0c1116;
+  --edge: #212934;
+  --edge2: #262e39;
+  --edge3: #1e262f;
+  --divider: #1b222b;
+  --ink: #ece6da;
+  --ink2: #c6cdd6;
+  --mut: #9aa3af;
+  --mut2: #8a93a0;
+  --mut3: #6c7581;
+  --dim: #4a5460;
+  --dim2: #5d6672;
+  --accent: #35d399;
+  --accent2: #5be3b0;
+  --accent-deep: #1dba89;
+  --done: #2ab98a;
+  --rest-done: #164034;
+  --today: #f5b54b;
+  --locked: #1c2530;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-card: var(--card);
+  --color-card2: var(--card2);
+  --color-inset: var(--inset);
+  --color-edge: var(--edge);
+  --color-edge2: var(--edge2);
+  --color-edge3: var(--edge3);
+  --color-divider: var(--divider);
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink2);
+  --color-mut: var(--mut);
+  --color-mut2: var(--mut2);
+  --color-mut3: var(--mut3);
+  --color-dim: var(--dim);
+  --color-dim2: var(--dim2);
+  --color-accent: var(--accent);
+  --color-accent2: var(--accent2);
+  --color-accent-deep: var(--accent-deep);
+  --color-done: var(--done);
+  --color-rest-done: var(--rest-done);
+  --color-today: var(--today);
+  --color-locked: var(--locked);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-grotesk);
+  --font-mono: var(--font-jbmono);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: radial-gradient(
+      1200px 600px at 78% -8%,
+      rgba(53, 211, 153, 0.06),
+      transparent 60%
+    ),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent);
+}
+a:hover {
+  color: var(--accent2);
+}
+
+::selection {
+  background: rgba(53, 211, 153, 0.28);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--edge2);
+  border-radius: 20px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ── Motion ─────────────────────────────────────────────────────────────── */
+@keyframes pulseRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 181, 75, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(245, 181, 75, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 181, 75, 0);
+  }
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes flick {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.72;
+  }
+}
+.anim-pulse-ring {
+  animation: pulseRing 2s infinite;
+}
+.anim-fade-up {
+  animation: fadeUp 0.3s ease;
+}
+.anim-fade-up-slow {
+  animation: fadeUp 0.4s ease;
+}
+.anim-toast-in {
+  animation: toastIn 0.3s ease;
+}
+.anim-flick {
+  animation: flick 1.1s infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+  }
+}
+
+/* ── Shared component styles ────────────────────────────────────────────── */
+@layer components {
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(150deg, #35d399, #1dba89);
+    border: none;
+    color: #062018;
+    font-family: inherit;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+  }
+  .btn-primary:hover {
+    filter: brightness(1.06);
+  }
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--card2);
+    border: 1px solid var(--edge2);
+    color: var(--ink);
+    font-family: inherit;
+    font-weight: 500;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+  }
+  .btn-ghost:hover {
+    border-color: #34404f;
+  }
+  .card-std {
+    background: var(--card);
+    border: 1px solid var(--edge);
+    border-radius: 16px;
+  }
+  .card-grad {
+    background: linear-gradient(180deg, #12181f, #0e1319);
+    border: 1px solid var(--edge);
+    border-radius: 20px;
+  }
+  .tag-mono {
+    font-family: var(--font-mono), monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+}
