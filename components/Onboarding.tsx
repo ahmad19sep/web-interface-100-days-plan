@@ -1,29 +1,26 @@
 "use client";
 
-// /start — the door to every track on this device.
+// /start — the door to every account.
 //
-//  new person   → name + personal code → 3 setup steps → Day 1
-//  returning    → pick your name → enter your code → your dashboard
+//  new person   → pick a username + personal code → 3 setup steps → Day 1
+//  returning    → username + code → your dashboard
 //  mid-setup    → straight back to the setup steps
 //
-// Tracks are code-locked per person (lib/profiles.ts); the code is asked at
-// every login — sessions last one browser session, and Settings can lock the
-// track any time.
+// Accounts live in the shared database (lib/session-client.ts calls
+// app/api/auth/*), not the browser — sign in from any device with the same
+// username + code.
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { COHORT_START_DATE } from "@/lib/plan";
 import {
-  createProfile,
-  legacyName,
-  legacyTrackExists,
-  login,
+  HANDLE_RE,
   MIN_CODE_LENGTH,
+  login,
+  signup,
   useProfiles,
-  type Profile,
 } from "@/lib/profiles";
-import { initialsOf } from "@/lib/demo";
 import {
   completeOnboarding,
   expectedDay,
@@ -32,18 +29,6 @@ import {
   type Visibility,
 } from "@/lib/store";
 import { Logo } from "./icons";
-
-const AVATARS = [
-  "linear-gradient(150deg,#7C6CF5,#5B4BD6)",
-  "linear-gradient(150deg,#35D399,#16A97E)",
-  "linear-gradient(150deg,#F5B54B,#D98A2B)",
-  "linear-gradient(150deg,#EC6A9C,#C13E77)",
-  "linear-gradient(150deg,#4AA8FF,#2B7FD6)",
-];
-
-function avatarFor(index: number): string {
-  return AVATARS[index % AVATARS.length];
-}
 
 function OptionCard({
   selected,
@@ -103,26 +88,19 @@ function Pill({
 const inputClass =
   "w-full rounded-xl border border-edge3 bg-panel px-4 py-3 text-sm text-ink placeholder:text-dim focus:border-[rgba(53,211,153,.5)] focus:outline-none";
 
-type Phase = "boot" | "who" | "code" | "create" | "setup";
+type Phase = "boot" | "entry" | "login" | "signup" | "setup";
 
 export default function Onboarding() {
   const router = useRouter();
-  const { ready, list, activeId } = useProfiles();
+  const { ready, activeId } = useProfiles();
   const { onboarded } = useProgress();
 
-  // Sub-navigation inside the logged-out flow; null = default screen.
-  // Everything else about the phase is derived from the stores at render.
-  const [subPhase, setSubPhase] = useState<"who" | "code" | "create" | null>(
-    null
-  );
-  const [selected, setSelected] = useState<Profile | null>(null);
+  const [subPhase, setSubPhase] = useState<"login" | "signup" | null>(null);
 
-  // create form (name prefills from a pre-profiles track, if one exists)
-  const [name, setName] = useState<string>(() => legacyName());
-  const [newCode, setNewCode] = useState("");
-  const [confirmCode, setConfirmCode] = useState("");
-  // login form
+  const [handle, setHandle] = useState("");
+  const [name, setName] = useState("");
   const [code, setCode] = useState("");
+  const [confirmCode, setConfirmCode] = useState("");
 
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -133,11 +111,7 @@ export default function Onboarding() {
       ? onboarded
         ? "boot" // logged in and done — redirecting to /today below
         : "setup"
-      : subPhase === "code" && !selected
-        ? "who"
-        : (subPhase ?? (list.length > 0 ? "who" : "create"));
-
-  const claiming = phase === "create" && legacyTrackExists();
+      : (subPhase ?? "entry");
 
   useEffect(() => {
     if (ready && activeId && onboarded) router.replace("/today");
@@ -145,65 +119,67 @@ export default function Onboarding() {
 
   // ── actions ───────────────────────────────────────────────────────────────
 
-  async function submitCreate() {
-    const trimmed = name.trim();
-    if (!trimmed) {
+  async function submitSignup() {
+    const cleanHandle = handle.trim().toLowerCase();
+    if (!HANDLE_RE.test(cleanHandle)) {
+      setError("Username must be 3-24 characters: letters, numbers, - or _.");
+      return;
+    }
+    if (!name.trim()) {
       setError("Add a name so we know whose track this is.");
       return;
     }
-    if (newCode.length < MIN_CODE_LENGTH) {
+    if (code.length < MIN_CODE_LENGTH) {
       setError(`Your code needs at least ${MIN_CODE_LENGTH} characters.`);
       return;
     }
-    if (newCode !== confirmCode) {
+    if (code !== confirmCode) {
       setError("The two codes don't match — type them again.");
       return;
     }
     setError("");
     setBusy(true);
-    await createProfile(trimmed, newCode);
-    setBusy(false);
-    // activeId flips → the derived phase becomes "setup"
+    try {
+      await signup(cleanHandle, name.trim(), code);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't create your track.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function submitLogin() {
-    if (!selected) return;
+    if (!handle.trim() || !code) return;
+    setError("");
     setBusy(true);
-    const ok = await login(selected.id, code);
-    setBusy(false);
-    if (!ok) {
-      setError("That code didn't match — try again.");
+    try {
+      await login(handle.trim().toLowerCase(), code);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't log in.");
       setCode("");
-      return;
+    } finally {
+      setBusy(false);
     }
-    setError("");
-    // activeId flips → setup steps, or the redirect effect sends us to /today
   }
 
-  function pickProfile(p: Profile) {
-    setSelected(p);
-    setCode("");
-    setError("");
-    setSubPhase("code");
-  }
-
-  function startNew() {
+  function goTo(next: "login" | "signup") {
+    setHandle("");
     setName("");
-    setNewCode("");
+    setCode("");
     setConfirmCode("");
     setError("");
-    setSubPhase("create");
+    setSubPhase(next);
   }
 
   // ── header + shell ────────────────────────────────────────────────────────
 
   const heading =
-    phase === "who"
-      ? "Who's checking in?"
-      : phase === "code"
-        ? "Welcome back"
-        : phase === "create"
-          ? "Create your track"
+    phase === "login"
+      ? "Welcome back"
+      : phase === "signup"
+        ? "Create your track"
+        : phase === "entry"
+          ? "Join the challenge"
           : "Set up your track";
 
   return (
@@ -236,73 +212,40 @@ export default function Onboarding() {
           </div>
         )}
 
-        {/* ── WHO — pick your track ── */}
-        {phase === "who" && (
+        {/* ── ENTRY ── */}
+        {phase === "entry" && (
           <div className="anim-fade-up card-std rounded-[20px] p-6 sm:p-[30px]">
             <div className="mb-1 font-display text-base font-semibold">
-              Pick your track
+              Your track, everywhere
             </div>
-            <div className="mb-4 text-[13px] text-mut2">
-              Everyone on this device has their own code-locked track.
+            <div className="mb-5 text-[13px] text-mut2">
+              One username + code opens your streak, check-ins and notes on
+              any phone or laptop.
             </div>
-            <div className="mb-4 flex flex-col gap-2">
-              {list.map((p, i) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => pickProfile(p)}
-                  className="flex cursor-pointer items-center gap-3 rounded-xl border border-edge3 bg-panel p-3 text-left transition-colors hover:border-[rgba(53,211,153,.4)]"
-                >
-                  <span
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold text-white"
-                    style={{ background: avatarFor(i) }}
-                  >
-                    {initialsOf(p.name)}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold text-ink">
-                      {p.name}
-                    </span>
-                    <span className="block font-mono text-[11px] text-mut3">
-                      joined {p.created}
-                    </span>
-                  </span>
-                  <span className="text-[13px] text-mut3">🔒</span>
-                </button>
-              ))}
+            <div className="flex flex-col gap-2.5">
+              <button
+                type="button"
+                onClick={() => goTo("signup")}
+                className="btn-primary w-full py-[13px] text-sm"
+              >
+                Create a new track →
+              </button>
+              <button
+                type="button"
+                onClick={() => goTo("login")}
+                className="btn-ghost w-full py-[13px] text-sm"
+              >
+                I already have a track — log in
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={startNew}
-              className="btn-ghost w-full py-3 text-[13.5px]"
-            >
-              + Start a new track
-            </button>
           </div>
         )}
 
-        {/* ── CODE — unlock a track ── */}
-        {phase === "code" && selected && (
+        {/* ── LOGIN ── */}
+        {phase === "login" && (
           <div className="anim-fade-up card-std rounded-[20px] p-6 sm:p-[30px]">
-            <div className="mb-4 flex items-center gap-3">
-              <span
-                className="flex h-10 w-10 items-center justify-center rounded-full font-display text-sm font-bold text-white"
-                style={{
-                  background: avatarFor(
-                    Math.max(0, list.findIndex((p) => p.id === selected.id))
-                  ),
-                }}
-              >
-                {initialsOf(selected.name)}
-              </span>
-              <div>
-                <div className="text-sm font-semibold text-ink">
-                  {selected.name}
-                </div>
-                <div className="text-xs text-mut2">
-                  Enter your code to open your track
-                </div>
-              </div>
+            <div className="mb-4 text-[13px] text-mut2">
+              Enter your username and code to open your track.
             </div>
             <form
               onSubmit={(e) => {
@@ -311,8 +254,20 @@ export default function Onboarding() {
               }}
             >
               <input
-                type="password"
+                type="text"
                 autoFocus
+                value={handle}
+                onChange={(e) => {
+                  setHandle(e.target.value);
+                  setError("");
+                }}
+                placeholder="Username"
+                autoComplete="username"
+                autoCapitalize="none"
+                className={`${inputClass} mb-2.5`}
+              />
+              <input
+                type="password"
                 value={code}
                 onChange={(e) => {
                   setCode(e.target.value);
@@ -327,43 +282,48 @@ export default function Onboarding() {
               )}
               <button
                 type="submit"
-                disabled={busy || code.length === 0}
+                disabled={busy || !handle.trim() || code.length === 0}
                 className="btn-primary w-full py-[13px] text-sm disabled:cursor-default disabled:opacity-60"
               >
                 {busy ? "Checking…" : "Open my track →"}
               </button>
             </form>
-            <div className="mt-3 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => setSubPhase("who")}
-                className="cursor-pointer text-[12.5px] text-mut3 hover:text-ink"
-              >
-                ← Not you? Pick another track
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => goTo("signup")}
+              className="mt-3 cursor-pointer text-[12.5px] text-mut3 hover:text-ink"
+            >
+              New here? Create a track instead
+            </button>
             <p className="mt-4 text-xs leading-[1.6] text-mut3">
-              Codes can&apos;t be recovered — they never leave this device. If
-              it&apos;s truly gone, start a new track and keep building.
+              Codes can&apos;t be recovered — if it&apos;s truly gone, start a
+              new track and keep building.
             </p>
           </div>
         )}
 
-        {/* ── CREATE — name + code ── */}
-        {phase === "create" && (
+        {/* ── SIGNUP ── */}
+        {phase === "signup" && (
           <div className="anim-fade-up card-std rounded-[20px] p-6 sm:p-[30px]">
-            {claiming && (
-              <div className="mb-4 rounded-xl border border-[rgba(53,211,153,.35)] bg-[rgba(53,211,153,.08)] p-3.5 text-[13px] leading-[1.6] text-ink2">
-                This device already has a track in progress. Set a code now to
-                claim it — every check-in and note carries over.
-              </div>
-            )}
             <div className="mb-1 font-display text-base font-semibold">
-              1 · Your name
+              1 · Username &amp; name
             </div>
             <div className="mb-3 text-[13px] text-mut2">
-              Shown on your dashboard and share card.
+              Your username is how you log back in — pick something you&apos;ll
+              remember. Your name is shown on your dashboard and share card.
             </div>
+            <input
+              type="text"
+              value={handle}
+              onChange={(e) => {
+                setHandle(e.target.value);
+                setError("");
+              }}
+              placeholder="Username (e.g. saadkhan)"
+              autoComplete="username"
+              autoCapitalize="none"
+              className={`${inputClass} mb-2.5`}
+            />
             <input
               type="text"
               value={name}
@@ -378,20 +338,20 @@ export default function Onboarding() {
               2 · Set your code
             </div>
             <div className="mb-3 text-[13px] text-mut2">
-              You&apos;ll enter it every time you open your track, so progress
-              and notes stay yours — even on a shared device.
+              You&apos;ll enter this — with your username — to open your track
+              on any device.
             </div>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                void submitCreate();
+                void submitSignup();
               }}
             >
               <input
                 type="password"
-                value={newCode}
+                value={code}
                 onChange={(e) => {
-                  setNewCode(e.target.value);
+                  setCode(e.target.value);
                   setError("");
                 }}
                 placeholder={`Code — at least ${MIN_CODE_LENGTH} characters`}
@@ -417,22 +377,19 @@ export default function Onboarding() {
                 disabled={busy}
                 className="btn-primary w-full py-[13px] text-sm disabled:cursor-default disabled:opacity-60"
               >
-                {busy ? "Creating…" : claiming ? "Claim my track →" : "Continue →"}
+                {busy ? "Creating…" : "Continue →"}
               </button>
             </form>
-            {list.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setSubPhase("who")}
-                className="mt-3 cursor-pointer text-[12.5px] text-mut3 hover:text-ink"
-              >
-                ← Back to all tracks
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => goTo("login")}
+              className="mt-3 cursor-pointer text-[12.5px] text-mut3 hover:text-ink"
+            >
+              ← Already have a track? Log in
+            </button>
             <p className="mt-4 text-xs leading-[1.6] text-mut3">
-              Your code and progress live only in this browser — nothing is
-              uploaded, and a forgotten code can&apos;t be reset. Pick one
-              you&apos;ll remember.
+              Your code can&apos;t be recovered if forgotten — pick one
+              you&apos;ll remember. Nobody else can see it.
             </p>
           </div>
         )}
@@ -446,16 +403,17 @@ export default function Onboarding() {
 
 function SetupSteps() {
   const router = useRouter();
-  const { list, activeId } = useProfiles();
+  const { name } = useProgress();
   const [startToday, setStartToday] = useState(true);
   const [reminder, setReminder] = useState<Reminder>("evening");
   const [visibility, setVisibility] = useState<Visibility>("public");
+  const [busy, setBusy] = useState(false);
 
   const cohortDay = expectedDay(COHORT_START_DATE);
-  const profileName = list.find((p) => p.id === activeId)?.name ?? "";
 
-  function start() {
-    completeOnboarding({ startToday, reminder, visibility, name: profileName });
+  async function start() {
+    setBusy(true);
+    await completeOnboarding({ startToday, reminder, visibility, name });
     router.push("/today");
   }
 
@@ -522,7 +480,7 @@ function SetupSteps() {
           <OptionCard
             selected={visibility === "public"}
             title="Public"
-            sub="Appear on the leaderboard"
+            sub="Appear on the community tab"
             onClick={() => setVisibility("public")}
           />
           <OptionCard
@@ -535,10 +493,11 @@ function SetupSteps() {
       </div>
       <button
         type="button"
-        onClick={start}
-        className="btn-primary w-full py-[15px] text-[15px] !font-bold"
+        onClick={() => void start()}
+        disabled={busy}
+        className="btn-primary w-full py-[15px] text-[15px] !font-bold disabled:cursor-default disabled:opacity-60"
       >
-        Start Day 1 →
+        {busy ? "Starting…" : "Start Day 1 →"}
       </button>
     </div>
   );

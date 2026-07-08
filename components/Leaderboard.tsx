@@ -1,35 +1,61 @@
 "use client";
 
-import { useState } from "react";
-import { DEMO_LEADERS, DEMO_SHOWCASE, initialsOf } from "@/lib/demo";
-import {
-  computeStreak,
-  currentDay,
-  useProgress,
-} from "@/lib/store";
+import { useEffect, useState } from "react";
+import { DEMO_SHOWCASE, initialsOf } from "@/lib/demo";
+import { useProgress } from "@/lib/store";
 import { IconHeart } from "./icons";
 
-const FILTERS = ["This week", "All time", "🇵🇰 My country"];
+const FILTERS = ["This week", "All time"];
+
+const AVATARS = [
+  "linear-gradient(150deg,#7C6CF5,#5B4BD6)",
+  "linear-gradient(150deg,#35D399,#16A97E)",
+  "linear-gradient(150deg,#F5B54B,#D98A2B)",
+  "linear-gradient(150deg,#EC6A9C,#C13E77)",
+  "linear-gradient(150deg,#4AA8FF,#2B7FD6)",
+];
+
+interface Member {
+  handle: string;
+  name: string;
+  day: number;
+  streak: number;
+  totalDays: number;
+}
+
+type CommunityFetch =
+  | { state: "loading" }
+  | { state: "not-configured" }
+  | { state: "error" }
+  | { state: "ready"; members: Member[] };
+
+function useCommunity(): CommunityFetch {
+  const [result, setResult] = useState<CommunityFetch>({ state: "loading" });
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/community")
+      .then((res) => res.json())
+      .then((body: { members?: Member[]; notConfigured?: boolean }) => {
+        if (cancelled) return;
+        if (body.notConfigured) setResult({ state: "not-configured" });
+        else setResult({ state: "ready", members: body.members ?? [] });
+      })
+      .catch(() => {
+        if (!cancelled) setResult({ state: "error" });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return result;
+}
 
 export default function Leaderboard() {
   const state = useProgress();
-  const [filter, setFilter] = useState(0);
-  const streak = computeStreak(state.checkins);
-  const day = Math.min(currentDay(state.checkins), 100);
-  const done = Object.keys(state.checkins).length;
-
-  const rows = DEMO_LEADERS.map((u) =>
-    u.me
-      ? {
-          ...u,
-          name: `${state.name || "You"} (you)`,
-          initials: initialsOf(state.name || "You"),
-          day,
-          streak: streak.streak,
-          total: done,
-        }
-      : u
-  );
+  const [filter, setFilter] = useState(1);
+  const community = useCommunity();
 
   return (
     <div>
@@ -41,7 +67,7 @@ export default function Leaderboard() {
           Leaderboard &amp; community
         </h1>
         <div className="mt-1 font-mono text-[11px] text-mut3">
-          preview cohort · live sync ships with the community backend
+          everyone who&apos;s chosen a public profile shows up here
         </div>
       </div>
 
@@ -64,54 +90,84 @@ export default function Leaderboard() {
               </button>
             ))}
           </div>
-          <div className="flex flex-col gap-0.5">
-            {rows.map((u) => (
-              <div
-                key={u.rank}
-                className={`flex items-center gap-3 rounded-[11px] px-3 py-[11px] ${
-                  u.me
-                    ? "border border-[rgba(53,211,153,.28)] bg-[rgba(53,211,153,.08)]"
-                    : "border border-transparent"
-                }`}
-              >
-                <span
-                  className="w-[26px] font-mono text-sm font-bold"
-                  style={{
-                    color:
-                      u.rank === 1
-                        ? "#F5B54B"
-                        : u.rank <= 3
-                          ? "#ECE6DA"
-                          : "#6C7581",
-                  }}
-                >
-                  {u.rank}
-                </span>
-                <div
-                  className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full font-display text-[13px] font-bold text-white"
-                  style={{ background: u.avatar }}
-                >
-                  {u.initials}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-[13.5px] font-semibold">
-                    {u.name}
+
+          {community.state === "loading" && (
+            <div className="py-8 text-center text-[13px] text-mut3">
+              Loading the community…
+            </div>
+          )}
+
+          {community.state === "not-configured" && (
+            <div className="py-8 text-center text-[13px] leading-[1.6] text-mut3">
+              The community backend isn&apos;t connected yet — this list
+              fills in once it is.
+            </div>
+          )}
+
+          {community.state === "error" && (
+            <div className="py-8 text-center text-[13px] text-mut3">
+              Couldn&apos;t load the community right now — try again shortly.
+            </div>
+          )}
+
+          {community.state === "ready" && community.members.length === 0 && (
+            <div className="py-8 text-center text-[13px] leading-[1.6] text-mut3">
+              No public tracks yet.{" "}
+              {state.visibility === "public"
+                ? "You'll show up here once you've checked in a day."
+                : "Turn on a public profile in Settings to be the first."}
+            </div>
+          )}
+
+          {community.state === "ready" && community.members.length > 0 && (
+            <div className="flex flex-col gap-0.5">
+              {community.members.map((u, i) => {
+                const me = Boolean(state.handle) && u.handle === state.handle;
+                return (
+                  <div
+                    key={u.handle}
+                    className={`flex items-center gap-3 rounded-[11px] px-3 py-[11px] ${
+                      me
+                        ? "border border-[rgba(53,211,153,.28)] bg-[rgba(53,211,153,.08)]"
+                        : "border border-transparent"
+                    }`}
+                  >
+                    <span
+                      className="w-[26px] font-mono text-sm font-bold"
+                      style={{
+                        color:
+                          i === 0 ? "#F5B54B" : i < 3 ? "#ECE6DA" : "#6C7581",
+                      }}
+                    >
+                      {i + 1}
+                    </span>
+                    <div
+                      className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full font-display text-[13px] font-bold text-white"
+                      style={{ background: AVATARS[i % AVATARS.length] }}
+                    >
+                      {initialsOf(u.name)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-[13.5px] font-semibold">
+                        {u.name}
+                      </div>
+                      <div className="truncate text-[11.5px] text-mut3">
+                        @{u.handle} · Day {u.day}
+                      </div>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <div className="whitespace-nowrap font-mono text-sm text-today">
+                        🔥 {u.streak}
+                      </div>
+                      <div className="whitespace-nowrap text-[11px] text-mut3">
+                        {u.totalDays} days
+                      </div>
+                    </div>
                   </div>
-                  <div className="truncate text-[11.5px] text-mut3">
-                    {u.country} · Day {u.day}
-                  </div>
-                </div>
-                <div className="shrink-0 text-right">
-                  <div className="whitespace-nowrap font-mono text-sm text-today">
-                    🔥 {u.streak}
-                  </div>
-                  <div className="whitespace-nowrap text-[11px] text-mut3">
-                    {u.total} days
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* showcase wall */}
@@ -120,7 +176,7 @@ export default function Leaderboard() {
             <div className="font-display text-base font-semibold">
               Weekly showcase wall
             </div>
-            <span className="text-[11.5px] text-mut3">opt-in</span>
+            <span className="text-[11.5px] text-mut3">preview · opt-in</span>
           </div>
           <div className="flex flex-col gap-3">
             {DEMO_SHOWCASE.map((c) => (

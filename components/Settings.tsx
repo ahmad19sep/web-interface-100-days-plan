@@ -147,17 +147,16 @@ export default function Settings() {
             <button
               type="button"
               onClick={() => {
-                logout();
-                router.push("/start");
+                void logout().then(() => router.push("/start"));
               }}
               className="cursor-pointer rounded-[10px] border border-edge2 bg-card2 px-4 py-2.5 text-[13px] text-mut2 hover:text-ink"
             >
-              🔒 Lock track / log out
+              🔒 Log out
             </button>
           </div>
           <p className="mt-2.5 text-xs text-mut3">
-            Locking keeps every check-in and note saved on this device — enter
-            your code on the start screen to open your track again.
+            Your track is saved to your account — log in with your username
+            and code from any device to pick up where you left off.
           </p>
         </div>
       </div>

@@ -13,10 +13,11 @@ curriculum.
 
 - **Landing** — logged-out marketing page (hero, how-it-works, the 8 projects,
   weekly rhythm, creator, join CTA).
-- **Start / login** — every person on a device gets their own **code-locked
-  track**: new people set a display name + personal code (min 4 chars, stored
-  salted-hashed); returning people pick their name and enter their code. The
-  code is asked once per browser session; Settings can lock the track anytime.
+- **Start / login** — every learner has their own **account**: a username +
+  personal code (min 4 chars, stored salted-hashed) that opens the same track
+  from any phone or laptop. Settings can log out anytime; logging back in
+  from any device with the same username + code picks up right where you
+  left off.
 - **Onboarding** — start date (today / align with cohort), daily reminder,
   profile visibility. Max 3 steps, never shame.
 - **Dashboard "Today"** — day counter, today's build card, check-in CTA, this
@@ -28,8 +29,10 @@ curriculum.
   private notes journal, GitHub folder link, around-today rail.
 - **Projects** — P1–P8 + capstone with SHIPPED / IN PROGRESS / LOCKED states;
   per-project detail with day list and ship criteria.
-- **Leaderboard & community** — preview cohort + weekly showcase wall (live
-  sync ships with the community backend; your row uses real local stats).
+- **Leaderboard & community** — real ranked list of everyone with a public
+  profile (name, day, streak, days done), pulled live from the database;
+  private profiles never appear. The weekly showcase wall is still preview
+  data (see ARCHITECTURE.md's v3 section).
 - **Profile** — stats (current streak, days done, projects shipped, longest
   streak) + journey thumbnail.
 - **Settings** — reminder, public profile, private notes, account.
@@ -45,15 +48,13 @@ curriculum.
   check-in resumes it.
 - The grace token refills after 7 clean consecutive check-ins.
 
-Progress is stored **locally in the browser** (`localStorage`) — no accounts,
-no backend, instant deploys. Each person on a device has their own
-**code-locked profile** (`lib/profiles.ts`), so tracks stay separate and
-casually private even on a shared computer; codes never leave the device and
-can't be recovered. The owner sees aggregate visitors via Vercel Web
-Analytics. The cohort backend (real auth, live leaderboard, owner/admin
-dashboard, showcase wall) is the natural v2 — see
-**[ARCHITECTURE.md](ARCHITECTURE.md)** for the access model and the
-multi-challenge structure (`lib/challenges/`).
+Progress is stored in a **shared Postgres database** — every learner's
+username + code opens the same track from any device (see
+`db/schema.sql`). Codes are salted-hashed and can't be recovered. The owner
+sees aggregate visitors via Vercel Web Analytics. See
+**[ARCHITECTURE.md](ARCHITECTURE.md)** for the full access model, the
+one-time database setup, and the multi-challenge structure
+(`lib/challenges/`).
 
 ## Daily owner workflow
 
@@ -80,6 +81,7 @@ Each challenge day, as the owner:
 
 ```bash
 npm install
+cp .env.local.example .env.local   # fill in DATABASE_URL — see ARCHITECTURE.md
 npm run dev
 ```
 
@@ -93,5 +95,5 @@ vercel --prod
 
 ## Stack
 
-Next.js (App Router) · TypeScript · Tailwind CSS v4 · localStorage · Canvas ·
-Space Grotesk / Inter / JetBrains Mono
+Next.js (App Router) · TypeScript · Tailwind CSS v4 · Postgres (Neon) ·
+Canvas · Space Grotesk / Inter / JetBrains Mono

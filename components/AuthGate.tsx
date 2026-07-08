@@ -1,7 +1,7 @@
 "use client";
 
-// Wraps every signed-in screen. Nobody logged in this browser session (or an
-// unfinished onboarding) → back to /start, where tracks are code-locked.
+// Wraps every signed-in screen. No active account session (or an unfinished
+// onboarding) → back to /start, where a username + code opens the account.
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
