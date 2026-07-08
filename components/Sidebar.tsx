@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { initialsOf } from "@/lib/demo";
 import { computeStreak, currentDay, useProgress } from "@/lib/store";
 import {
+  IconCreator,
   IconJourney,
   IconLeaderboard,
   IconProfile,
@@ -30,6 +31,7 @@ function activeKey(pathname: string): string {
   if (pathname.startsWith("/leaderboard")) return "leaderboard";
   if (pathname.startsWith("/profile") || pathname.startsWith("/complete")) return "profile";
   if (pathname.startsWith("/settings")) return "settings";
+  if (pathname.startsWith("/creator")) return "creator";
   return "today";
 }
 
@@ -40,6 +42,9 @@ export default function Sidebar() {
   const day = Math.min(currentDay(state.checkins), 100);
   const { streak } = computeStreak(state.checkins);
   const name = state.name || "Your track";
+  const nav = state.isOwner
+    ? [...NAV, { key: "creator", href: "/creator", label: "Creator", Icon: IconCreator }]
+    : NAV;
 
   return (
     <>
@@ -56,7 +61,7 @@ export default function Sidebar() {
           </div>
         </Link>
         <nav className="flex flex-col gap-[3px]">
-          {NAV.map(({ key, href, label, Icon }) => (
+          {nav.map(({ key, href, label, Icon }) => (
             <Link
               key={key}
               href={href}
@@ -102,7 +107,7 @@ export default function Sidebar() {
           <Logo size={28} radius={8} />
         </Link>
         <nav className="flex flex-1 items-center gap-1 overflow-x-auto">
-          {NAV.map(({ key, href, label }) => (
+          {nav.map(({ key, href, label }) => (
             <Link
               key={key}
               href={href}

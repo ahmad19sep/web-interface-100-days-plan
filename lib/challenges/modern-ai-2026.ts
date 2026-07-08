@@ -6,6 +6,7 @@ import type {
   Challenge,
   DayPlan,
   Project,
+  QuizQuestion,
   WeekPlan,
 } from "./types";
 
@@ -186,6 +187,24 @@ const OWNER_NOTES: Record<number, string> = {
  */
 const WATCH_LINKS: Record<number, { label: string; url: string }[]> = {
   // 1: [{ label: "…", url: "https://…" }],
+};
+
+/**
+ * Daily quiz — one multiple-choice check per day, graded instantly on
+ * submit. Add a day's questions and deploy:
+ *
+ *   1: [{
+ *     question: "What does the `usage` field on an API response tell you?",
+ *     options: ["The model's temperature", "Token counts & cost", "The system prompt", "Rate limit remaining"],
+ *     correctIndex: 1,
+ *   }],
+ *
+ * Answers are never stored as "correct/incorrect" — they're re-graded
+ * against this file every time, so fixing a typo in `correctIndex` fixes
+ * everyone's score retroactively.
+ */
+const QUIZZES: Record<number, QuizQuestion[]> = {
+  // 1: [{ question: "…", options: ["…", "…"], correctIndex: 0 }],
 };
 
 const CREATOR = {
@@ -748,6 +767,7 @@ export const MODERN_AI_2026: Challenge = {
     ...(VIDEOS[day.day] ? { video: VIDEOS[day.day] } : {}),
     ...(OWNER_NOTES[day.day] ? { ownerNote: OWNER_NOTES[day.day] } : {}),
     ...(WATCH_LINKS[day.day] ? { watchLinks: WATCH_LINKS[day.day] } : {}),
+    ...(QUIZZES[day.day] ? { quiz: QUIZZES[day.day] } : {}),
   })),
   weeks: WEEKS,
   projects: PROJECTS,

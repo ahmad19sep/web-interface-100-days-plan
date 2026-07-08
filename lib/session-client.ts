@@ -20,12 +20,15 @@ export interface Profile {
   startDate: string | null;
   joined: string;
   onboarded: boolean;
+  isOwner: boolean;
 }
 
 export interface Snapshot {
   profile: Profile;
   checkins: Record<number, string>;
   notes: Record<number, string>;
+  /** day → questionIndex → selectedIndex */
+  quizAnswers: Record<number, Record<number, number>>;
 }
 
 export const MIN_CODE_LENGTH = 4;
@@ -59,14 +62,26 @@ function ensureLoaded() {
   if (loading || typeof window === "undefined") return;
   loading = fetch("/api/auth/me")
     .then((res) => res.json())
-    .then((body: { profile: Profile | null; checkins?: Record<number, string>; notes?: Record<number, string> }) => {
-      setState({
-        ready: true,
-        snapshot: body.profile
-          ? { profile: body.profile, checkins: body.checkins ?? {}, notes: body.notes ?? {} }
-          : null,
-      });
-    })
+    .then(
+      (body: {
+        profile: Profile | null;
+        checkins?: Record<number, string>;
+        notes?: Record<number, string>;
+        quizAnswers?: Record<number, Record<number, number>>;
+      }) => {
+        setState({
+          ready: true,
+          snapshot: body.profile
+            ? {
+                profile: body.profile,
+                checkins: body.checkins ?? {},
+                notes: body.notes ?? {},
+                quizAnswers: body.quizAnswers ?? {},
+              }
+            : null,
+        });
+      }
+    )
     .catch(() => setState({ ready: true, snapshot: null }));
 }
 
@@ -131,6 +146,7 @@ interface OptimisticPatch {
   profile?: Partial<Profile>;
   checkins?: Record<number, string>;
   notes?: Record<number, string>;
+  quizAnswers?: Record<number, Record<number, number>>;
 }
 
 /** Apply a change to the in-memory snapshot immediately (before the server confirms it). */
@@ -143,6 +159,7 @@ export function applyOptimistic(patch: OptimisticPatch): void {
       profile: patch.profile ? { ...prev.profile, ...patch.profile } : prev.profile,
       checkins: patch.checkins ?? prev.checkins,
       notes: patch.notes ?? prev.notes,
+      quizAnswers: patch.quizAnswers ?? prev.quizAnswers,
     },
   });
 }
@@ -160,10 +177,42 @@ export async function persist(request: () => Promise<Response>): Promise<void> {
         profile: (body.profile as Profile) ?? prev.profile,
         checkins: (body.checkins as Record<number, string>) ?? prev.checkins,
         notes: (body.notes as Record<number, string>) ?? prev.notes,
+        quizAnswers: (body.quizAnswers as Record<number, Record<number, number>>) ?? prev.quizAnswers,
       },
     });
   } catch {
     loading = null;
     ensureLoaded();
   }
+}
+
+/** Submit answers for one day's quiz; applies the graded result optimistically. */
+export async function submitQuiz(
+  day: number,
+  answers: { questionIndex: number; selectedIndex: number }[]
+): Promise<{ correct: number; total: number }> {
+  const prev = state.snapshot;
+  if (!prev) return { correct: 0, total: 0 };
+
+  const dayAnswers = { ...(prev.quizAnswers[day] ?? {}) };
+  for (const a of answers) dayAnswers[a.questionIndex] = a.selectedIndex;
+  applyOptimistic({ quizAnswers: { ...prev.quizAnswers, [day]: dayAnswers } });
+
+  const res = await fetch("/api/progress/quiz", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ day, answers }),
+  });
+  const body = (await parseOrThrow(res)) as {
+    selected: Record<number, number>;
+    correct: number;
+    total: number;
+  };
+  const current = state.snapshot;
+  if (current) {
+    applyOptimistic({
+      quizAnswers: { ...current.quizAnswers, [day]: body.selected },
+    });
+  }
+  return { correct: body.correct, total: body.total };
 }

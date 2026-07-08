@@ -31,10 +31,12 @@ import {
   applyOptimistic,
   currentSnapshot,
   persist,
+  submitQuiz as submitQuizToServer,
   useSession,
   type Reminder,
   type Visibility,
 } from "./session-client";
+import { gradeDayQuiz, type GradedQuestion } from "./quiz";
 
 export type { Reminder, Visibility };
 export {
@@ -42,15 +44,17 @@ export {
   currentDay,
   dayState,
   expectedDay,
+  gradeDayQuiz,
   localToday,
   projectDone,
   projectStatus,
   shippedCount,
 };
-export type { DayState, ProjectStatus, StreakInfo, StreakStatus };
+export type { DayState, GradedQuestion, ProjectStatus, StreakInfo, StreakStatus };
 
 export interface ProgressState {
   onboarded: boolean;
+  isOwner: boolean;
   handle: string;
   name: string;
   github: string;
@@ -64,10 +68,13 @@ export interface ProgressState {
   checkins: Record<number, string>;
   /** day number → private note */
   notes: Record<number, string>;
+  /** day number → questionIndex → selectedIndex */
+  quizAnswers: Record<number, Record<number, number>>;
 }
 
 const EMPTY: ProgressState = {
   onboarded: false,
+  isOwner: false,
   handle: "",
   name: "",
   github: "",
@@ -78,6 +85,7 @@ const EMPTY: ProgressState = {
   notesPrivate: true,
   checkins: {},
   notes: {},
+  quizAnswers: {},
 };
 
 export function useProgress(): ProgressState {
@@ -86,6 +94,7 @@ export function useProgress(): ProgressState {
   const p = snapshot.profile;
   return {
     onboarded: p.onboarded,
+    isOwner: p.isOwner,
     handle: p.handle,
     name: p.name,
     github: p.github,
@@ -96,6 +105,7 @@ export function useProgress(): ProgressState {
     notesPrivate: p.notesPrivate,
     checkins: snapshot.checkins,
     notes: snapshot.notes,
+    quizAnswers: snapshot.quizAnswers,
   };
 }
 
@@ -210,4 +220,12 @@ export function setVisibility(visibility: Visibility) {
 export function setNotesPrivate(notesPrivate: boolean) {
   applyOptimistic({ profile: { notesPrivate } });
   void patchProfile({ notesPrivate });
+}
+
+/** Submit (or re-submit) answers for one day's quiz; grades instantly. */
+export async function submitQuiz(
+  day: number,
+  answers: { questionIndex: number; selectedIndex: number }[]
+): Promise<{ correct: number; total: number }> {
+  return submitQuizToServer(day, answers);
 }

@@ -19,8 +19,15 @@ create table if not exists profiles (
   start_date     date,
   joined         date not null default current_date,
   onboarded      boolean not null default false,
+  -- unlocks /creator (aggregate stats across every account). Flip by hand:
+  --   update profiles set is_owner = true where handle = 'yourhandle';
+  is_owner       boolean not null default false,
   created_at     timestamptz not null default now()
 );
+
+-- for a database created before is_owner existed (CREATE TABLE IF NOT
+-- EXISTS above is a no-op on an already-existing table)
+alter table profiles add column if not exists is_owner boolean not null default false;
 
 create table if not exists checkins (
   profile_id  uuid not null references profiles(id) on delete cascade,
@@ -42,5 +49,18 @@ create table if not exists sessions (
   created_at  timestamptz not null default now()
 );
 
+-- One row per question answered. `selected_index` only — never a stored
+-- "correct" flag, so fixing a quiz answer in code re-grades everyone
+-- automatically (see QUIZZES in lib/challenges/modern-ai-2026.ts).
+create table if not exists quiz_answers (
+  profile_id      uuid not null references profiles(id) on delete cascade,
+  day             int not null,
+  question_index  int not null,
+  selected_index  int not null,
+  answered_at     timestamptz not null default now(),
+  primary key (profile_id, day, question_index)
+);
+
 create index if not exists sessions_profile_id_idx on sessions(profile_id);
 create index if not exists checkins_profile_id_idx on checkins(profile_id);
+create index if not exists quiz_answers_profile_id_idx on quiz_answers(profile_id);

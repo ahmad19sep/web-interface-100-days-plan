@@ -31,8 +31,17 @@ export interface DayPlan {
   ownerNote?: string;
   /** Owner-curated links to watch for the day, merged from WATCH_LINKS */
   watchLinks?: { label: string; url: string }[];
+  /** Multiple-choice quiz for the day, merged from QUIZZES */
+  quiz?: QuizQuestion[];
   projects: ProjectId[];
   isRest: boolean;
+}
+
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  /** Index into `options` */
+  correctIndex: number;
 }
 
 export interface WeekPlan {

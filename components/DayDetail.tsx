@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
   CREATOR,
@@ -9,14 +10,107 @@ import {
   PROJECTS,
   youTubeSearchUrl,
 } from "@/lib/plan";
+import type { QuizQuestion } from "@/lib/challenges/types";
 import {
   currentDay,
   setNote,
+  submitQuiz,
   toggleDay,
   useProgress,
 } from "@/lib/store";
 import { Toast, useToast } from "./Toast";
 import { IconBack, IconCheck, IconGitHub, IconPlay } from "./icons";
+
+function QuizCard({
+  day,
+  quiz,
+  saved,
+}: {
+  day: number;
+  quiz: QuizQuestion[];
+  saved: Record<number, number>;
+}) {
+  const [selected, setSelected] = useState<Record<number, number>>(saved);
+  const [graded, setGraded] = useState(Object.keys(saved).length > 0);
+  const [busy, setBusy] = useState(false);
+
+  const allAnswered = quiz.every((_, i) => selected[i] !== undefined);
+  const correctCount = quiz.filter((q, i) => selected[i] === q.correctIndex).length;
+
+  async function onSubmit() {
+    setBusy(true);
+    await submitQuiz(
+      day,
+      Object.entries(selected).map(([qi, si]) => ({
+        questionIndex: Number(qi),
+        selectedIndex: si,
+      }))
+    );
+    setBusy(false);
+    setGraded(true);
+  }
+
+  return (
+    <div className="card-std mb-[22px] rounded-[14px] p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="font-display text-[15px] font-semibold">Quick quiz</div>
+        {graded && (
+          <span className="font-mono text-[12.5px] text-accent">
+            {correctCount} / {quiz.length} correct
+          </span>
+        )}
+      </div>
+      <div className="flex flex-col gap-4">
+        {quiz.map((q, qi) => (
+          <div key={qi}>
+            <div className="mb-2 text-[13.5px] font-medium text-ink2">
+              {qi + 1}. {q.question}
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {q.options.map((opt, oi) => {
+                const isSelected = selected[qi] === oi;
+                const isCorrect = oi === q.correctIndex;
+                return (
+                  <button
+                    key={oi}
+                    type="button"
+                    disabled={busy}
+                    onClick={() => {
+                      setSelected((s) => ({ ...s, [qi]: oi }));
+                      setGraded(false);
+                    }}
+                    className={`flex items-center gap-2.5 rounded-[10px] border p-2.5 text-left text-[13px] transition-colors ${
+                      graded && isCorrect
+                        ? "border-[rgba(53,211,153,.5)] bg-[rgba(53,211,153,.08)] !text-accent"
+                        : graded && isSelected && !isCorrect
+                          ? "border-[rgba(245,181,75,.5)] bg-[rgba(245,181,75,.08)] !text-today"
+                          : isSelected
+                            ? "border-[rgba(53,211,153,.4)] bg-panel !text-ink"
+                            : "border-edge3 bg-panel !text-ink2 hover:border-[#2A3542]"
+                    }`}
+                  >
+                    <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border border-current text-[10px]">
+                      {graded && isCorrect ? "✓" : graded && isSelected ? "✕" : ""}
+                    </span>
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() => void onSubmit()}
+        disabled={!allAnswered || busy}
+        className="btn-primary mt-4 w-full py-3 text-sm disabled:cursor-default disabled:opacity-50"
+      >
+        {busy ? "Checking…" : graded ? "Re-check answers" : "Check answers"}
+      </button>
+    </div>
+  );
+}
 
 /** Video id from any YouTube URL shape (youtu.be, watch, live, shorts…). */
 function youTubeId(url: string): string | null {
@@ -217,6 +311,10 @@ export default function DayDetail({ day }: { day: number }) {
                 {plan.doneWhen}
               </div>
             </div>
+          )}
+
+          {plan.quiz && plan.quiz.length > 0 && (
+            <QuizCard day={day} quiz={plan.quiz} saved={state.quizAnswers[day] ?? {}} />
           )}
 
           {/* notes */}

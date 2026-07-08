@@ -35,7 +35,7 @@ export async function POST(request: Request) {
          values ($1, $2, $3, $4)
          returning id, handle, name, github, reminder, visibility,
                    notes_private, start_date::text as start_date,
-                   joined::text as joined, onboarded`,
+                   joined::text as joined, onboarded, is_owner`,
         [handle, name, salt, hash]
       );
     } catch (err: unknown) {

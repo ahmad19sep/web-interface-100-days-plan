@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const rows = await query<ProfileRow>(
       `select id, handle, name, github, reminder, visibility, notes_private,
               start_date::text as start_date, joined::text as joined,
-              onboarded, salt, code_hash
+              onboarded, is_owner, salt, code_hash
        from profiles where handle = $1`,
       [handle]
     );

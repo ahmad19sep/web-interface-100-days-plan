@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
-import { DAYS, PROJECTS, getDay, pad3, weekOf } from "@/lib/plan";
+import { DAYS, PROJECTS, getDay, pad3, weekOf, youTubeSearchUrl } from "@/lib/plan";
 import {
   computeStreak,
   currentDay,
@@ -319,23 +319,14 @@ export default function DashboardHome() {
                   >
                     Notes
                   </Link>
-                  {plan.video ? (
-                    <a
-                      href={plan.video}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-ghost flex-1 px-[18px] py-[15px] text-sm"
-                    >
-                      ▶ Watch
-                    </a>
-                  ) : (
-                    <Link
-                      href={`/day/${day}`}
-                      className="btn-ghost flex-1 px-[18px] py-[15px] text-sm"
-                    >
-                      Watch
-                    </Link>
-                  )}
+                  <a
+                    href={plan.video ?? youTubeSearchUrl(plan)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-ghost flex-1 px-[18px] py-[15px] text-sm"
+                  >
+                    {plan.video ? "▶ Watch" : "🔎 Find the video"}
+                  </a>
                 </div>
               </div>
             </div>

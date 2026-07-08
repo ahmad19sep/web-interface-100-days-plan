@@ -72,6 +72,10 @@ Each challenge day, as the owner:
    - `WATCH_LINKS` — curated links (yours or other creators') listed in the
      day's resource card, e.g.
      `2: [{ label: "Karpathy — GPT Tokenizer", url: "https://youtu.be/…" }],`
+   - `QUIZZES` — a multiple-choice check for the day, auto-graded on submit
+     and never stored as "correct/incorrect" — only the selected option is
+     saved, so fixing a `correctIndex` re-grades everyone retroactively:
+     `1: [{ question: "…", options: ["…", "…"], correctIndex: 0 }],`
 3. **Deploy** (`git push` with Vercel connected, or `vercel --prod`). That
    day's page now embeds the player, and the dashboard "Watch" button opens
    it. Days without a link show "video coming soon" plus a "Search this topic

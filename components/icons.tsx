@@ -71,6 +71,12 @@ export const IconSettings = ({ size = 18 }: { size?: number }) => (
   </Base>
 );
 
+export const IconCreator = ({ size = 18 }: { size?: number }) => (
+  <Base size={size}>
+    <path d="M4 20V10M12 20V4M20 20v-6" />
+  </Base>
+);
+
 export const IconCheck = ({
   size = 15,
   stroke = "#062018",

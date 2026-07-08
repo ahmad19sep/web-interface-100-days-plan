@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { Badge } from "@/lib/badges";
 import { DEMO_SHOWCASE, initialsOf } from "@/lib/demo";
 import { useProgress } from "@/lib/store";
 import { IconHeart } from "./icons";
@@ -21,6 +22,8 @@ interface Member {
   day: number;
   streak: number;
   totalDays: number;
+  badges: Badge[];
+  quizScore: number | null;
 }
 
 type CommunityFetch =
@@ -148,11 +151,23 @@ export default function Leaderboard() {
                       {initialsOf(u.name)}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-[13.5px] font-semibold">
-                        {u.name}
+                      <div className="flex items-center gap-1.5">
+                        <span className="truncate text-[13.5px] font-semibold">
+                          {u.name}
+                        </span>
+                        {u.badges.length > 0 && (
+                          <span className="flex shrink-0 items-center gap-[3px]">
+                            {u.badges.map((b) => (
+                              <span key={b.id} title={`${b.label} — ${b.description}`}>
+                                {b.emoji}
+                              </span>
+                            ))}
+                          </span>
+                        )}
                       </div>
                       <div className="truncate text-[11.5px] text-mut3">
                         @{u.handle} · Day {u.day}
+                        {u.quizScore !== null && ` · 🎯 ${u.quizScore}%`}
                       </div>
                     </div>
                     <div className="shrink-0 text-right">

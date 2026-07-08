@@ -19,6 +19,7 @@ export interface SessionProfile {
   start_date: string | null;
   joined: string;
   onboarded: boolean;
+  is_owner: boolean;
 }
 
 export async function createSession(profileId: string): Promise<void> {
@@ -52,7 +53,7 @@ export async function currentProfile(): Promise<SessionProfile | null> {
   const rows = await query<SessionProfile>(
     `select p.id, p.handle, p.name, p.github, p.reminder, p.visibility,
             p.notes_private, p.start_date::text as start_date,
-            p.joined::text as joined, p.onboarded
+            p.joined::text as joined, p.onboarded, p.is_owner
      from sessions s join profiles p on p.id = s.profile_id
      where s.id = $1`,
     [token]
