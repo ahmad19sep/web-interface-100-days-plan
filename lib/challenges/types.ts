@@ -15,12 +15,22 @@ export type ProjectId =
 export interface DayPlan {
   day: number;
   title: string;
+  /** Plain-language what-and-why of the topic — shown under the title */
+  about?: string;
+  /** YouTube search phrase for the topic (falls back to the title) */
+  search?: string;
   /** Viewer resource, ~30–45 min */
   resource: string;
   /** Viewer build task, ~45–75 min */
   build: string;
   doneWhen?: string;
   videoTitle?: string;
+  /** Lesson video URL (YouTube) — day pages embed it once the owner adds it */
+  video?: string;
+  /** Owner's note for the day, merged from OWNER_NOTES */
+  ownerNote?: string;
+  /** Owner-curated links to watch for the day, merged from WATCH_LINKS */
+  watchLinks?: { label: string; url: string }[];
   projects: ProjectId[];
   isRest: boolean;
 }
@@ -61,7 +71,7 @@ export interface Challenge {
   totalDays: number;
   /** The public cohort's shared Day-1 date, "YYYY-MM-DD" */
   cohortStart: string;
-  /** Monorepo with one folder per day (day-001 … day-NNN) */
+  /** Monorepo with one folder per day (day-1 … day-NNN) */
   github: string;
   creator: Creator;
   days: DayPlan[];

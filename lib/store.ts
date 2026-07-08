@@ -12,12 +12,17 @@
 
 import { useSyncExternalStore } from "react";
 import {
-  CHALLENGE,
   COHORT_START_DATE,
   DAYS,
   PROJECTS,
   type Project,
 } from "./plan";
+import {
+  activeProfileId,
+  renameActiveProfile,
+  subscribeProfiles,
+  trackKeyFor,
+} from "./profiles";
 
 export type Reminder = "morning" | "evening" | "none";
 export type Visibility = "public" | "private";
@@ -39,10 +44,8 @@ export interface ProgressState {
   notes: Record<number, string>;
 }
 
-// Progress is namespaced per challenge, so future challenges get their own
-// independent track in the same browser.
-const KEY = `track:${CHALLENGE.id}:v1`;
-const LEGACY_KEY = "hundred-days-modern-ai-v1";
+// Progress is namespaced per challenge AND per profile (several people can
+// share one browser, each behind their own code — see lib/profiles.ts).
 const EMPTY: ProgressState = {
   onboarded: false,
   name: "",
@@ -57,46 +60,35 @@ const EMPTY: ProgressState = {
 };
 
 let state: ProgressState = EMPTY;
-let loaded = false;
+/** Profile id the in-memory state was loaded for (undefined = never loaded) */
+let loadedFor: string | null | undefined;
+let watching = false;
 const listeners = new Set<() => void>();
 
 function emit() {
   for (const l of listeners) l();
 }
 
+function currentKey(): string | null {
+  const id = activeProfileId();
+  return id ? trackKeyFor(id) : null;
+}
+
 function persist() {
+  const key = currentKey();
+  if (!key) return;
   try {
-    localStorage.setItem(KEY, JSON.stringify(state));
+    localStorage.setItem(key, JSON.stringify(state));
   } catch {
     // storage unavailable — keep in-memory state
   }
 }
 
-function loadOnce() {
-  if (loaded || typeof window === "undefined") return;
-  loaded = true;
-  try {
-    let raw = localStorage.getItem(KEY);
-    // one-time migration from the pre-namespaced key
-    if (!raw) {
-      const legacy = localStorage.getItem(LEGACY_KEY);
-      if (legacy) {
-        raw = legacy;
-        localStorage.setItem(KEY, legacy);
-        localStorage.removeItem(LEGACY_KEY);
-      }
-    }
-    if (raw) {
-      const parsed = JSON.parse(raw) as Partial<ProgressState>;
-      if (parsed && typeof parsed === "object") {
-        state = { ...EMPTY, ...parsed };
-      }
-    }
-  } catch {
-    state = EMPTY;
-  }
+function watchOnce() {
+  if (watching || typeof window === "undefined") return;
+  watching = true;
   window.addEventListener("storage", (e) => {
-    if (e.key !== KEY) return;
+    if (!e.key || e.key !== currentKey()) return;
     try {
       state = e.newValue
         ? { ...EMPTY, ...(JSON.parse(e.newValue) as ProgressState) }
@@ -108,15 +100,39 @@ function loadOnce() {
   });
 }
 
+/** (Re)load progress for whoever is logged in right now. */
+function ensureLoaded() {
+  if (typeof window === "undefined") return;
+  watchOnce();
+  const id = activeProfileId();
+  if (loadedFor === id) return;
+  loadedFor = id;
+  if (!id) {
+    state = EMPTY;
+    return;
+  }
+  try {
+    const raw = localStorage.getItem(trackKeyFor(id));
+    const parsed = raw ? (JSON.parse(raw) as Partial<ProgressState>) : null;
+    state =
+      parsed && typeof parsed === "object" ? { ...EMPTY, ...parsed } : EMPTY;
+  } catch {
+    state = EMPTY;
+  }
+}
+
 function subscribe(cb: () => void) {
   listeners.add(cb);
+  // a profile switch must re-render consumers so they pick up the new track
+  const unsubProfiles = subscribeProfiles(cb);
   return () => {
     listeners.delete(cb);
+    unsubProfiles();
   };
 }
 
 function getSnapshot(): ProgressState {
-  loadOnce();
+  ensureLoaded();
   return state;
 }
 
@@ -129,7 +145,7 @@ export function useProgress(): ProgressState {
 }
 
 function set(patch: Partial<ProgressState>) {
-  loadOnce();
+  ensureLoaded();
   state = { ...state, ...patch };
   persist();
   emit();
@@ -150,7 +166,7 @@ export function completeOnboarding(opts: {
   visibility: Visibility;
   name: string;
 }) {
-  loadOnce();
+  ensureLoaded();
   set({
     onboarded: true,
     name: opts.name || state.name,
@@ -161,13 +177,9 @@ export function completeOnboarding(opts: {
   });
 }
 
-export function logOut() {
-  set({ onboarded: false });
-}
-
 /** Toggle a day's check-in; returns the streak count after the change. */
 export function toggleDay(day: number): number {
-  loadOnce();
+  ensureLoaded();
   const checkins = { ...state.checkins };
   if (checkins[day]) delete checkins[day];
   else checkins[day] = localToday();
@@ -176,7 +188,7 @@ export function toggleDay(day: number): number {
 }
 
 export function setNote(day: number, text: string) {
-  loadOnce();
+  ensureLoaded();
   const notes = { ...state.notes };
   if (text.trim() === "") delete notes[day];
   else notes[day] = text;
@@ -185,6 +197,8 @@ export function setNote(day: number, text: string) {
 
 export function setName(name: string) {
   set({ name });
+  // the login list on /start shows the profile name — keep it in sync
+  renameActiveProfile(name);
 }
 export function setGithub(github: string) {
   set({ github });

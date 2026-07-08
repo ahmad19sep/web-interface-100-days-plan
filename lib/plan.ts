@@ -41,6 +41,17 @@ export function getDay(n: number): DayPlan | undefined {
   return CHALLENGE.days[n - 1];
 }
 
+/** GitHub folder for one day's code — folders are named day-1 … day-100. */
+export function dayFolderUrl(n: number): string {
+  return `${CHALLENGE.github}/tree/main/day-${n}`;
+}
+
+/** YouTube search for the day's topic (until the official video is added). */
+export function youTubeSearchUrl(plan: DayPlan): string {
+  const query = plan.search ?? plan.title;
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+}
+
 export function weekOf(day: number): WeekPlan {
   return CHALLENGE.weeks.find((w) => day >= w.start && day <= w.end)!;
 }

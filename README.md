@@ -13,8 +13,12 @@ curriculum.
 
 - **Landing** — logged-out marketing page (hero, how-it-works, the 8 projects,
   weekly rhythm, creator, join CTA).
+- **Start / login** — every person on a device gets their own **code-locked
+  track**: new people set a display name + personal code (min 4 chars, stored
+  salted-hashed); returning people pick their name and enter their code. The
+  code is asked once per browser session; Settings can lock the track anytime.
 - **Onboarding** — start date (today / align with cohort), daily reminder,
-  profile visibility, display name. Max 3 steps, never shame.
+  profile visibility. Max 3 steps, never shame.
 - **Dashboard "Today"** — day counter, today's build card, check-in CTA, this
   week checklist, journey mini-map. Auto-derives four states: **today**,
   **behind/catch-up**, **rest day** (every 7th), and **streak paused**.
@@ -42,11 +46,35 @@ curriculum.
 - The grace token refills after 7 clean consecutive check-ins.
 
 Progress is stored **locally in the browser** (`localStorage`) — no accounts,
-no backend, instant deploys. Users only ever see their own progress; the owner
-sees aggregate visitors via Vercel Web Analytics. The cohort backend (auth,
-live leaderboard, owner/admin dashboard, showcase wall) is the natural v2 —
-see **[ARCHITECTURE.md](ARCHITECTURE.md)** for the access model and the
+no backend, instant deploys. Each person on a device has their own
+**code-locked profile** (`lib/profiles.ts`), so tracks stay separate and
+casually private even on a shared computer; codes never leave the device and
+can't be recovered. The owner sees aggregate visitors via Vercel Web
+Analytics. The cohort backend (real auth, live leaderboard, owner/admin
+dashboard, showcase wall) is the natural v2 — see
+**[ARCHITECTURE.md](ARCHITECTURE.md)** for the access model and the
 multi-challenge structure (`lib/challenges/`).
+
+## Daily owner workflow
+
+Each challenge day, as the owner:
+
+1. **Push the day's code** to a `day-N` folder (`day-1`, `day-2`, … `day-100`)
+   in [ahmad19sep/100-days-learning-ai](https://github.com/ahmad19sep/100-days-learning-ai) —
+   every day page's "Open the GitHub folder" button links straight to that
+   folder.
+2. **Add the lesson video** once it's live: one line in the `VIDEOS` map at
+   the top of `lib/challenges/modern-ai-2026.ts`, e.g. `14: "https://youtu.be/XXXX",`.
+   Two sibling maps take the same one-line-a-day treatment:
+   - `OWNER_NOTES` — a short message shown on that day's page ("Note from
+     @aixahmad"), e.g. `14: "Don't skip the Kappa step — it's the point.",`
+   - `WATCH_LINKS` — curated links (yours or other creators') listed in the
+     day's resource card, e.g.
+     `2: [{ label: "Karpathy — GPT Tokenizer", url: "https://youtu.be/…" }],`
+3. **Deploy** (`git push` with Vercel connected, or `vercel --prod`). That
+   day's page now embeds the player, and the dashboard "Watch" button opens
+   it. Days without a link show "video coming soon" plus a "Search this topic
+   on YouTube" button built from each day's curated search phrase.
 
 ## Develop
 

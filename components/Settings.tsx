@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { logout } from "@/lib/profiles";
 import {
-  logOut,
   setGithub,
   setName,
   setNotesPrivate,
@@ -147,17 +147,17 @@ export default function Settings() {
             <button
               type="button"
               onClick={() => {
-                logOut();
-                router.push("/");
+                logout();
+                router.push("/start");
               }}
               className="cursor-pointer rounded-[10px] border border-edge2 bg-card2 px-4 py-2.5 text-[13px] text-mut2 hover:text-ink"
             >
-              Log out
+              🔒 Lock track / log out
             </button>
           </div>
           <p className="mt-2.5 text-xs text-mut3">
-            Logging out returns you to the landing page — your local progress
-            stays saved on this device.
+            Locking keeps every check-in and note saved on this device — enter
+            your code on the start screen to open your track again.
           </p>
         </div>
       </div>

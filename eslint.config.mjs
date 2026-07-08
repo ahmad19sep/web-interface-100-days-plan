@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Design-handoff prototype (reference artifact, not app code):
+    "100 days app prompt/**",
   ]),
 ]);
 

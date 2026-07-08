@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { DAYS, PROJECTS, getDay, pad3, weekOf } from "@/lib/plan";
 import {
   computeStreak,
@@ -15,6 +15,16 @@ import {
 import { buildCells, JourneyCells } from "./JourneyGrid";
 import { Toast, useToast } from "./Toast";
 import { IconCheck, IconClockBack } from "./icons";
+
+const emptySubscribe = () => () => {};
+/** false during SSR/hydration, true after — avoids a streak-number mismatch */
+function useHydrated(): boolean {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+}
 
 function projectBadge(day: number): string | null {
   const plan = getDay(day);
@@ -162,8 +172,7 @@ export default function DashboardHome() {
   const router = useRouter();
   const state = useProgress();
   const [toast, showToast] = useToast();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
 
   const day = currentDay(state.checkins);
   const plan = day <= 100 ? getDay(day) : undefined;
@@ -310,12 +319,23 @@ export default function DashboardHome() {
                   >
                     Notes
                   </Link>
-                  <Link
-                    href={`/day/${day}`}
-                    className="btn-ghost flex-1 px-[18px] py-[15px] text-sm"
-                  >
-                    Watch
-                  </Link>
+                  {plan.video ? (
+                    <a
+                      href={plan.video}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-ghost flex-1 px-[18px] py-[15px] text-sm"
+                    >
+                      ▶ Watch
+                    </a>
+                  ) : (
+                    <Link
+                      href={`/day/${day}`}
+                      className="btn-ghost flex-1 px-[18px] py-[15px] text-sm"
+                    >
+                      Watch
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

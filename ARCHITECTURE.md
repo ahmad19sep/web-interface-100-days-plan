@@ -2,14 +2,22 @@
 
 ## Who sees what (v1 — current, live)
 
-There are **no accounts** in v1. Progress lives in each visitor's own browser
-(`localStorage`), so privacy is automatic:
+There are **no server accounts** in v1, but each device now has **local,
+code-locked profiles** (`lib/profiles.ts`): a new person sets a display name +
+personal code; a returning person picks their name and enters their code
+before their track opens. The session lives in `sessionStorage`, so every new
+browser session asks for the code again, and Settings can lock the track at
+any time.
 
 | Person | What they can see |
 |---|---|
-| **A user** | Only their own progress — check-ins, streak, notes. It never leaves their device. Different browser/device = different track. |
-| **Another user** | Nothing about anyone else. The leaderboard/showcase are clearly-labeled preview data. |
+| **A user** | Only their own progress — check-ins, streak, notes — after entering their code. It never leaves their device. Different browser/device = different track. |
+| **Someone else on the same device** | The list of display names on the start screen, nothing more — each track needs its owner's code. (Courtesy privacy: v1 has no backend, so devtools can still read `localStorage`.) |
+| **Another user elsewhere** | Nothing about anyone else. The leaderboard/showcase are clearly-labeled preview data. |
 | **You (owner)** | Aggregate traffic via **Vercel Web Analytics** — visitors, page views, referrers, countries. Not individual users or their progress (that data never reaches a server in v1). |
+
+Codes are stored as salted SHA-256 hashes, asked on every login, and are
+**not recoverable** (nothing is uploaded, so there is no email reset).
 
 To turn analytics on: Vercel Dashboard → project **web-interface-100-days-plan**
 → **Analytics** tab → Enable. The `<Analytics />` component is already wired in
@@ -17,11 +25,18 @@ To turn analytics on: Vercel Dashboard → project **web-interface-100-days-plan
 
 ### Storage keys
 
-Each challenge gets its own namespace, so tracks never collide:
+Each challenge **and each profile** gets its own namespace, so tracks never
+collide:
 
 ```
-track:<challenge-id>:v1        e.g.  track:modern-ai-2026:v1
+profiles:v1                              ← device profile list (localStorage)
+active-profile:v1                        ← who's logged in (sessionStorage)
+track:<challenge-id>:<profile-id>:v1     e.g. track:modern-ai-2026:3f2c…:v1
 ```
+
+The first profile created on a device automatically adopts any pre-profiles
+track (`track:<challenge-id>:v1` or the oldest `hundred-days-modern-ai-v1`),
+so nobody loses a streak to the upgrade.
 
 ## Multi-challenge structure (ready now)
 

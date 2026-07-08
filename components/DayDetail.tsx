@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { GITHUB_REPO, PROJECTS, getDay, pad3 } from "@/lib/plan";
+import {
+  CREATOR,
+  dayFolderUrl,
+  getDay,
+  pad3,
+  PROJECTS,
+  youTubeSearchUrl,
+} from "@/lib/plan";
 import {
   currentDay,
   setNote,
@@ -10,6 +17,14 @@ import {
 } from "@/lib/store";
 import { Toast, useToast } from "./Toast";
 import { IconBack, IconCheck, IconGitHub, IconPlay } from "./icons";
+
+/** Video id from any YouTube URL shape (youtu.be, watch, live, shorts…). */
+function youTubeId(url: string): string | null {
+  const m = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|live\/|shorts\/))([\w-]{11})/
+  );
+  return m ? m[1] : null;
+}
 
 export default function DayDetail({ day }: { day: number }) {
   const state = useProgress();
@@ -86,31 +101,70 @@ export default function DayDetail({ day }: { day: number }) {
             </div>
           </div>
 
-          <h1 className="mb-[22px] font-display text-[28px] font-bold tracking-[-.02em]">
+          <h1 className="mb-2 font-display text-[28px] font-bold tracking-[-.02em]">
             {plan.title}
           </h1>
+          {plan.about ? (
+            <p className="mb-[22px] max-w-[680px] text-[14.5px] leading-[1.7] text-mut">
+              {plan.about}
+            </p>
+          ) : (
+            <div className="mb-[22px]" />
+          )}
 
-          {/* video placeholder */}
-          <div className="relative mb-[22px] flex min-h-[230px] items-center justify-center overflow-hidden rounded-[14px] border border-edge3 bg-inset">
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(135deg,rgba(53,211,153,.08),transparent)",
-              }}
-            />
-            <div className="z-[1] flex h-[60px] w-[60px] cursor-pointer items-center justify-center rounded-full bg-[rgba(255,255,255,.1)] backdrop-blur-[4px]">
-              <IconPlay size={24} />
-            </div>
-            <div className="absolute bottom-3.5 left-4 z-[1]">
-              <div className="text-[13.5px] font-medium text-ink">
-                {plan.videoTitle ?? `Day ${day} — ${plan.title}`}
+          {plan.ownerNote && (
+            <div className="mb-[22px] rounded-[14px] border border-[rgba(53,211,153,.3)] bg-[rgba(53,211,153,.06)] p-[18px]">
+              <div className="mb-1.5 font-mono text-[11px] tracking-[.08em] text-accent">
+                📌 NOTE FROM {CREATOR.handle.toUpperCase()}
               </div>
-              <div className="mt-[3px] font-mono text-[11px] text-accent">
-                AI Radar · daily lesson
+              <div className="text-sm leading-[1.6] text-ink2">
+                {plan.ownerNote}
               </div>
             </div>
-          </div>
+          )}
+
+          {/* video — embedded once the owner adds the day's link */}
+          {plan.video && youTubeId(plan.video) ? (
+            <div className="mb-[22px] overflow-hidden rounded-[14px] border border-edge3 bg-inset">
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${youTubeId(plan.video)}`}
+                title={plan.videoTitle ?? `Day ${day} — ${plan.title}`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="aspect-video w-full"
+              />
+            </div>
+          ) : (
+            <a
+              href={plan.video ?? undefined}
+              target={plan.video ? "_blank" : undefined}
+              rel={plan.video ? "noopener noreferrer" : undefined}
+              className={`relative mb-[22px] flex min-h-[230px] items-center justify-center overflow-hidden rounded-[14px] border border-edge3 bg-inset ${
+                plan.video ? "" : "pointer-events-none"
+              }`}
+            >
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(135deg,rgba(53,211,153,.08),transparent)",
+                }}
+              />
+              <div className="z-[1] flex h-[60px] w-[60px] cursor-pointer items-center justify-center rounded-full bg-[rgba(255,255,255,.1)] backdrop-blur-[4px]">
+                <IconPlay size={24} />
+              </div>
+              <div className="absolute bottom-3.5 left-4 z-[1]">
+                <div className="text-[13.5px] font-medium text-ink">
+                  {plan.videoTitle ?? `Day ${day} — ${plan.title}`}
+                </div>
+                <div className="mt-[3px] font-mono text-[11px] text-accent">
+                  {plan.video
+                    ? "AI Radar · daily lesson"
+                    : "AI Radar · video coming soon"}
+                </div>
+              </div>
+            </a>
+          )}
 
           {/* build + resource tiles */}
           <div className="mb-3.5 grid gap-3.5 sm:grid-cols-2">
@@ -121,6 +175,31 @@ export default function DayDetail({ day }: { day: number }) {
               <div className="text-sm leading-[1.6] text-ink2">
                 {plan.resource}
               </div>
+              {plan.watchLinks && plan.watchLinks.length > 0 && (
+                <div className="mt-3 flex flex-col gap-1.5">
+                  {plan.watchLinks.map((l) => (
+                    <a
+                      key={l.url}
+                      href={l.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[13px] !text-accent hover:!text-accent2"
+                    >
+                      ▶ {l.label} ↗
+                    </a>
+                  ))}
+                </div>
+              )}
+              {!plan.isRest && (
+                <a
+                  href={youTubeSearchUrl(plan)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 block text-[13px] !text-accent hover:!text-accent2"
+                >
+                  🔍 Search this topic on YouTube ↗
+                </a>
+              )}
             </div>
             <div className="card-std rounded-[14px] p-[18px]">
               <div className="mb-2 text-[11.5px] text-mut3">
@@ -181,7 +260,7 @@ export default function DayDetail({ day }: { day: number }) {
               </button>
             )}
             <a
-              href={`${GITHUB_REPO}/tree/main/day-${pad3(day)}`}
+              href={dayFolderUrl(day)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-ghost w-full py-3 text-[13.5px] !rounded-[11px] !font-normal !text-ink"

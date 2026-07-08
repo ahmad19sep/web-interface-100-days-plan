@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AuthGate from "@/components/AuthGate";
 import ShareCards from "@/components/ShareCards";
 
 export const metadata: Metadata = {
@@ -6,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function SharePage() {
-  return <ShareCards />;
+  return (
+    <AuthGate>
+      <ShareCards />
+    </AuthGate>
+  );
 }
