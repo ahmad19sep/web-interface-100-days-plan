@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   CREATOR,
@@ -120,6 +120,135 @@ function youTubeId(url: string): string | null {
   return m ? m[1] : null;
 }
 
+interface DayContent {
+  videoUrl: string | null;
+  githubUrl: string | null;
+  note: string | null;
+}
+
+const EMPTY_CONTENT: DayContent = { videoUrl: null, githubUrl: null, note: null };
+
+/**
+ * Owner-editable day content (video/GitHub link/note) — live, no deploy
+ * needed. `ready` gates the edit panel so its inputs mount already
+ * initialized from the fetched value, instead of syncing via an effect.
+ */
+function useDayContent(day: number): {
+  content: DayContent;
+  ready: boolean;
+  setContent: (next: DayContent) => void;
+} {
+  const [content, setContent] = useState<DayContent>(EMPTY_CONTENT);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/day-content/${day}`)
+      .then((res) => res.json())
+      .then((body: DayContent) => {
+        if (cancelled) return;
+        setContent(body);
+        setReady(true);
+      })
+      .catch(() => {
+        if (!cancelled) setReady(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [day]);
+
+  return { content, ready, setContent };
+}
+
+/** Owner-only panel to set this day's video/GitHub link/note live, from the app. */
+function CreatorDayPanel({
+  day,
+  content,
+  onSaved,
+}: {
+  day: number;
+  content: DayContent;
+  onSaved: (next: DayContent) => void;
+}) {
+  const [videoUrl, setVideoUrl] = useState(content.videoUrl ?? "");
+  const [githubUrl, setGithubUrl] = useState(content.githubUrl ?? "");
+  const [note, setNoteText] = useState(content.note ?? "");
+  const [busy, setBusy] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  async function onSave() {
+    setBusy(true);
+    setSaved(false);
+    const res = await fetch(`/api/day-content/${day}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ videoUrl, githubUrl, note }),
+    });
+    const body = (await res.json()) as DayContent;
+    setBusy(false);
+    if (res.ok) {
+      onSaved(body);
+      setSaved(true);
+    }
+  }
+
+  const inputClass =
+    "w-full rounded-[10px] border border-edge3 bg-panel px-3 py-2.5 text-[13px] text-ink placeholder:text-dim focus:border-[rgba(53,211,153,.5)] focus:outline-none";
+
+  return (
+    <div className="mb-[22px] rounded-[14px] border border-[rgba(245,181,75,.3)] bg-[rgba(245,181,75,.05)] p-[18px]">
+      <div className="mb-3 font-mono text-[11px] tracking-[.08em] text-today">
+        👑 CREATOR — visible only to you
+      </div>
+      <div className="flex flex-col gap-2.5">
+        <label className="block">
+          <span className="mb-1 block text-xs text-mut3">Video link</span>
+          <input
+            type="text"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            placeholder="https://youtu.be/…"
+            className={inputClass}
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs text-mut3">
+            GitHub link (defaults to the day-{day} folder if left blank)
+          </span>
+          <input
+            type="text"
+            value={githubUrl}
+            onChange={(e) => setGithubUrl(e.target.value)}
+            placeholder="https://github.com/…"
+            className={inputClass}
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs text-mut3">
+            Note — shown to everyone on this day
+          </span>
+          <textarea
+            value={note}
+            onChange={(e) => setNoteText(e.target.value)}
+            rows={3}
+            placeholder="Anything worth flagging for today's build…"
+            className={`${inputClass} resize-y`}
+          />
+        </label>
+        <button
+          type="button"
+          onClick={() => void onSave()}
+          disabled={busy}
+          className="btn-primary self-start px-4 py-2 text-[13px] disabled:cursor-default disabled:opacity-60"
+        >
+          {busy ? "Saving…" : saved ? "Saved ✓" : "Save for everyone"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function DayDetail({ day }: { day: number }) {
   const state = useProgress();
   const [toast, showToast] = useToast();
@@ -127,6 +256,13 @@ export default function DayDetail({ day }: { day: number }) {
   const current = currentDay(state.checkins);
   const done = Boolean(state.checkins[day]);
   const isToday = day === current;
+  const { content: dayContent, ready: dayContentReady, setContent: setDayContent } =
+    useDayContent(day);
+
+  // Owner-set content (live, no deploy) wins over the code-based defaults.
+  const effectiveVideo = dayContent.videoUrl ?? plan.video;
+  const effectiveGithubUrl = dayContent.githubUrl ?? dayFolderUrl(day);
+  const effectiveNote = dayContent.note ?? plan.ownerNote;
 
   const project = plan.projects.length
     ? PROJECTS.find((p) => p.id === plan.projects[0])
@@ -206,22 +342,26 @@ export default function DayDetail({ day }: { day: number }) {
             <div className="mb-[22px]" />
           )}
 
-          {plan.ownerNote && (
+          {state.isOwner && dayContentReady && (
+            <CreatorDayPanel day={day} content={dayContent} onSaved={setDayContent} />
+          )}
+
+          {effectiveNote && (
             <div className="mb-[22px] rounded-[14px] border border-[rgba(53,211,153,.3)] bg-[rgba(53,211,153,.06)] p-[18px]">
               <div className="mb-1.5 font-mono text-[11px] tracking-[.08em] text-accent">
                 📌 NOTE FROM {CREATOR.handle.toUpperCase()}
               </div>
               <div className="text-sm leading-[1.6] text-ink2">
-                {plan.ownerNote}
+                {effectiveNote}
               </div>
             </div>
           )}
 
           {/* video — embedded once the owner adds the day's link */}
-          {plan.video && youTubeId(plan.video) ? (
+          {effectiveVideo && youTubeId(effectiveVideo) ? (
             <div className="mb-[22px] overflow-hidden rounded-[14px] border border-edge3 bg-inset">
               <iframe
-                src={`https://www.youtube-nocookie.com/embed/${youTubeId(plan.video)}`}
+                src={`https://www.youtube-nocookie.com/embed/${youTubeId(effectiveVideo)}`}
                 title={plan.videoTitle ?? `Day ${day} — ${plan.title}`}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
@@ -230,11 +370,11 @@ export default function DayDetail({ day }: { day: number }) {
             </div>
           ) : (
             <a
-              href={plan.video ?? undefined}
-              target={plan.video ? "_blank" : undefined}
-              rel={plan.video ? "noopener noreferrer" : undefined}
+              href={effectiveVideo ?? undefined}
+              target={effectiveVideo ? "_blank" : undefined}
+              rel={effectiveVideo ? "noopener noreferrer" : undefined}
               className={`relative mb-[22px] flex min-h-[230px] items-center justify-center overflow-hidden rounded-[14px] border border-edge3 bg-inset ${
-                plan.video ? "" : "pointer-events-none"
+                effectiveVideo ? "" : "pointer-events-none"
               }`}
             >
               <div
@@ -252,7 +392,7 @@ export default function DayDetail({ day }: { day: number }) {
                   {plan.videoTitle ?? `Day ${day} — ${plan.title}`}
                 </div>
                 <div className="mt-[3px] font-mono text-[11px] text-accent">
-                  {plan.video
+                  {effectiveVideo
                     ? "AI Radar · daily lesson"
                     : "AI Radar · video coming soon"}
                 </div>
@@ -358,7 +498,7 @@ export default function DayDetail({ day }: { day: number }) {
               </button>
             )}
             <a
-              href={dayFolderUrl(day)}
+              href={effectiveGithubUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-ghost w-full py-3 text-[13.5px] !rounded-[11px] !font-normal !text-ink"

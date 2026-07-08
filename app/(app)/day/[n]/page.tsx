@@ -27,5 +27,7 @@ export default async function DayPage({
   const { n } = await params;
   const num = Number(n);
   if (!Number.isInteger(num) || num < 1 || num > 100) notFound();
-  return <DayDetail day={num} />;
+  // Remount on day change — resets QuizCard/CreatorDayPanel local state
+  // instead of leaking the previous day's answers/inputs into the new one.
+  return <DayDetail key={num} day={num} />;
 }

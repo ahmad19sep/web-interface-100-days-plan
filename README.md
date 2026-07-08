@@ -58,28 +58,28 @@ one-time database setup, and the multi-challenge structure
 
 ## Daily owner workflow
 
-Each challenge day, as the owner:
+**Live, from the app — no deploy needed.** Log in as the owner account and
+open that day's page: a **"👑 CREATOR"** panel appears (visible only to you)
+with three fields — video link, GitHub link, and a note — each with a Save
+button. Saving updates that day's page for every user immediately. GitHub
+defaults to the `day-N` folder pattern in
+[ahmad19sep/100-days-learning-ai](https://github.com/ahmad19sep/100-days-learning-ai)
+if you leave it blank.
 
-1. **Push the day's code** to a `day-N` folder (`day-1`, `day-2`, … `day-100`)
-   in [ahmad19sep/100-days-learning-ai](https://github.com/ahmad19sep/100-days-learning-ai) —
-   every day page's "Open the GitHub folder" button links straight to that
-   folder.
-2. **Add the lesson video** once it's live: one line in the `VIDEOS` map at
-   the top of `lib/challenges/modern-ai-2026.ts`, e.g. `14: "https://youtu.be/XXXX",`.
-   Two sibling maps take the same one-line-a-day treatment:
-   - `OWNER_NOTES` — a short message shown on that day's page ("Note from
-     @aixahmad"), e.g. `14: "Don't skip the Kappa step — it's the point.",`
-   - `WATCH_LINKS` — curated links (yours or other creators') listed in the
-     day's resource card, e.g.
-     `2: [{ label: "Karpathy — GPT Tokenizer", url: "https://youtu.be/…" }],`
-   - `QUIZZES` — a multiple-choice check for the day, auto-graded on submit
-     and never stored as "correct/incorrect" — only the selected option is
-     saved, so fixing a `correctIndex` re-grades everyone retroactively:
-     `1: [{ question: "…", options: ["…", "…"], correctIndex: 0 }],`
-3. **Deploy** (`git push` with Vercel connected, or `vercel --prod`). That
-   day's page now embeds the player, and the dashboard "Watch" button opens
-   it. Days without a link show "video coming soon" plus a "Search this topic
-   on YouTube" button built from each day's curated search phrase.
+**Bulk-loading many days at once, via code** (optional — still works,
+useful for pre-seeding before the challenge starts): `VIDEOS`, `OWNER_NOTES`,
+and `WATCH_LINKS` in `lib/challenges/modern-ai-2026.ts` take one line per
+day, e.g. `14: "https://youtu.be/XXXX",`. Anything set live from the app
+takes priority over these when both exist for the same day.
+
+`QUIZZES` (also in that file) is still code-only for now — a multiple-choice
+check per day, auto-graded on submit. Answers are never stored as
+"correct/incorrect", only the selected option — so fixing a `correctIndex`
+re-grades everyone retroactively:
+`1: [{ question: "…", options: ["…", "…"], correctIndex: 0 }],`
+
+Days without a video show "video coming soon" plus a "Search this topic on
+YouTube" button built from each day's curated search phrase.
 
 ## Develop
 

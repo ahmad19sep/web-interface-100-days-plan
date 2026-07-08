@@ -30,6 +30,10 @@ quiz_answers  (profile_id, day, question_index, selected_index) ← raw selectio
                current QUIZZES data in lib/challenges/modern-ai-2026.ts, so
                fixing a quiz question re-grades every past answer for free
 sessions      (id, profile_id, created_at)       ← the login-cookie token
+day_content   (day, video_url, github_url, note) ← owner-editable per day,
+               live from the app (see /creator's day-page panel) — takes
+               priority over the code-based VIDEOS/OWNER_NOTES when both
+               exist for the same day
 ```
 
 `handle` is the unique login username; `name` is the display name shown on
@@ -56,6 +60,7 @@ app/api/profile                          ← PATCH settings (name, reminder, …
 app/api/progress/{checkin,note,quiz}     ← the things checked/answered daily
 app/api/community                        ← public ranked list + badges (GET, no auth)
 app/api/admin/stats                      ← owner-only aggregate stats (GET, 403 if not is_owner)
+app/api/day-content/[day]                ← GET public, PUT owner-only (video/GitHub link/note)
 ```
 
 `lib/db.ts` throws a clear `DbNotConfiguredError` (surfaced as HTTP 503) if
