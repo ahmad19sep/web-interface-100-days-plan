@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
 import { DbNotConfiguredError, query } from "@/lib/db";
+import { getDayContentRow, sanitizeQuizInput } from "@/lib/day-content";
 import { currentProfile } from "@/lib/session";
-
-interface Row {
-  video_url: string | null;
-  github_url: string | null;
-  note: string | null;
-}
 
 function parseDay(raw: string): number | null {
   const day = Number(raw);
@@ -21,19 +16,10 @@ export async function GET(
     const day = parseDay((await params).day);
     if (day === null) return NextResponse.json({ error: "Invalid day." }, { status: 400 });
 
-    const rows = await query<Row>(
-      "select video_url, github_url, note from day_content where day = $1",
-      [day]
-    );
-    const row = rows[0];
-    return NextResponse.json({
-      videoUrl: row?.video_url ?? null,
-      githubUrl: row?.github_url ?? null,
-      note: row?.note ?? null,
-    });
+    return NextResponse.json(await getDayContentRow(day));
   } catch (err) {
     if (err instanceof DbNotConfiguredError) {
-      return NextResponse.json({ videoUrl: null, githubUrl: null, note: null });
+      return NextResponse.json({ videoUrl: null, githubUrl: null, note: null, quiz: null });
     }
     throw err;
   }
@@ -56,19 +42,21 @@ export async function PUT(
     const videoUrl = typeof body?.videoUrl === "string" ? body.videoUrl.trim() || null : null;
     const githubUrl = typeof body?.githubUrl === "string" ? body.githubUrl.trim() || null : null;
     const note = typeof body?.note === "string" ? body.note.trim() || null : null;
+    const quiz = sanitizeQuizInput(body?.quiz);
 
     await query(
-      `insert into day_content (day, video_url, github_url, note, updated_at)
-       values ($1, $2, $3, $4, now())
+      `insert into day_content (day, video_url, github_url, note, quiz, updated_at)
+       values ($1, $2, $3, $4, $5, now())
        on conflict (day) do update set
          video_url = excluded.video_url,
          github_url = excluded.github_url,
          note = excluded.note,
+         quiz = excluded.quiz,
          updated_at = now()`,
-      [day, videoUrl, githubUrl, note]
+      [day, videoUrl, githubUrl, note, quiz ? JSON.stringify(quiz) : null]
     );
 
-    return NextResponse.json({ videoUrl, githubUrl, note });
+    return NextResponse.json({ videoUrl, githubUrl, note, quiz });
   } catch (err) {
     if (err instanceof DbNotConfiguredError) {
       return NextResponse.json({ error: err.message }, { status: 503 });

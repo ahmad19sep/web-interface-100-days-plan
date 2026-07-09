@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { computeBadges, quizScorePercent, type Badge } from "@/lib/badges";
+import { effectiveQuizMap } from "@/lib/day-content";
 import { DbNotConfiguredError, query } from "@/lib/db";
 import { CHALLENGE } from "@/lib/plan";
 import { computeStreak, currentDay, shippedCount } from "@/lib/progress";
@@ -29,6 +30,8 @@ export interface CommunityMember {
 
 export async function GET() {
   try {
+    const quizMap = await effectiveQuizMap();
+
     // Two LEFT JOIN LATERAL subqueries, each pre-aggregated to one row per
     // profile — a plain LEFT JOIN on both checkins AND quiz_answers would
     // fan out (every checkin paired with every quiz answer) and corrupt
@@ -56,7 +59,7 @@ export async function GET() {
     const members: CommunityMember[] = rows.map((r) => {
       const checkins = r.checkins ?? {};
       const streak = computeStreak(checkins);
-      const quiz = gradeAll(r.quiz_answers ?? []);
+      const quiz = gradeAll(r.quiz_answers ?? [], quizMap);
       return {
         handle: r.handle,
         name: r.name,

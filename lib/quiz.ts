@@ -1,9 +1,10 @@
-// Pure quiz-grading logic — no storage, no "use client". Answers are stored
-// as raw selected indices only; grading always re-reads the current
-// correctIndex from the curriculum data, so fixing a quiz in code re-grades
-// every past answer automatically.
+// Pure quiz-grading logic — no storage, no "use client", no direct
+// curriculum lookups. Callers pass in the *effective* quiz for a day
+// (code-based QUIZZES merged with any live owner override — see
+// lib/day-content.ts on the server, or DayDetail's dayContent on the
+// client) so grading always uses whichever quiz is actually showing.
 
-import { getDay } from "./plan";
+import type { QuizQuestion } from "./challenges/types";
 
 export interface QuizStats {
   correct: number;
@@ -16,12 +17,14 @@ export interface StoredAnswer {
   selectedIndex: number;
 }
 
+export type QuizMap = Record<number, QuizQuestion[]>;
+
 /** Aggregate correct/total across every question a user has answered. */
-export function gradeAll(answers: StoredAnswer[]): QuizStats {
+export function gradeAll(answers: StoredAnswer[], quizMap: QuizMap): QuizStats {
   let correct = 0;
   let total = 0;
   for (const a of answers) {
-    const q = getDay(a.day)?.quiz?.[a.questionIndex];
+    const q = quizMap[a.day]?.[a.questionIndex];
     if (!q) continue; // question no longer exists — don't penalize or count it
     total++;
     if (q.correctIndex === a.selectedIndex) correct++;
@@ -38,10 +41,9 @@ export interface GradedQuestion {
 
 /** One day's quiz, with the user's selections (if any) graded inline. */
 export function gradeDayQuiz(
-  day: number,
+  quiz: QuizQuestion[] | undefined,
   selected: Record<number, number>
 ): GradedQuestion[] {
-  const quiz = getDay(day)?.quiz;
   if (!quiz) return [];
   return quiz.map((q, i) => ({
     question: q.question,

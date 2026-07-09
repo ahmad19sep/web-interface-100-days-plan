@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { DbNotConfiguredError, query } from "@/lib/db";
-import { getDay } from "@/lib/plan";
+import { effectiveQuizForDay } from "@/lib/day-content";
 import { currentProfile } from "@/lib/session";
 
 interface AnswerInput {
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid submission." }, { status: 400 });
     }
 
-    const quiz = getDay(day)?.quiz;
+    const quiz = await effectiveQuizForDay(day);
     if (!quiz || quiz.length === 0) {
       return NextResponse.json({ error: "This day has no quiz." }, { status: 400 });
     }

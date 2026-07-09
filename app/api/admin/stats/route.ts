@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { computeBadges, quizScorePercent, type Badge } from "@/lib/badges";
+import { effectiveQuizMap } from "@/lib/day-content";
 import { DbNotConfiguredError, query } from "@/lib/db";
 import { CHALLENGE } from "@/lib/plan";
 import { computeStreak, currentDay, shippedCount } from "@/lib/progress";
@@ -35,6 +36,8 @@ export async function GET() {
       return NextResponse.json({ error: "Not authorized." }, { status: 403 });
     }
 
+    const quizMap = await effectiveQuizMap();
+
     // Same LEFT JOIN LATERAL shape as /api/community — pre-aggregate each
     // side per profile before joining, so a fan-out never corrupts the
     // checkins/quiz-answers aggregates. No visibility filter: the owner
@@ -61,7 +64,7 @@ export async function GET() {
     const members: AdminMember[] = rows.map((r) => {
       const checkins = r.checkins ?? {};
       const streak = computeStreak(checkins);
-      const quiz = gradeAll(r.quiz_answers ?? []);
+      const quiz = gradeAll(r.quiz_answers ?? [], quizMap);
       return {
         handle: r.handle,
         name: r.name,

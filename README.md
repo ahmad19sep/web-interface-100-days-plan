@@ -60,11 +60,14 @@ one-time database setup, and the multi-challenge structure
 
 **Live, from the app — no deploy needed.** Log in as the owner account and
 open that day's page: a **"👑 CREATOR"** panel appears (visible only to you)
-with three fields — video link, GitHub link, and a note — each with a Save
-button. Saving updates that day's page for every user immediately. GitHub
-defaults to the `day-N` folder pattern in
+with video link, GitHub link, a note, and a quiz builder (add/remove
+questions and options, mark the correct one per question) — one Save button
+for all of it. Saving updates that day's page for every user immediately.
+GitHub defaults to the `day-N` folder pattern in
 [ahmad19sep/100-days-learning-ai](https://github.com/ahmad19sep/100-days-learning-ai)
-if you leave it blank.
+if you leave it blank. Everything you set shows to users in one grouped
+**"📦 Today's learnings from …"** section on that day's page, instead of
+scattered across the layout.
 
 **Bulk-loading many days at once, via code** (optional — still works,
 useful for pre-seeding before the challenge starts): `VIDEOS`, `OWNER_NOTES`,
@@ -72,11 +75,11 @@ and `WATCH_LINKS` in `lib/challenges/modern-ai-2026.ts` take one line per
 day, e.g. `14: "https://youtu.be/XXXX",`. Anything set live from the app
 takes priority over these when both exist for the same day.
 
-`QUIZZES` (also in that file) is still code-only for now — a multiple-choice
-check per day, auto-graded on submit. Answers are never stored as
-"correct/incorrect", only the selected option — so fixing a `correctIndex`
-re-grades everyone retroactively:
-`1: [{ question: "…", options: ["…", "…"], correctIndex: 0 }],`
+`QUIZZES` (also in that file) works the same way as a bulk-preload fallback
+for the quiz builder above — a DB-set quiz for a day always wins over it.
+Either way, answers are never stored as "correct/incorrect", only the
+selected option — so fixing a `correctIndex` (in the app or in code)
+re-grades everyone retroactively.
 
 Days without a video show "video coming soon" plus a "Search this topic on
 YouTube" button built from each day's curated search phrase.

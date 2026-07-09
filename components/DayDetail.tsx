@@ -21,14 +21,26 @@ import {
 import { Toast, useToast } from "./Toast";
 import { IconBack, IconCheck, IconGitHub, IconPlay } from "./icons";
 
+/** Video id from any YouTube URL shape (youtu.be, watch, live, shorts…). */
+function youTubeId(url: string): string | null {
+  const m = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|live\/|shorts\/))([\w-]{11})/
+  );
+  return m ? m[1] : null;
+}
+
+const QUIZ_PASS_FRACTION = 0.6;
+
 function QuizCard({
   day,
   quiz,
   saved,
+  onPassed,
 }: {
   day: number;
   quiz: QuizQuestion[];
   saved: Record<number, number>;
+  onPassed?: () => void;
 }) {
   const [selected, setSelected] = useState<Record<number, number>>(saved);
   const [graded, setGraded] = useState(Object.keys(saved).length > 0);
@@ -36,6 +48,7 @@ function QuizCard({
 
   const allAnswered = quiz.every((_, i) => selected[i] !== undefined);
   const correctCount = quiz.filter((q, i) => selected[i] === q.correctIndex).length;
+  const passed = correctCount / quiz.length >= QUIZ_PASS_FRACTION;
 
   async function onSubmit() {
     setBusy(true);
@@ -48,15 +61,22 @@ function QuizCard({
     );
     setBusy(false);
     setGraded(true);
+    if (quiz.filter((q, i) => selected[i] === q.correctIndex).length / quiz.length >= QUIZ_PASS_FRACTION) {
+      onPassed?.();
+    }
   }
 
   return (
-    <div className="card-std mb-[22px] rounded-[14px] p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="font-display text-[15px] font-semibold">Quick quiz</div>
+    <div id="quiz">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="font-mono text-[11px] tracking-[.08em] text-mut3">
+          🧩 QUIZ · PASS AT {Math.round(QUIZ_PASS_FRACTION * 100)}%
+        </div>
         {graded && (
-          <span className="font-mono text-[12.5px] text-accent">
-            {correctCount} / {quiz.length} correct
+          <span
+            className={`font-mono text-[12.5px] ${passed ? "text-accent" : "text-today"}`}
+          >
+            {correctCount} / {quiz.length} correct{passed ? " · passed" : " · try again"}
           </span>
         )}
       </div>
@@ -112,25 +132,23 @@ function QuizCard({
   );
 }
 
-/** Video id from any YouTube URL shape (youtu.be, watch, live, shorts…). */
-function youTubeId(url: string): string | null {
-  const m = url.match(
-    /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|live\/|shorts\/))([\w-]{11})/
-  );
-  return m ? m[1] : null;
-}
-
 interface DayContent {
   videoUrl: string | null;
   githubUrl: string | null;
   note: string | null;
+  quiz: QuizQuestion[] | null;
 }
 
-const EMPTY_CONTENT: DayContent = { videoUrl: null, githubUrl: null, note: null };
+const EMPTY_CONTENT: DayContent = {
+  videoUrl: null,
+  githubUrl: null,
+  note: null,
+  quiz: null,
+};
 
 /**
- * Owner-editable day content (video/GitHub link/note) — live, no deploy
- * needed. `ready` gates the edit panel so its inputs mount already
+ * Owner-editable day content (video/GitHub link/note/quiz) — live, no
+ * deploy needed. `ready` gates the edit panel so its inputs mount already
  * initialized from the fetched value, instead of syncing via an effect.
  */
 function useDayContent(day: number): {
@@ -161,7 +179,123 @@ function useDayContent(day: number): {
   return { content, ready, setContent };
 }
 
-/** Owner-only panel to set this day's video/GitHub link/note live, from the app. */
+interface QuizDraft {
+  question: string;
+  options: string[];
+  correctIndex: number;
+}
+
+const smallInputClass =
+  "flex-1 rounded-[8px] border border-edge3 bg-card px-2.5 py-1.5 text-[13px] text-ink placeholder:text-dim focus:border-[rgba(53,211,153,.5)] focus:outline-none";
+
+function QuizBuilder({
+  quiz,
+  onChange,
+}: {
+  quiz: QuizDraft[];
+  onChange: (next: QuizDraft[]) => void;
+}) {
+  function updateQuestion(qi: number, patch: Partial<QuizDraft>) {
+    onChange(quiz.map((q, i) => (i === qi ? { ...q, ...patch } : q)));
+  }
+  function updateOption(qi: number, oi: number, value: string) {
+    onChange(
+      quiz.map((q, i) =>
+        i === qi ? { ...q, options: q.options.map((o, j) => (j === oi ? value : o)) } : q
+      )
+    );
+  }
+  function addQuestion() {
+    onChange([...quiz, { question: "", options: ["", ""], correctIndex: 0 }]);
+  }
+  function removeQuestion(qi: number) {
+    onChange(quiz.filter((_, i) => i !== qi));
+  }
+  function addOption(qi: number) {
+    onChange(quiz.map((q, i) => (i === qi ? { ...q, options: [...q.options, ""] } : q)));
+  }
+  function removeOption(qi: number, oi: number) {
+    onChange(
+      quiz.map((q, i) => {
+        if (i !== qi) return q;
+        const options = q.options.filter((_, j) => j !== oi);
+        const correctIndex = q.correctIndex >= oi && q.correctIndex > 0 ? q.correctIndex - 1 : q.correctIndex;
+        return { ...q, options, correctIndex: Math.min(correctIndex, options.length - 1) };
+      })
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      {quiz.map((q, qi) => (
+        <div key={qi} className="rounded-[10px] border border-edge3 bg-panel p-3">
+          <div className="mb-2 flex items-center gap-2">
+            <input
+              type="text"
+              value={q.question}
+              onChange={(e) => updateQuestion(qi, { question: e.target.value })}
+              placeholder={`Question ${qi + 1}`}
+              className={smallInputClass}
+            />
+            <button
+              type="button"
+              onClick={() => removeQuestion(qi)}
+              className="shrink-0 text-[11px] text-mut3 hover:text-today"
+            >
+              Remove
+            </button>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {q.options.map((opt, oi) => (
+              <div key={oi} className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name={`correct-${qi}`}
+                  checked={q.correctIndex === oi}
+                  onChange={() => updateQuestion(qi, { correctIndex: oi })}
+                  title="Mark as the correct answer"
+                  className="accent-[#35D399]"
+                />
+                <input
+                  type="text"
+                  value={opt}
+                  onChange={(e) => updateOption(qi, oi, e.target.value)}
+                  placeholder={`Option ${oi + 1}`}
+                  className={smallInputClass}
+                />
+                {q.options.length > 2 && (
+                  <button
+                    type="button"
+                    onClick={() => removeOption(qi, oi)}
+                    className="shrink-0 text-[11px] text-mut3 hover:text-today"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => addOption(qi)}
+              className="self-start text-[12px] !text-accent hover:!text-accent2"
+            >
+              + Add option
+            </button>
+          </div>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={addQuestion}
+        className="btn-ghost self-start px-3 py-1.5 text-[12.5px]"
+      >
+        + Add question
+      </button>
+    </div>
+  );
+}
+
+/** Owner-only panel to set this day's video/GitHub link/note/quiz live, from the app. */
 function CreatorDayPanel({
   day,
   content,
@@ -174,6 +308,7 @@ function CreatorDayPanel({
   const [videoUrl, setVideoUrl] = useState(content.videoUrl ?? "");
   const [githubUrl, setGithubUrl] = useState(content.githubUrl ?? "");
   const [note, setNoteText] = useState(content.note ?? "");
+  const [quiz, setQuiz] = useState<QuizDraft[]>(content.quiz ?? []);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -183,7 +318,7 @@ function CreatorDayPanel({
     const res = await fetch(`/api/day-content/${day}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ videoUrl, githubUrl, note }),
+      body: JSON.stringify({ videoUrl, githubUrl, note, quiz }),
     });
     const body = (await res.json()) as DayContent;
     setBusy(false);
@@ -236,6 +371,14 @@ function CreatorDayPanel({
             className={`${inputClass} resize-y`}
           />
         </label>
+
+        <div>
+          <span className="mb-1.5 block text-xs text-mut3">
+            Quiz — leave empty for no quiz today
+          </span>
+          <QuizBuilder quiz={quiz} onChange={setQuiz} />
+        </div>
+
         <button
           type="button"
           onClick={() => void onSave()}
@@ -263,6 +406,14 @@ export default function DayDetail({ day }: { day: number }) {
   const effectiveVideo = dayContent.videoUrl ?? plan.video;
   const effectiveGithubUrl = dayContent.githubUrl ?? dayFolderUrl(day);
   const effectiveNote = dayContent.note ?? plan.ownerNote;
+  const effectiveQuiz = dayContent.quiz ?? plan.quiz;
+  const hasQuiz = Boolean(effectiveQuiz && effectiveQuiz.length > 0);
+  const quizPassed = !hasQuiz || (() => {
+    const saved = state.quizAnswers[day] ?? {};
+    if (!effectiveQuiz || Object.keys(saved).length < effectiveQuiz.length) return false;
+    const correct = effectiveQuiz.filter((q, i) => saved[i] === q.correctIndex).length;
+    return correct / effectiveQuiz.length >= QUIZ_PASS_FRACTION;
+  })();
 
   const project = plan.projects.length
     ? PROJECTS.find((p) => p.id === plan.projects[0])
@@ -346,62 +497,102 @@ export default function DayDetail({ day }: { day: number }) {
             <CreatorDayPanel day={day} content={dayContent} onSaved={setDayContent} />
           )}
 
-          {effectiveNote && (
-            <div className="mb-[22px] rounded-[14px] border border-[rgba(53,211,153,.3)] bg-[rgba(53,211,153,.06)] p-[18px]">
-              <div className="mb-1.5 font-mono text-[11px] tracking-[.08em] text-accent">
-                📌 NOTE FROM {CREATOR.handle.toUpperCase()}
-              </div>
-              <div className="text-sm leading-[1.6] text-ink2">
-                {effectiveNote}
-              </div>
+          {/* Today's learnings from the creator — note, video, GitHub link, quiz,
+              all in one clearly-labeled section instead of scattered around the page. */}
+          <div className="mb-[22px] overflow-hidden rounded-[16px] border border-edge bg-card">
+            <div className="border-b border-edge3 px-[18px] py-3.5 font-display text-[15px] font-semibold">
+              📦 Today&apos;s learnings from {CREATOR.name}
             </div>
-          )}
+            <div className="flex flex-col gap-[18px] p-[18px]">
+              {effectiveNote && (
+                <div id="creator-note">
+                  <div className="mb-1.5 font-mono text-[11px] tracking-[.08em] text-accent">
+                    📌 NOTE
+                  </div>
+                  <div className="text-sm leading-[1.6] text-ink2">{effectiveNote}</div>
+                </div>
+              )}
 
-          {/* video — embedded once the owner adds the day's link */}
-          {effectiveVideo && youTubeId(effectiveVideo) ? (
-            <div className="mb-[22px] overflow-hidden rounded-[14px] border border-edge3 bg-inset">
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${youTubeId(effectiveVideo)}`}
-                title={plan.videoTitle ?? `Day ${day} — ${plan.title}`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="aspect-video w-full"
-              />
+              <div id="creator-video">
+                <div className="mb-1.5 font-mono text-[11px] tracking-[.08em] text-mut3">
+                  🎬 VIDEO
+                </div>
+                {effectiveVideo && youTubeId(effectiveVideo) ? (
+                  <div className="overflow-hidden rounded-[14px] border border-edge3 bg-inset">
+                    <iframe
+                      src={`https://www.youtube-nocookie.com/embed/${youTubeId(effectiveVideo)}`}
+                      title={plan.videoTitle ?? `Day ${day} — ${plan.title}`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="aspect-video w-full"
+                    />
+                  </div>
+                ) : (
+                  <a
+                    href={effectiveVideo ?? undefined}
+                    target={effectiveVideo ? "_blank" : undefined}
+                    rel={effectiveVideo ? "noopener noreferrer" : undefined}
+                    className={`relative flex min-h-[230px] items-center justify-center overflow-hidden rounded-[14px] border border-edge3 bg-inset ${
+                      effectiveVideo ? "" : "pointer-events-none"
+                    }`}
+                  >
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        background:
+                          "linear-gradient(135deg,rgba(53,211,153,.08),transparent)",
+                      }}
+                    />
+                    <div className="z-[1] flex h-[60px] w-[60px] cursor-pointer items-center justify-center rounded-full bg-[rgba(255,255,255,.1)] backdrop-blur-[4px]">
+                      <IconPlay size={24} />
+                    </div>
+                    <div className="absolute bottom-3.5 left-4 z-[1]">
+                      <div className="text-[13.5px] font-medium text-ink">
+                        {plan.videoTitle ?? `Day ${day} — ${plan.title}`}
+                      </div>
+                      <div className="mt-[3px] font-mono text-[11px] text-accent">
+                        {effectiveVideo
+                          ? "AI Radar · daily lesson"
+                          : "AI Radar · video coming soon"}
+                      </div>
+                    </div>
+                  </a>
+                )}
+              </div>
+
+              <div>
+                <div className="mb-1.5 font-mono text-[11px] tracking-[.08em] text-mut3">
+                  💻 CODE
+                </div>
+                <a
+                  href={effectiveGithubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-ghost self-start px-4 py-2.5 text-[13px] !font-normal !text-ink"
+                >
+                  <IconGitHub />
+                  View the code
+                </a>
+              </div>
+
+              {effectiveQuiz && effectiveQuiz.length > 0 && (
+                <>
+                  <div className="h-px bg-edge3" />
+                  <QuizCard
+                    day={day}
+                    quiz={effectiveQuiz}
+                    saved={state.quizAnswers[day] ?? {}}
+                    onPassed={() => {
+                      if (!done) onCheckIn();
+                    }}
+                  />
+                </>
+              )}
             </div>
-          ) : (
-            <a
-              href={effectiveVideo ?? undefined}
-              target={effectiveVideo ? "_blank" : undefined}
-              rel={effectiveVideo ? "noopener noreferrer" : undefined}
-              className={`relative mb-[22px] flex min-h-[230px] items-center justify-center overflow-hidden rounded-[14px] border border-edge3 bg-inset ${
-                effectiveVideo ? "" : "pointer-events-none"
-              }`}
-            >
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(135deg,rgba(53,211,153,.08),transparent)",
-                }}
-              />
-              <div className="z-[1] flex h-[60px] w-[60px] cursor-pointer items-center justify-center rounded-full bg-[rgba(255,255,255,.1)] backdrop-blur-[4px]">
-                <IconPlay size={24} />
-              </div>
-              <div className="absolute bottom-3.5 left-4 z-[1]">
-                <div className="text-[13.5px] font-medium text-ink">
-                  {plan.videoTitle ?? `Day ${day} — ${plan.title}`}
-                </div>
-                <div className="mt-[3px] font-mono text-[11px] text-accent">
-                  {effectiveVideo
-                    ? "AI Radar · daily lesson"
-                    : "AI Radar · video coming soon"}
-                </div>
-              </div>
-            </a>
-          )}
+          </div>
 
           {/* build + resource tiles */}
-          <div className="mb-3.5 grid gap-3.5 sm:grid-cols-2">
+          <div id="resources" className="mb-3.5 grid gap-3.5 sm:grid-cols-2">
             <div className="card-std rounded-[14px] p-[18px]">
               <div className="mb-2 text-[11.5px] text-mut3">
                 📺 THE RESOURCE · ~30–45 MIN
@@ -453,10 +644,6 @@ export default function DayDetail({ day }: { day: number }) {
             </div>
           )}
 
-          {plan.quiz && plan.quiz.length > 0 && (
-            <QuizCard day={day} quiz={plan.quiz} saved={state.quizAnswers[day] ?? {}} />
-          )}
-
           {/* notes */}
           <div className="card-std rounded-[14px] p-5">
             <div className="mb-3 flex items-center justify-between">
@@ -482,30 +669,84 @@ export default function DayDetail({ day }: { day: number }) {
               <button
                 type="button"
                 onClick={onCheckIn}
-                className="btn-ghost mb-2.5 w-full !border-[rgba(53,211,153,.4)] py-3.5 text-[14.5px] !text-accent"
+                className="btn-ghost w-full !border-[rgba(53,211,153,.4)] py-3.5 text-[14.5px] !text-accent"
               >
                 <IconCheck size={17} stroke="#35D399" strokeWidth={2.5} />
                 Day {day} done · tap to undo
               </button>
+            ) : hasQuiz && !quizPassed ? (
+              <a
+                href="#quiz"
+                className="btn-ghost flex w-full items-center justify-center gap-2 !border-[rgba(245,181,75,.4)] py-3.5 text-[14.5px] !text-today"
+              >
+                🧩 Pass the quiz to finish (60%+)
+              </a>
             ) : (
               <button
                 type="button"
                 onClick={onCheckIn}
-                className="btn-primary mb-2.5 w-full py-3.5 text-[14.5px] !font-bold"
+                className="btn-primary w-full py-3.5 text-[14.5px] !font-bold"
               >
                 <IconCheck size={17} strokeWidth={2.5} />
                 Mark Day {day} done
               </button>
             )}
-            <a
-              href={effectiveGithubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-ghost w-full py-3 text-[13.5px] !rounded-[11px] !font-normal !text-ink"
-            >
-              <IconGitHub />
-              Open the GitHub folder
-            </a>
+          </div>
+
+          <div className="card-std p-5">
+            <div className="mb-3.5 font-display text-sm font-semibold">
+              Helping material
+            </div>
+            <div className="flex flex-col gap-2">
+              {effectiveNote && (
+                <a
+                  href="#creator-note"
+                  className="btn-ghost w-full py-2.5 text-[13px] !rounded-[11px] !font-normal !text-ink"
+                >
+                  📝 Creator&apos;s note
+                </a>
+              )}
+              {effectiveVideo ? (
+                <a
+                  href={effectiveVideo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-ghost w-full py-2.5 text-[13px] !rounded-[11px] !font-normal !text-ink"
+                >
+                  🎬 Watch the video
+                </a>
+              ) : (
+                <a
+                  href="#creator-video"
+                  className="btn-ghost w-full py-2.5 text-[13px] !rounded-[11px] !font-normal !text-ink"
+                >
+                  🎬 Video (coming soon)
+                </a>
+              )}
+              <a
+                href={effectiveGithubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-ghost w-full py-2.5 text-[13px] !rounded-[11px] !font-normal !text-ink"
+              >
+                <IconGitHub />
+                View the code
+              </a>
+              <a
+                href="#resources"
+                className="btn-ghost w-full py-2.5 text-[13px] !rounded-[11px] !font-normal !text-ink"
+              >
+                📚 Resources
+              </a>
+              {hasQuiz && (
+                <a
+                  href="#quiz"
+                  className="btn-ghost w-full py-2.5 text-[13px] !rounded-[11px] !font-normal !text-ink"
+                >
+                  🧩 Quiz
+                </a>
+              )}
+            </div>
           </div>
 
           <div className="card-std p-5">

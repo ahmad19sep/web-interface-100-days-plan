@@ -30,11 +30,18 @@ quiz_answers  (profile_id, day, question_index, selected_index) ← raw selectio
                current QUIZZES data in lib/challenges/modern-ai-2026.ts, so
                fixing a quiz question re-grades every past answer for free
 sessions      (id, profile_id, created_at)       ← the login-cookie token
-day_content   (day, video_url, github_url, note) ← owner-editable per day,
-               live from the app (see /creator's day-page panel) — takes
-               priority over the code-based VIDEOS/OWNER_NOTES when both
-               exist for the same day
+day_content   (day, video_url, github_url, note, quiz) ← owner-editable per
+               day, live from each day page's "👑 CREATOR" panel — takes
+               priority over the code-based VIDEOS/OWNER_NOTES/QUIZZES when
+               both exist for the same day
 ```
+
+`lib/day-content.ts` (server-only) merges the code-based curriculum defaults
+with any `day_content` row — every route that grades quizzes
+(`/api/progress/quiz`, `/api/community`, `/api/admin/stats`) calls
+`effectiveQuizMap()`/`effectiveQuizForDay()` from there instead of reading
+`getDay(n).quiz` directly, so an owner-authored quiz grades identically to a
+code-based one.
 
 `handle` is the unique login username; `name` is the display name shown on
 the dashboard, share card, and community tab. See `db/schema.sql` for the

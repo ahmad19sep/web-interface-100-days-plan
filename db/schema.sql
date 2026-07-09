@@ -61,17 +61,22 @@ create table if not exists quiz_answers (
   primary key (profile_id, day, question_index)
 );
 
--- Owner-editable per-day content — video/GitHub link/note set live from the
--- app (see /api/day-content) instead of editing lib/challenges/modern-ai-2026.ts
--- and redeploying. Shown to every user; falls back to the code-based
--- VIDEOS/OWNER_NOTES/day folder pattern when a day has no row here yet.
+-- Owner-editable per-day content — video/GitHub link/note/quiz set live from
+-- the app (see /api/day-content) instead of editing
+-- lib/challenges/modern-ai-2026.ts and redeploying. Shown to every user;
+-- falls back to the code-based VIDEOS/OWNER_NOTES/QUIZZES/day folder pattern
+-- when a day has no row (or no quiz) here yet.
 create table if not exists day_content (
   day         int primary key,
   video_url   text,
   github_url  text,
   note        text,
+  -- [{ question, options: string[], correctIndex }, ...] or null
+  quiz        jsonb,
   updated_at  timestamptz not null default now()
 );
+
+alter table day_content add column if not exists quiz jsonb;
 
 create index if not exists sessions_profile_id_idx on sessions(profile_id);
 create index if not exists checkins_profile_id_idx on checkins(profile_id);
