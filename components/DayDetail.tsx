@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   CREATOR,
@@ -18,6 +18,7 @@ import {
   toggleDay,
   useProgress,
 } from "@/lib/store";
+import { useDayContent, type DayContent } from "@/lib/use-day-content";
 import { Toast, useToast } from "./Toast";
 import { IconBack, IconCheck, IconGitHub, IconPlay } from "./icons";
 
@@ -30,6 +31,97 @@ function youTubeId(url: string): string | null {
 }
 
 const QUIZ_PASS_FRACTION = 0.6;
+
+const CONFETTI_EMOJI = ["🎉", "🎊", "✨", "⭐", "🥳", "💚"];
+
+interface ConfettiPiece {
+  id: number;
+  emoji: string;
+  left: number;
+  delay: number;
+  duration: number;
+  size: number;
+}
+
+function randomPieces(): ConfettiPiece[] {
+  return Array.from({ length: 44 }, (_, i) => ({
+    id: i,
+    emoji: CONFETTI_EMOJI[i % CONFETTI_EMOJI.length],
+    left: Math.random() * 100,
+    delay: Math.random() * 0.5,
+    duration: 2.1 + Math.random() * 1.5,
+    size: 15 + Math.random() * 15,
+  }));
+}
+
+function Confetti() {
+  // Lazy initializer runs once on mount and caches the result — the
+  // React-endorsed way to seed state from an impure source like
+  // Math.random() without re-rolling on every render.
+  const [pieces] = useState<ConfettiPiece[]>(randomPieces);
+
+  return (
+    <div className="pointer-events-none fixed inset-0 z-[60] overflow-hidden">
+      {pieces.map((p) => (
+        <span
+          key={p.id}
+          className="anim-confetti-fall absolute top-0"
+          style={{
+            left: `${p.left}%`,
+            fontSize: `${p.size}px`,
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.duration}s`,
+          }}
+        >
+          {p.emoji}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function QuizResultModal({
+  correct,
+  total,
+  passed,
+  onClose,
+}: {
+  correct: number;
+  total: number;
+  passed: boolean;
+  onClose: () => void;
+}) {
+  const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+  return (
+    <>
+      {passed && <Confetti />}
+      <div
+        className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-5"
+        onClick={onClose}
+      >
+        <div
+          className="anim-toast-in w-full max-w-[360px] rounded-[20px] border border-edge bg-card p-8 text-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="mb-3 text-[52px] leading-none">{passed ? "🎉" : "😢"}</div>
+          <div className="mb-1.5 font-display text-xl font-bold">
+            {passed ? "Congratulations!" : "Not quite — try again"}
+          </div>
+          <div className="mb-5 font-mono text-sm text-mut2">
+            {correct} / {total} correct · {pct}%
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className={passed ? "btn-primary w-full py-3 text-sm" : "btn-ghost w-full py-3 text-sm"}
+          >
+            {passed ? "Continue →" : "Try again"}
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
 
 function QuizCard({
   day,
@@ -45,6 +137,9 @@ function QuizCard({
   const [selected, setSelected] = useState<Record<number, number>>(saved);
   const [graded, setGraded] = useState(Object.keys(saved).length > 0);
   const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<{ correct: number; total: number; passed: boolean } | null>(
+    null
+  );
 
   const allAnswered = quiz.every((_, i) => selected[i] !== undefined);
   const correctCount = quiz.filter((q, i) => selected[i] === q.correctIndex).length;
@@ -61,13 +156,22 @@ function QuizCard({
     );
     setBusy(false);
     setGraded(true);
-    if (quiz.filter((q, i) => selected[i] === q.correctIndex).length / quiz.length >= QUIZ_PASS_FRACTION) {
-      onPassed?.();
-    }
+    const nowCorrect = quiz.filter((q, i) => selected[i] === q.correctIndex).length;
+    const nowPassed = nowCorrect / quiz.length >= QUIZ_PASS_FRACTION;
+    setResult({ correct: nowCorrect, total: quiz.length, passed: nowPassed });
+    if (nowPassed) onPassed?.();
   }
 
   return (
     <div id="quiz">
+      {result && (
+        <QuizResultModal
+          correct={result.correct}
+          total={result.total}
+          passed={result.passed}
+          onClose={() => setResult(null)}
+        />
+      )}
       <div className="mb-3 flex items-center justify-between">
         <div className="font-mono text-[11px] tracking-[.08em] text-mut3">
           🧩 QUIZ · PASS AT {Math.round(QUIZ_PASS_FRACTION * 100)}%
@@ -130,53 +234,6 @@ function QuizCard({
       </button>
     </div>
   );
-}
-
-interface DayContent {
-  videoUrl: string | null;
-  githubUrl: string | null;
-  note: string | null;
-  quiz: QuizQuestion[] | null;
-}
-
-const EMPTY_CONTENT: DayContent = {
-  videoUrl: null,
-  githubUrl: null,
-  note: null,
-  quiz: null,
-};
-
-/**
- * Owner-editable day content (video/GitHub link/note/quiz) — live, no
- * deploy needed. `ready` gates the edit panel so its inputs mount already
- * initialized from the fetched value, instead of syncing via an effect.
- */
-function useDayContent(day: number): {
-  content: DayContent;
-  ready: boolean;
-  setContent: (next: DayContent) => void;
-} {
-  const [content, setContent] = useState<DayContent>(EMPTY_CONTENT);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch(`/api/day-content/${day}`)
-      .then((res) => res.json())
-      .then((body: DayContent) => {
-        if (cancelled) return;
-        setContent(body);
-        setReady(true);
-      })
-      .catch(() => {
-        if (!cancelled) setReady(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [day]);
-
-  return { content, ready, setContent };
 }
 
 interface QuizDraft {

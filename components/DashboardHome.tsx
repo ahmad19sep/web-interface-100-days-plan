@@ -12,9 +12,58 @@ import {
   toggleDay,
   useProgress,
 } from "@/lib/store";
+import { useDayContent } from "@/lib/use-day-content";
 import { buildCells, JourneyCells } from "./JourneyGrid";
 import { Toast, useToast } from "./Toast";
 import { IconCheck, IconClockBack } from "./icons";
+
+/**
+ * Check-in action for the dashboard. When today's day has a quiz, this
+ * always routes to the day page instead of completing inline — otherwise
+ * the dashboard's one-click check-in would silently bypass the quiz's 60%
+ * pass gate that only lives on /day/[n].
+ */
+function CheckInAction({
+  day,
+  ready,
+  hasQuiz,
+  quizLabel,
+  label,
+  className,
+  onCheckIn,
+}: {
+  day: number;
+  /** Whether we've confirmed today's quiz status — false briefly on load. */
+  ready: boolean;
+  hasQuiz: boolean;
+  quizLabel: string;
+  label: React.ReactNode;
+  className: string;
+  onCheckIn: () => void;
+}) {
+  // Disabled until we know whether this day has a quiz — otherwise a fast
+  // click in that window could bypass a quiz that's only set in the
+  // database (no code-based fallback to catch it on the first render).
+  if (!ready) {
+    return (
+      <button type="button" disabled className={`${className} cursor-default opacity-60`}>
+        {label}
+      </button>
+    );
+  }
+  if (hasQuiz) {
+    return (
+      <Link href={`/day/${day}`} className={className}>
+        🧩 {quizLabel}
+      </Link>
+    );
+  }
+  return (
+    <button type="button" onClick={onCheckIn} className={className}>
+      {label}
+    </button>
+  );
+}
 
 const emptySubscribe = () => () => {};
 /** false during SSR/hydration, true after — avoids a streak-number mismatch */
@@ -176,6 +225,9 @@ export default function DashboardHome() {
 
   const day = currentDay(state.checkins);
   const plan = day <= 100 ? getDay(day) : undefined;
+  const { content: dayContent, ready: dayContentReady } = useDayContent(Math.min(day, 100));
+  const effectiveQuiz = dayContent.quiz ?? plan?.quiz;
+  const hasQuiz = Boolean(effectiveQuiz && effectiveQuiz.length > 0);
   const doneCount = Object.keys(state.checkins).length;
   const streak = computeStreak(state.checkins);
   const shipped = shippedCount(state.checkins);
@@ -304,14 +356,20 @@ export default function DashboardHome() {
                 </div>
               </div>
               <div className="mt-auto flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={() => checkIn(day)}
+                <CheckInAction
+                  day={day}
+                  ready={dayContentReady}
+                  hasQuiz={hasQuiz}
+                  onCheckIn={() => checkIn(day)}
+                  quizLabel={`Take the quiz to finish Day ${day} →`}
                   className="btn-primary flex-1 px-4 py-[15px] text-[15px] !font-bold"
-                >
-                  <IconCheck size={18} strokeWidth={2.5} />
-                  Check in — mark Day {day} done
-                </button>
+                  label={
+                    <>
+                      <IconCheck size={18} strokeWidth={2.5} />
+                      Check in — mark Day {day} done
+                    </>
+                  }
+                />
                 <div className="flex gap-3">
                   <Link
                     href={`/day/${day}`}
@@ -396,13 +454,15 @@ export default function DashboardHome() {
                 {plan.build}
               </p>
               <div className="mt-auto flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={() => checkIn(day)}
+                <CheckInAction
+                  day={day}
+                  ready={dayContentReady}
+                  hasQuiz={hasQuiz}
+                  onCheckIn={() => checkIn(day)}
+                  quizLabel={`Take the quiz to finish Day ${day} →`}
                   className="btn-primary flex-1 px-4 py-[15px] text-[15px] !font-bold"
-                >
-                  Resume Day {day}
-                </button>
+                  label={`Resume Day ${day}`}
+                />
                 <Link
                   href={`/day/${day}`}
                   className="btn-ghost px-[18px] py-[15px] text-sm"
@@ -435,14 +495,20 @@ export default function DashboardHome() {
               the community shipped, and come back fresh tomorrow. Your streak
               counts rest days too.
             </p>
-            <button
-              type="button"
-              onClick={() => checkIn(day)}
+            <CheckInAction
+              day={day}
+              ready={dayContentReady}
+              hasQuiz={hasQuiz}
+              onCheckIn={() => checkIn(day)}
+              quizLabel={`Take the quiz to log rest Day ${day} →`}
               className="btn-primary px-6 py-3.5 text-[15px] !font-bold"
-            >
-              <IconCheck size={17} strokeWidth={2.5} />
-              Check in — log rest Day {day}
-            </button>
+              label={
+                <>
+                  <IconCheck size={17} strokeWidth={2.5} />
+                  Check in — log rest Day {day}
+                </>
+              }
+            />
           </div>
           <div className="grid gap-5 md:grid-cols-2">
             <div className="card-std p-6">
@@ -541,13 +607,15 @@ export default function DashboardHome() {
                 don&apos;t count against you.
               </p>
               <div className="mt-auto flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={() => checkIn(day)}
+                <CheckInAction
+                  day={day}
+                  ready={dayContentReady}
+                  hasQuiz={hasQuiz}
+                  onCheckIn={() => checkIn(day)}
+                  quizLabel={`Take the quiz to resume streak →`}
                   className="btn-primary flex-1 px-4 py-[15px] text-[15px] !font-bold"
-                >
-                  Check in — resume streak
-                </button>
+                  label="Check in — resume streak"
+                />
                 <button
                   type="button"
                   onClick={() => router.push("/journey")}
