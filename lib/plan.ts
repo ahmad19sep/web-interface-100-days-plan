@@ -14,6 +14,7 @@ import type { Challenge, DayPlan, WeekPlan } from "./challenges/types";
 
 export type {
   Challenge,
+  Course,
   Creator,
   DayPlan,
   Project,
@@ -33,6 +34,7 @@ export const CHALLENGE: Challenge = MODERN_AI_2026;
 export const DAYS = CHALLENGE.days;
 export const WEEKS = CHALLENGE.weeks;
 export const PROJECTS = CHALLENGE.projects;
+export const COURSES = CHALLENGE.courses;
 export const COHORT_START_DATE = CHALLENGE.cohortStart;
 export const GITHUB_REPO = CHALLENGE.github;
 export const CREATOR = CHALLENGE.creator;

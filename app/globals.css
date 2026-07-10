@@ -25,6 +25,14 @@
   --rest-done: #164034;
   --today: #f5b54b;
   --locked: #1c2530;
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  --stat-sm: 64px;
+  --stat-md: 88px;
 }
 
 @theme inline {
@@ -127,15 +135,6 @@ a:hover {
     transform: translateY(0) scale(1);
   }
 }
-@keyframes flick {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.72;
-  }
-}
 @keyframes confettiFall {
   0% {
     transform: translateY(-10vh) rotate(0deg);
@@ -157,9 +156,6 @@ a:hover {
 }
 .anim-toast-in {
   animation: toastIn 0.3s ease;
-}
-.anim-flick {
-  animation: flick 1.1s infinite;
 }
 .anim-confetti-fall {
   animation-name: confettiFall;
@@ -211,17 +207,23 @@ a:hover {
   .card-std {
     background: var(--card);
     border: 1px solid var(--edge);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
   .card-grad {
     background: linear-gradient(180deg, #12181f, #0e1319);
     border: 1px solid var(--edge);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
   }
   .tag-mono {
     font-family: var(--font-mono), monospace;
     font-size: 11px;
     padding: 4px 10px;
     border-radius: 6px;
+  }
+  .stat-sm {
+    font-size: var(--stat-sm);
+  }
+  .stat-md {
+    font-size: var(--stat-md);
   }
 }

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { initialsOf } from "@/lib/demo";
 import { computeStreak, currentDay, useProgress } from "@/lib/store";
 import {
+  IconCourses,
   IconCreator,
   IconJourney,
   IconLeaderboard,
@@ -19,6 +20,7 @@ const NAV = [
   { key: "today", href: "/today", label: "Today", Icon: IconToday },
   { key: "journey", href: "/journey", label: "Journey map", Icon: IconJourney },
   { key: "projects", href: "/projects", label: "Projects", Icon: IconProjects },
+  { key: "courses", href: "/courses", label: "Courses", Icon: IconCourses },
   { key: "leaderboard", href: "/leaderboard", label: "Leaderboard", Icon: IconLeaderboard },
   { key: "profile", href: "/profile", label: "Profile", Icon: IconProfile },
   { key: "settings", href: "/settings", label: "Settings", Icon: IconSettings },
@@ -28,6 +30,7 @@ function activeKey(pathname: string): string {
   if (pathname.startsWith("/today")) return "today";
   if (pathname.startsWith("/journey") || pathname.startsWith("/day")) return "journey";
   if (pathname.startsWith("/projects")) return "projects";
+  if (pathname.startsWith("/courses")) return "courses";
   if (pathname.startsWith("/leaderboard")) return "leaderboard";
   if (pathname.startsWith("/profile") || pathname.startsWith("/complete")) return "profile";
   if (pathname.startsWith("/settings")) return "settings";

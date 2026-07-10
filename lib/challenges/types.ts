@@ -67,6 +67,18 @@ export interface Project {
   doneWhen: string;
 }
 
+/** An external course referenced by one or more days in the curriculum. */
+export interface Course {
+  id: string;
+  name: string;
+  provider: string;
+  url: string;
+  /** One-line card blurb */
+  blurb: string;
+  /** Day numbers whose resource text references this course */
+  days: number[];
+}
+
 export interface Creator {
   name: string;
   handle: string;
@@ -86,4 +98,5 @@ export interface Challenge {
   days: DayPlan[];
   weeks: WeekPlan[];
   projects: Project[];
+  courses: Course[];
 }

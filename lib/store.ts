@@ -18,6 +18,7 @@ import {
   currentDay,
   dayState,
   expectedDay,
+  isLocked,
   localToday,
   projectDone,
   projectStatus,
@@ -45,6 +46,7 @@ export {
   dayState,
   expectedDay,
   gradeDayQuiz,
+  isLocked,
   localToday,
   projectDone,
   projectStatus,
@@ -169,6 +171,9 @@ export async function completeOnboarding(opts: {
 export function toggleDay(day: number): number {
   const snap = currentSnapshot();
   if (!snap) return 0;
+  if (!snap.checkins[day] && isLocked(day, snap.checkins)) {
+    return computeStreak(snap.checkins).streak;
+  }
   const checkins = { ...snap.checkins };
   if (checkins[day]) delete checkins[day];
   else checkins[day] = localToday();

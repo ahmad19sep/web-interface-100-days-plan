@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { DbNotConfiguredError, query } from "@/lib/db";
+import { currentDay } from "@/lib/progress";
 import { currentProfile } from "@/lib/session";
 
 export async function POST(request: Request) {
@@ -24,6 +25,19 @@ export async function POST(request: Request) {
         day,
       ]);
     } else {
+      const priorRows = await query<{ day: number }>(
+        "select day from checkins where profile_id = $1",
+        [profile.id]
+      );
+      const priorCheckins: Record<number, string> = {};
+      for (const r of priorRows) priorCheckins[r.day] = "1";
+      const firstIncomplete = currentDay(priorCheckins);
+      if (day > firstIncomplete) {
+        return NextResponse.json(
+          { error: `Complete day ${firstIncomplete} first.` },
+          { status: 400 }
+        );
+      }
       await query(
         "insert into checkins (profile_id, day, checked_on) values ($1, $2, current_date)",
         [profile.id, day]

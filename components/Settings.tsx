@@ -11,28 +11,7 @@ import {
   useProgress,
   type Reminder,
 } from "@/lib/store";
-
-function Toggle({
-  on,
-  onClick,
-}: {
-  on: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="relative h-[26px] w-11 shrink-0 cursor-pointer rounded-full transition-colors"
-      style={{ background: on ? "rgba(53,211,153,.5)" : "#232B35" }}
-    >
-      <span
-        className="absolute top-[3px] h-5 w-5 rounded-full bg-ink transition-all"
-        style={{ left: on ? 21 : 3 }}
-      />
-    </button>
-  );
-}
+import { Toggle } from "./Toggle";
 
 const REMINDERS: { key: Reminder; label: string }[] = [
   { key: "morning", label: "Morning" },

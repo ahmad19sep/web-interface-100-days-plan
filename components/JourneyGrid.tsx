@@ -39,15 +39,17 @@ export function demoCells(current = 37): CellData[] {
 function cellColors(c: CellData) {
   let bg: string;
   let border = "1px solid transparent";
-  if (c.state === "done") bg = c.rest ? "#164034" : "#2AB98A";
+  if (c.state === "done") bg = c.rest ? "var(--rest-done)" : "var(--done)";
   else if (c.state === "current") {
     bg = "rgba(245,181,75,.16)";
-    border = "1.5px solid #F5B54B";
-  } else bg = c.rest ? "transparent" : "#1C2530";
+    border = "1.5px solid var(--today)";
+  } else bg = c.rest ? "transparent" : "var(--locked)";
   if (c.rest && c.state !== "current") border = "1px dashed #3A4552";
   return { bg, border };
 }
 
+// Used as a canvas fillStyle in ShareCards.tsx, which can't resolve CSS
+// custom properties — keep these as literal hex/rgba, not var(--...).
 export function shareCellColor(c: CellData): string {
   if (c.state === "done") return c.rest ? "rgba(53,211,153,.28)" : "#35D399";
   if (c.state === "current") return "#F5B54B";
@@ -91,12 +93,12 @@ export function JourneyCells({
         const pulse = c.state === "current" ? "anim-pulse-ring" : "";
         const title = `Day ${c.n}${c.rest ? " · Rest day" : ""} · ${c.state}`;
         if (variant === "journey") {
-          let numColor = "#4A5460";
+          let numColor = "var(--dim)";
           let weight = 400;
           if (c.state === "done") {
             numColor = c.rest ? "#5FC7A4" : "#08281E";
             if (!c.rest) weight = 700;
-          } else if (c.state === "current") numColor = "#F5B54B";
+          } else if (c.state === "current") numColor = "var(--today)";
           return (
             <button
               key={c.n}

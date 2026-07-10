@@ -51,6 +51,13 @@ export const IconProjects = ({ size = 18 }: { size?: number }) => (
   </Base>
 );
 
+export const IconCourses = ({ size = 18 }: { size?: number }) => (
+  <Base size={size}>
+    <path d="M4 5.5C4 4.7 4.7 4 5.5 4H12v16H5.5c-.8 0-1.5-.7-1.5-1.5v-13Z" />
+    <path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H12v16h6.5c.8 0 1.5-.7 1.5-1.5v-13Z" />
+  </Base>
+);
+
 export const IconLeaderboard = ({ size = 18 }: { size?: number }) => (
   <Base size={size}>
     <path d="M6 20V10M12 20V4M18 20v-6" />

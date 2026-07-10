@@ -14,6 +14,7 @@ import {
 } from "@/lib/store";
 import { useDayContent } from "@/lib/use-day-content";
 import { buildCells, JourneyCells } from "./JourneyGrid";
+import { ProgressBar } from "./ProgressBar";
 import { Toast, useToast } from "./Toast";
 import { IconCheck, IconClockBack } from "./icons";
 
@@ -100,7 +101,7 @@ function DayCounterCard({
       <div className="mb-1.5 font-mono text-xs tracking-[.1em] text-mut3">
         {label}
       </div>
-      <div className="font-mono text-[88px] font-extrabold leading-[.9] tracking-[-.04em] text-accent">
+      <div className="stat-md font-mono font-extrabold leading-[.9] tracking-[-.04em] text-accent">
         {pad3(day)}
       </div>
       <div className="mt-1 font-mono text-[15px] text-mut3">/ 100</div>
@@ -111,14 +112,8 @@ function DayCounterCard({
             <span className="text-[13px] text-mut2">Progress</span>
             <span className="font-mono text-[13px] text-ink">{done}%</span>
           </div>
-          <div className="mb-5 h-2 overflow-hidden rounded-full bg-locked">
-            <div
-              className="h-full rounded-full"
-              style={{
-                width: `${done}%`,
-                background: "linear-gradient(90deg,#1DBA89,#35D399)",
-              }}
-            />
+          <div className="mb-5">
+            <ProgressBar pct={done} />
           </div>
           <div className="flex justify-between text-[12.5px] text-mut2">
             <span>Projects shipped</span>
@@ -150,7 +145,11 @@ function ThisWeekCard({
           const today = d.day === day;
           if (done)
             return (
-              <Link key={d.day} href={`/day/${d.day}`} className="flex items-center gap-3">
+              <Link
+                key={d.day}
+                href={`/day/${d.day}`}
+                className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-0.5 transition-colors hover:bg-card2"
+              >
                 <span className="flex h-[22px] w-[22px] items-center justify-center rounded-md bg-accent-deep">
                   <IconCheck size={12} />
                 </span>
@@ -162,7 +161,11 @@ function ThisWeekCard({
             );
           if (today)
             return (
-              <Link key={d.day} href={`/day/${d.day}`} className="flex items-center gap-3">
+              <Link
+                key={d.day}
+                href={`/day/${d.day}`}
+                className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-0.5 transition-colors hover:bg-card2"
+              >
                 <span className="flex h-[22px] w-[22px] items-center justify-center rounded-md border border-[rgba(245,181,75,.5)] bg-[rgba(245,181,75,.16)] font-mono text-[10px] text-today">
                   {d.day}
                 </span>
@@ -173,7 +176,11 @@ function ThisWeekCard({
               </Link>
             );
           return (
-            <Link key={d.day} href={`/day/${d.day}`} className="flex items-center gap-3 opacity-50">
+            <Link
+              key={d.day}
+              href={`/day/${d.day}`}
+              className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-0.5 opacity-50 transition-colors hover:bg-card2"
+            >
               <span className="h-[22px] w-[22px] rounded-md bg-locked" />
               <span className="flex-1 truncate text-[13.5px] !text-ink">
                 Day {d.day} · {d.title}
@@ -584,7 +591,7 @@ export default function DashboardHome() {
                 STREAK
               </div>
               <div className="flex items-baseline gap-2">
-                <div className="font-mono text-[64px] font-extrabold leading-[.9] tracking-[-.04em] text-mut3">
+                <div className="stat-sm font-mono font-extrabold leading-[.9] tracking-[-.04em] text-mut3">
                   {streak.streak}
                 </div>
                 <div className="text-[15px] text-mut3">paused</div>

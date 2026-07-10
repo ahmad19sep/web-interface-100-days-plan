@@ -103,6 +103,14 @@ export function dayState(
   return "locked";
 }
 
+/** True once a day is beyond the first incomplete day — i.e. the previous
+ * day hasn't been checked in yet. Past incomplete days stay checkable, so
+ * this is deliberately narrower than dayState's "locked" (which also flags
+ * those). Matches the server-side rule in the checkin API route. */
+export function isLocked(day: number, checkins: Record<number, string>): boolean {
+  return day > currentDay(checkins);
+}
+
 export type ProjectStatus = "shipped" | "progress" | "locked";
 
 export function projectStatus(

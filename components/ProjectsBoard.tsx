@@ -9,6 +9,7 @@ import {
   shippedCount,
   useProgress,
 } from "@/lib/store";
+import { ProgressBar } from "./ProgressBar";
 
 export default function ProjectsBoard() {
   const state = useProgress();
@@ -50,21 +51,19 @@ export default function ProjectsBoard() {
             st === "shipped" ? "#35D399" : st === "progress" ? "#F5B54B" : "#5D6672";
           const barColor = st === "progress" ? "#F5B54B" : "#35D399";
           const border =
-            st === "progress" ? "rgba(245,181,75,.3)" : "#212934";
+            st === "progress" ? "rgba(245,181,75,.3)" : "var(--edge)";
 
           const badge =
             st === "shipped" ? (
-              <span className="rounded-md bg-[rgba(53,211,153,.12)] px-[9px] py-[3px] font-mono text-[10.5px] text-accent">
+              <span className="tag-mono bg-[rgba(53,211,153,.12)] text-accent">
                 SHIPPED
               </span>
             ) : st === "progress" ? (
-              <span className="rounded-md bg-[rgba(245,181,75,.14)] px-[9px] py-[3px] font-mono text-[10.5px] text-today">
+              <span className="tag-mono bg-[rgba(245,181,75,.14)] text-today">
                 IN PROGRESS
               </span>
             ) : (
-              <span className="rounded-md bg-locked px-[9px] py-[3px] font-mono text-[10.5px] text-mut3">
-                LOCKED
-              </span>
+              <span className="tag-mono bg-locked text-mut3">LOCKED</span>
             );
 
           const body = (
@@ -92,12 +91,7 @@ export default function ProjectsBoard() {
                   {done}/{total}
                 </span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-locked">
-                <div
-                  className="h-full rounded-full"
-                  style={{ width: `${pct}%`, background: barColor }}
-                />
-              </div>
+              <ProgressBar pct={pct} color={barColor} />
             </>
           );
 
@@ -105,8 +99,8 @@ export default function ProjectsBoard() {
             return (
               <div
                 key={p.id}
-                className="rounded-2xl bg-card p-5 opacity-[.62]"
-                style={{ border: `1px solid ${border}` }}
+                className="card-std p-5 opacity-[.62]"
+                style={{ borderColor: border }}
               >
                 {body}
               </div>
@@ -116,8 +110,8 @@ export default function ProjectsBoard() {
             <Link
               key={p.id}
               href={`/projects/${p.id}`}
-              className="block rounded-2xl bg-card p-5 !text-ink transition-transform hover:-translate-y-0.5"
-              style={{ border: `1px solid ${border}` }}
+              className="card-std block p-5 !text-ink transition-transform hover:-translate-y-0.5"
+              style={{ borderColor: border }}
             >
               {body}
             </Link>

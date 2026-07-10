@@ -9,6 +9,7 @@ import {
   useProgress,
 } from "@/lib/store";
 import { IconBack } from "./icons";
+import { ProgressBar } from "./ProgressBar";
 
 export default function ProjectDetail({ project }: { project: Project }) {
   const state = useProgress();
@@ -25,10 +26,10 @@ export default function ProjectDetail({ project }: { project: Project }) {
 
   const accentTag =
     st === "progress"
-      ? { color: "#F5B54B", bg: "rgba(245,181,75,.14)" }
+      ? { color: "var(--today)", bg: "rgba(245,181,75,.14)" }
       : st === "shipped"
-        ? { color: "#35D399", bg: "rgba(53,211,153,.12)" }
-        : { color: "#6C7581", bg: "#1C2530" };
+        ? { color: "var(--accent)", bg: "rgba(53,211,153,.12)" }
+        : { color: "var(--mut3)", bg: "var(--locked)" };
 
   return (
     <div>
@@ -88,7 +89,11 @@ export default function ProjectDetail({ project }: { project: Project }) {
                     <span
                       className="w-[30px] font-mono text-xs"
                       style={{
-                        color: dDone ? "#6C7581" : dCurrent ? "#F5B54B" : "#4A5460",
+                        color: dDone
+                          ? "var(--mut3)"
+                          : dCurrent
+                            ? "var(--today)"
+                            : "var(--dim)",
                       }}
                     >
                       {pad3(d.day)}
@@ -97,20 +102,20 @@ export default function ProjectDetail({ project }: { project: Project }) {
                       className="h-2 w-2 shrink-0 rounded-[2px]"
                       style={{
                         background: dDone
-                          ? "#2AB98A"
+                          ? "var(--done)"
                           : dCurrent
-                            ? "#F5B54B"
-                            : "#1C2530",
+                            ? "var(--today)"
+                            : "var(--locked)",
                       }}
                     />
                     <span
                       className="flex-1 truncate text-[13.5px]"
                       style={{
                         color: dDone
-                          ? "#ECE6DA"
+                          ? "var(--ink)"
                           : dCurrent
-                            ? "#F5B54B"
-                            : "#6C7581",
+                            ? "var(--today)"
+                            : "var(--mut3)",
                       }}
                     >
                       {d.title}
@@ -137,14 +142,8 @@ export default function ProjectDetail({ project }: { project: Project }) {
               </span>
               <span className="text-sm text-mut3">/ {total} days</span>
             </div>
-            <div className="mb-1.5 h-2 overflow-hidden rounded-full bg-locked">
-              <div
-                className="h-full rounded-full"
-                style={{
-                  width: `${pct}%`,
-                  background: "linear-gradient(90deg,#1DBA89,#35D399)",
-                }}
-              />
+            <div className="mb-1.5">
+              <ProgressBar pct={pct} />
             </div>
             <div className="text-xs text-mut3">
               {pct}% · you&apos;re on Day {Math.min(current, 100)} of your track

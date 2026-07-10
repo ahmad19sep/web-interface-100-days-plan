@@ -13,6 +13,7 @@ import {
 import type { QuizQuestion } from "@/lib/challenges/types";
 import {
   currentDay,
+  isLocked,
   setNote,
   submitQuiz,
   toggleDay,
@@ -128,11 +129,13 @@ function QuizCard({
   quiz,
   saved,
   onPassed,
+  disabled,
 }: {
   day: number;
   quiz: QuizQuestion[];
   saved: Record<number, number>;
   onPassed?: () => void;
+  disabled?: boolean;
 }) {
   const [selected, setSelected] = useState<Record<number, number>>(saved);
   const [graded, setGraded] = useState(Object.keys(saved).length > 0);
@@ -198,7 +201,7 @@ function QuizCard({
                   <button
                     key={oi}
                     type="button"
-                    disabled={busy}
+                    disabled={busy || disabled}
                     onClick={() => {
                       setSelected((s) => ({ ...s, [qi]: oi }));
                       setGraded(false);
@@ -227,10 +230,16 @@ function QuizCard({
       <button
         type="button"
         onClick={() => void onSubmit()}
-        disabled={!allAnswered || busy}
+        disabled={!allAnswered || busy || disabled}
         className="btn-primary mt-4 w-full py-3 text-sm disabled:cursor-default disabled:opacity-50"
       >
-        {busy ? "Checking…" : graded ? "Re-check answers" : "Check answers"}
+        {disabled
+          ? "🔒 Locked"
+          : busy
+            ? "Checking…"
+            : graded
+              ? "Re-check answers"
+              : "Check answers"}
       </button>
     </div>
   );
@@ -456,6 +465,7 @@ export default function DayDetail({ day }: { day: number }) {
   const current = currentDay(state.checkins);
   const done = Boolean(state.checkins[day]);
   const isToday = day === current;
+  const locked = isLocked(day, state.checkins);
   const { content: dayContent, ready: dayContentReady, setContent: setDayContent } =
     useDayContent(day);
 
@@ -477,6 +487,13 @@ export default function DayDetail({ day }: { day: number }) {
     : undefined;
 
   function onCheckIn() {
+    if (locked) {
+      showToast({
+        title: "Locked",
+        sub: `Complete day ${day - 1} first.`,
+      });
+      return;
+    }
     const newStreak = toggleDay(day);
     if (!state.checkins[day]) {
       showToast({
@@ -639,6 +656,7 @@ export default function DayDetail({ day }: { day: number }) {
                     day={day}
                     quiz={effectiveQuiz}
                     saved={state.quizAnswers[day] ?? {}}
+                    disabled={locked}
                     onPassed={() => {
                       if (!done) onCheckIn();
                     }}
@@ -730,6 +748,14 @@ export default function DayDetail({ day }: { day: number }) {
               >
                 <IconCheck size={17} stroke="#35D399" strokeWidth={2.5} />
                 Day {day} done · tap to undo
+              </button>
+            ) : locked ? (
+              <button
+                type="button"
+                disabled
+                className="btn-ghost w-full cursor-default py-3.5 text-[14.5px] !text-mut3 opacity-50"
+              >
+                🔒 Complete Day {day - 1} first
               </button>
             ) : hasQuiz && !quizPassed ? (
               <a
@@ -835,10 +861,10 @@ export default function DayDetail({ day }: { day: number }) {
                       className="h-2 w-2 shrink-0 rounded-[2px]"
                       style={{
                         background: nDone
-                          ? "#2AB98A"
+                          ? "var(--done)"
                           : nCurrent
-                            ? "#F5B54B"
-                            : "#1C2530",
+                            ? "var(--today)"
+                            : "var(--locked)",
                       }}
                     />
                     <span

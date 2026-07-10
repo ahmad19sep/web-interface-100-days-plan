@@ -4,6 +4,7 @@
 
 import type {
   Challenge,
+  Course,
   DayPlan,
   Project,
   QuizQuestion,
@@ -145,6 +146,90 @@ export const PROJECTS: Project[] = [
       "One polished system combining retrieval + agent + evals + security, with a full case study — plus the client-acquisition sprint (portfolio, repositioning, productized audit offer).",
     doneWhen:
       "It passes its own evals, survives its own red-team, and ships with a public case study and metrics.",
+  },
+];
+
+/** External courses referenced across the curriculum's day resources. */
+export const COURSES: Course[] = [
+  {
+    id: "hf-agents-course",
+    name: "Agents Course",
+    provider: "Hugging Face",
+    url: "https://huggingface.co/learn/agents-course",
+    blurb: "Free course on building agents — smolagents and LangGraph units.",
+    days: [48],
+  },
+  {
+    id: "hf-mcp-course",
+    name: "MCP Course",
+    provider: "Hugging Face",
+    url: "https://huggingface.co/learn/mcp-course",
+    blurb: "Build MCP servers and clients across three hands-on units.",
+    days: [61, 62, 65, 66, 68],
+  },
+  {
+    id: "dlai-advanced-rag",
+    name: "Building and Evaluating Advanced RAG",
+    provider: "DeepLearning.AI",
+    url: "https://www.deeplearning.ai/short-courses/building-evaluating-advanced-rag/",
+    blurb: "The RAG triad — context relevance, groundedness, answer relevance.",
+    days: [17],
+  },
+  {
+    id: "dlai-eval-agents",
+    name: "Evaluating AI Agents",
+    provider: "DeepLearning.AI",
+    url: "https://www.deeplearning.ai/short-courses/evaluating-ai-agents/",
+    blurb: "Arize AI on tracing and evaluating agent behavior.",
+    days: [19, 41],
+  },
+  {
+    id: "dlai-improving-accuracy",
+    name: "Improving Accuracy of LLM Applications",
+    provider: "DeepLearning.AI",
+    url: "https://www.deeplearning.ai/short-courses/improving-accuracy-of-llm-applications/",
+    blurb: "AMD/Meta techniques for pushing LLM app accuracy higher.",
+    days: [32],
+  },
+  {
+    id: "dlai-computer-use",
+    name: "Building Toward Computer Use with Anthropic",
+    provider: "DeepLearning.AI",
+    url: "https://www.deeplearning.ai/short-courses/building-toward-computer-use-with-anthropic/",
+    blurb: "How Claude's computer-use capability was built, from Anthropic.",
+    days: [57],
+  },
+  {
+    id: "dlai-voice-agents",
+    name: "Voice for AI Agents and Applications",
+    provider: "DeepLearning.AI",
+    url: "https://www.deeplearning.ai/short-courses/voice-for-ai-agents-and-applications/",
+    blurb: "Vocal Bridge — adding voice interfaces to agentic apps.",
+    days: [58],
+  },
+  {
+    id: "dlai-mcp-rich-context",
+    name: "MCP: Build Rich-Context AI Apps with Anthropic",
+    provider: "DeepLearning.AI",
+    url: "https://www.deeplearning.ai/short-courses/mcp-build-rich-context-ai-apps-with-anthropic/",
+    blurb: "Anthropic's own course on building rich-context apps with MCP.",
+    days: [62],
+  },
+  {
+    id: "dlai-rag",
+    name: "Retrieval Augmented Generation (RAG)",
+    provider: "DeepLearning.AI",
+    url: "https://www.deeplearning.ai/short-courses/retrieval-augmented-generation-rag/",
+    blurb: "Search techniques that make retrieval actually work.",
+    days: [71],
+  },
+  {
+    id: "dlai-red-teaming",
+    name: "Red Teaming LLM Applications",
+    provider: "DeepLearning.AI",
+    url: "https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/",
+    blurb: "Giskard on finding and fixing LLM app vulnerabilities.",
+    days: [79],
   },
 ];
 
@@ -771,4 +856,5 @@ export const MODERN_AI_2026: Challenge = {
   })),
   weeks: WEEKS,
   projects: PROJECTS,
+  courses: COURSES,
 };

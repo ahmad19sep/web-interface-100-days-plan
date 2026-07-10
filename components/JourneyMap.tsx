@@ -8,6 +8,7 @@ import {
 } from "@/lib/store";
 import { buildCells, JourneyCells } from "./JourneyGrid";
 import { IconInfo } from "./icons";
+import { Toggle } from "./Toggle";
 
 export default function JourneyMap() {
   const state = useProgress();
@@ -75,24 +76,12 @@ export default function JourneyMap() {
               Rest day
             </span>
           </div>
-          <button
-            type="button"
+          <Toggle
+            on={showCohort}
             onClick={() => setShowCohort((v) => !v)}
-            className="flex cursor-pointer items-center gap-2 text-[12.5px] text-mut"
-          >
-            <span
-              className="relative h-5 w-[34px] rounded-full transition-colors duration-200"
-              style={{
-                background: showCohort ? "rgba(245,181,75,.5)" : "#232B35",
-              }}
-            >
-              <span
-                className="absolute top-0.5 h-4 w-4 rounded-full bg-ink transition-all duration-200"
-                style={{ left: showCohort ? 16 : 2 }}
-              />
-            </span>
-            Show cohort line
-          </button>
+            label="Show cohort line"
+            color="today"
+          />
         </div>
 
         <div className="relative">
