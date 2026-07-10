@@ -162,6 +162,19 @@ a:hover {
   animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.anim-rise {
+  animation: riseIn 0.35s ease;
+}
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;

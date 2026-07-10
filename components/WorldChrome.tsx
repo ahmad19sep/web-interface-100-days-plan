@@ -17,6 +17,31 @@ export default function WorldChrome({
 }) {
   const pathname = usePathname();
   const onWorld = pathname.startsWith("/journey");
+  // Day lessons open like the design's "lesson room" — a floating centered
+  // card over the dimmed world instead of a full-page overlay.
+  const isLesson = /^\/day\//.test(pathname);
+
+  if (isLesson) {
+    return (
+      <>
+        <JourneyWorld />
+        <div className="fixed inset-x-0 bottom-0 top-[52px] z-40 grid place-items-center bg-[rgba(6,9,18,.78)] p-3 backdrop-blur-[8px] sm:p-7 lg:left-[68px] lg:top-0">
+          <div className="anim-rise relative w-full max-w-[1080px]">
+            <Link
+              href="/journey"
+              title="Back to the world"
+              className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-[9px] border border-edge2 bg-[rgba(13,18,32,.9)] text-[15px] !text-mut2 hover:!text-ink"
+            >
+              ✕
+            </Link>
+            <div className="max-h-[92vh] overflow-y-auto rounded-[18px] border border-edge2 bg-card p-5 shadow-[0_30px_80px_rgba(0,0,0,.6)] sm:p-7">
+              {children}
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
