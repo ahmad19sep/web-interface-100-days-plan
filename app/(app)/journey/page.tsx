@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import JourneyMap from "@/components/JourneyMap";
+import JourneyWorld from "@/components/JourneyWorld";
 
 export const metadata: Metadata = {
-  title: "Journey map",
+  title: "Journey world",
 };
 
 export default function JourneyPage() {
-  return <JourneyMap />;
+  return <JourneyWorld />;
 }
