@@ -1,88 +1,94 @@
-# 100 Days of Modern AI — Companion Tracker
+# Ahmad X AI — learn AI by building
 
-The web app for the **100 Days of Modern AI** public learning challenge by
-AI Radar (@aixahmad): raw-API foundations → evals & reliability → context &
-cost → agents from scratch → MCP → retrieval depth → AI security → capstone
-& client sprint.
+The course platform at **[radar.hafizahmad.com](https://radar.hafizahmad.com)**
+by Ahmad (@aixahmad). Course #1, live now: **120 Days of Production AI
+Engineering** — raw APIs → retrieval → evals & reliability → context & cost →
+agents → loop engineering → production backend → multimodal → realtime voice →
+open-model serving → MCP/A2A → AI security → production capstone. 120 days,
+20 portfolio projects, evals-first and production-first.
 
 Built from the high-fidelity design handoff in
-`100 days app prompt/design_handoff_100_days_ai/`, wired to the real 100-day
-curriculum.
+`100 days app prompt/design_handoff_100_days_ai/`; the curriculum is pure data
+in `lib/challenges/production-ai-2026.ts` (generated from the prepared
+120-day JSON). Site brand lives in `lib/site.ts` — one-line change to rename.
 
 ## Screens
 
-- **Landing** — logged-out marketing page (hero, how-it-works, the 8 projects,
-  weekly rhythm, creator, join CTA).
+- **Landing** — logged-out page for the platform (hero with a live three.js
+  3D journey city, how-it-works, the 20 projects, weekly rhythm, about me,
+  join CTA).
 - **Start / login** — every learner has their own **account**: a username +
-  personal code (min 4 chars, stored salted-hashed) that opens the same track
-  from any phone or laptop. Settings can log out anytime; logging back in
-  from any device with the same username + code picks up right where you
-  left off.
+  personal code (min 4 chars, salted-hashed) that opens the same track from
+  any phone or laptop.
 - **Onboarding** — start date (today / align with cohort), daily reminder,
-  profile visibility. Max 3 steps, never shame.
-- **Dashboard "Today"** — day counter, today's build card, check-in CTA, this
-  week checklist, journey mini-map. Auto-derives four states: **today**,
-  **behind/catch-up**, **rest day** (every 7th), and **streak paused**.
-- **Journey map** — numbered 10×10 grid with done/today/locked/rest states and
-  an optional cohort line overlay.
-- **Day detail** — one page per day: video slot, resource, build, done-when,
-  private notes journal, GitHub folder link, around-today rail.
-- **Projects** — P1–P8 + capstone with SHIPPED / IN PROGRESS / LOCKED states;
+  profile visibility. Max 3 steps, never shame. Lands on **Courses**.
+- **Courses** — the catalog (own courses only, no external ones): one card
+  per course with progress and a Start/Continue button. Post-login home.
+- **Dashboard "Today"** — day counter, today's build card, this-week
+  checklist, 3D journey mini-map. One primary button — **Start Day N** — that
+  opens the day page; check-in deliberately does NOT live on the dashboard.
+  Auto-derives four states: today, behind/catch-up, rest day (every 7th),
+  streak paused.
+- **Journey map** — numbered 10×12 grid with done/today/locked/rest states
+  and an optional cohort line overlay.
+- **Day detail** — the only place a day can be completed: goal, why-it-
+  matters, what-to-learn, build, done-when, proof-to-post, difficulty/time
+  badges, the creator's grouped "📦 Today's learnings" (video embed, GitHub
+  folder, note, resource links), private notes, and the quiz (60% pass gate;
+  day-order locking).
+- **Projects** — P1–P20 with SHIPPED / IN PROGRESS / LOCKED states;
   per-project detail with day list and ship criteria.
 - **Leaderboard & community** — real ranked list of everyone with a public
-  profile (name, day, streak, days done), pulled live from the database;
-  private profiles never appear. The weekly showcase wall is still preview
-  data (see ARCHITECTURE.md's v3 section).
-- **Profile** — stats (current streak, days done, projects shipped, longest
-  streak) + journey thumbnail.
-- **Settings** — reminder, public profile, private notes, account.
-- **100-day completion** — certificate screen.
-- **Share card** — 1200×630 and 1080×1080 progress cards, PNG download, copy
-  image, share intent.
+  profile (name, day, streak, days done, badges, quiz score), live from the
+  database; private profiles never appear. Showcase wall is still preview
+  data (see ARCHITECTURE.md).
+- **Profile / Settings / Completion certificate / Share cards** (1200×630 +
+  1080×1080 PNG export).
+- **/creator** — owner-only dashboard: sign-ups, per-day check-in funnel,
+  every account's stats.
+
+## The 3D UI
+
+- Site-wide **three.js backdrop**: drifting emerald/amber particle field over
+  a moving wireframe floor, with pointer parallax — behind every screen from
+  login to certificate.
+- **Journey3D**: the track rendered as a 3D city (one tower per day; done
+  days glow emerald, today pulses amber) on the landing hero and dashboard.
+- Every button is an extruded 3D block (raised ledge, presses flat on
+  click); every card lifts in 3D on hover; inputs are pressed-in wells;
+  key cards tilt toward the cursor. All of it goes still under
+  `prefers-reduced-motion`; three.js loads client-side only.
 
 ## Streak rules (streak-with-grace)
 
 - Every check-in day grows the streak; rest days count too.
 - Miss **one** day → the grace token bridges it, streak holds.
-- Miss **two+** in a row → the streak **pauses** (never resets to 0); the next
-  check-in resumes it.
+- Miss **two+** in a row → the streak **pauses** (never resets to 0); the
+  next check-in resumes it.
 - The grace token refills after 7 clean consecutive check-ins.
 
-Progress is stored in a **shared Postgres database** — every learner's
-username + code opens the same track from any device (see
-`db/schema.sql`). Codes are salted-hashed and can't be recovered. The owner
-sees aggregate visitors via Vercel Web Analytics. See
-**[ARCHITECTURE.md](ARCHITECTURE.md)** for the full access model, the
-one-time database setup, and the multi-challenge structure
-(`lib/challenges/`).
+Progress lives in a **shared Postgres database** (`db/schema.sql`); codes are
+salted-hashed and not recoverable. See **[ARCHITECTURE.md](ARCHITECTURE.md)**
+for the access model, one-time DB setup, and the **multi-course roadmap**
+(adding course #2 = one data file + registry entry + a lossless
+`challenge_id` migration).
 
 ## Daily owner workflow
 
 **Live, from the app — no deploy needed.** Log in as the owner account and
-open that day's page: a **"👑 CREATOR"** panel appears (visible only to you)
-with video link, GitHub link, a note, and a quiz builder (add/remove
-questions and options, mark the correct one per question) — one Save button
-for all of it. Saving updates that day's page for every user immediately.
-GitHub defaults to the `day-N` folder pattern in
+open that day's page: the **"👑 CREATOR"** panel (visible only to you) sets
+the video link, GitHub link, note, resource links (one per line,
+`Label | https://url`), and the quiz builder — one Save updates that day for
+every user immediately. GitHub defaults to the `day-N` folder in
 [ahmad19sep/100-days-learning-ai](https://github.com/ahmad19sep/100-days-learning-ai)
-if you leave it blank. Everything you set shows to users in one grouped
-**"📦 Today's learnings from …"** section on that day's page, instead of
-scattered across the layout.
+if left blank.
 
-**Bulk-loading many days at once, via code** (optional — still works,
-useful for pre-seeding before the challenge starts): `VIDEOS`, `OWNER_NOTES`,
-and `WATCH_LINKS` in `lib/challenges/modern-ai-2026.ts` take one line per
-day, e.g. `14: "https://youtu.be/XXXX",`. Anything set live from the app
-takes priority over these when both exist for the same day.
-
-`QUIZZES` (also in that file) works the same way as a bulk-preload fallback
-for the quiz builder above — a DB-set quiz for a day always wins over it.
-Either way, answers are never stored as "correct/incorrect", only the
-selected option — so fixing a `correctIndex` (in the app or in code)
-re-grades everyone retroactively.
-
-Days without a video show "video coming soon" plus a "Search this topic on
-YouTube" button built from each day's curated search phrase.
+**Bulk pre-seeding via code** (optional): `VIDEOS`, `OWNER_NOTES`,
+`WATCH_LINKS`, and `QUIZZES` maps in the course file take one line per day;
+anything set live from the app wins over them. Quiz answers store only the
+selected option — never a "correct" flag — so fixing a `correctIndex`
+re-grades everyone retroactively. Days without a video show "coming soon"
+plus a topic search button.
 
 ## Develop
 
@@ -92,15 +98,14 @@ cp .env.local.example .env.local   # fill in DATABASE_URL — see ARCHITECTURE.m
 npm run dev
 ```
 
-## Deploy (Vercel)
+## Deploy
 
-```bash
-npm i -g vercel   # once
-vercel login      # once
-vercel --prod
-```
+Push to `main` — the GitHub repo is connected to Vercel and deploys to
+production automatically (also aliased to
+`web-interface-100-days-plan.vercel.app`). Domain: `radar.hafizahmad.com`
+via CNAME → `cname.vercel-dns.com` at Hostinger.
 
 ## Stack
 
-Next.js (App Router) · TypeScript · Tailwind CSS v4 · Postgres (Neon) ·
-Canvas · Space Grotesk / Inter / JetBrains Mono
+Next.js (App Router) · TypeScript · Tailwind CSS v4 · Postgres (Neon, `pg`) ·
+three.js · Canvas · Space Grotesk / Inter / JetBrains Mono
