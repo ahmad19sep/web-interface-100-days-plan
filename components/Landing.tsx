@@ -10,6 +10,7 @@ import {
   TOTAL_DAYS,
   TOTAL_PROJECTS,
 } from "@/lib/plan";
+import { SITE } from "@/lib/site";
 import { currentDay, expectedDay, useProgress } from "@/lib/store";
 import dynamic from "next/dynamic";
 import { demoCells, buildCells } from "./JourneyGrid";
@@ -50,17 +51,17 @@ export default function Landing() {
         <div className="flex items-center gap-[11px]">
           <Logo size={32} />
           <div className="font-display text-[15.5px] font-semibold tracking-[-.01em]">
-            {CHALLENGE.title}
+            {SITE.name}
           </div>
           <span className="ml-1 hidden rounded-md border border-[#232B35] px-[7px] py-[2px] font-mono text-[10.5px] text-dim2 sm:inline">
-            AHMAD X AI
+            {SITE.handle.toUpperCase()}
           </span>
         </div>
         <div className="flex items-center gap-4 sm:gap-[30px]">
           <div className="hidden gap-[26px] text-[13.5px] text-mut md:flex">
             <a className="!text-mut hover:!text-ink" href="#how">How it works</a>
-            <a className="!text-mut hover:!text-ink" href="#projects">The 8 projects</a>
-            <a className="!text-mut hover:!text-ink" href="#creator">Creator</a>
+            <a className="!text-mut hover:!text-ink" href="#projects">The course</a>
+            <a className="!text-mut hover:!text-ink" href="#creator">About me</a>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -87,7 +88,7 @@ export default function Landing() {
               className="h-1.5 w-1.5 rounded-full bg-accent"
               style={{ boxShadow: "0 0 8px #35D399" }}
             />
-            Cohort live now · Day {liveDay} of {TOTAL_DAYS}
+            {CHALLENGE.title} · Day {liveDay} of {TOTAL_DAYS}
           </div>
           <h1 className="mb-[22px] font-display text-[40px] font-bold leading-[1.03] tracking-[-.025em] sm:text-[57px]">
             120 days.
@@ -285,7 +286,7 @@ export default function Landing() {
         </div>
         <div className="card-std flex flex-col rounded-[18px] p-[30px]">
           <div className="mb-3 font-mono text-xs tracking-[.06em] text-accent">
-            THE CREATOR
+            ABOUT ME
           </div>
           <div className="mb-[18px] flex items-center gap-3.5">
             <div
@@ -340,7 +341,7 @@ export default function Landing() {
           Start the challenge
         </Link>
         <div className="mt-11 flex flex-col items-center justify-between gap-2 border-t border-[rgba(255,255,255,.06)] pt-[22px] text-[12.5px] text-dim2 sm:flex-row">
-          <span>© 2026 Ahmad X AI · {CHALLENGE.title}</span>
+          <span>© 2026 {SITE.name} · radar.hafizahmad.com</span>
           <span className="font-mono">Latin script only · built in public</span>
         </div>
       </section>

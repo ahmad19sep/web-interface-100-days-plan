@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { CHALLENGE } from "@/lib/plan";
+import { SITE } from "@/lib/site";
 import Background3DMount from "@/components/Background3DMount";
 import "./globals.css";
 
@@ -25,10 +25,11 @@ const jbmono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: CHALLENGE.title,
-    template: `%s · ${CHALLENGE.title}`,
+    default: `${SITE.name} — ${SITE.sub}`,
+    template: `%s · ${SITE.name}`,
   },
-  description: `A daily training log for the ${CHALLENGE.title} public learning challenge — learn, build, prove it, check in. Streak with grace, ${CHALLENGE.projects.length} real projects, one production capstone.`,
+  description: SITE.tagline,
+  metadataBase: new URL(SITE.url),
 };
 
 export default function RootLayout({

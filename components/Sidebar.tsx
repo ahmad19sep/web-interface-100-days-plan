@@ -57,10 +57,10 @@ export default function Sidebar() {
         <Link href="/" className="flex items-center gap-2.5 px-2 pb-[22px]">
           <Logo size={30} radius={8} />
           <div className="font-display text-[13.5px] font-semibold leading-[1.15] text-ink">
-            120 Days
+            Ahmad X AI
             <br />
             <span className="text-[11px] font-normal text-mut3">
-              of Production AI
+              learn AI by building
             </span>
           </div>
         </Link>
