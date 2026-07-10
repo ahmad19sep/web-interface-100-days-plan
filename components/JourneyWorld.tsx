@@ -10,6 +10,13 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { buildAvatarObject, loadThree } from "@/lib/avatar-models";
+import {
+  SHIP_DAYS,
+  weekColorCss,
+  weekColorHex as weekColor,
+  xpOf,
+  levelOf,
+} from "@/lib/game";
 import { DAYS, PROJECTS, TOTAL_DAYS, WEEKS, getDay, weekOf } from "@/lib/plan";
 import { computeStreak, shippedCount } from "@/lib/progress";
 import { currentDay, useProgress } from "@/lib/store";
@@ -17,19 +24,6 @@ import JourneyMap from "./JourneyMap";
 
 type ThreeNS = typeof import("three");
 type V3 = InstanceType<ThreeNS["Vector3"]>;
-
-// One color band per week, cycling a fixed palette so the road visibly
-// changes climate as you travel — fully derived from the curriculum data.
-const WEEK_PALETTE = [0x22d3ee, 0x7dd3fc, 0x34d399, 0xa78bfa, 0xfb923c, 0xf59e0b];
-const WEEK_PALETTE_CSS = ["#22d3ee", "#7dd3fc", "#34d399", "#a78bfa", "#fb923c", "#f59e0b"];
-function weekColor(week: number) {
-  return WEEK_PALETTE[(week - 1) % WEEK_PALETTE.length];
-}
-function weekColorCss(week: number) {
-  return WEEK_PALETTE_CSS[(week - 1) % WEEK_PALETTE_CSS.length];
-}
-
-const SHIP_DAYS = new Set(PROJECTS.map((p) => p.shipDay));
 
 interface WorldRefs {
   renderer: InstanceType<ThreeNS["WebGLRenderer"]>;
@@ -40,16 +34,6 @@ interface WorldRefs {
   walkTo(n: number, onArrive: () => void): void;
   /** Teleport to the end of the current walk (fires onArrive). */
   skipWalk(): void;
-}
-
-/** Purely derived gamification — nothing is stored, just counted. */
-function xpOf(checkins: Record<number, string>): number {
-  let xp = 0;
-  for (const key of Object.keys(checkins)) {
-    const n = Number(key);
-    xp += SHIP_DAYS.has(n) ? 250 : DAYS[n - 1]?.isRest ? 40 : 100;
-  }
-  return xp;
 }
 
 export default function JourneyWorld() {
@@ -87,7 +71,7 @@ export default function JourneyWorld() {
   const today = Math.min(currentDay(state.checkins), TOTAL_DAYS);
   const doneCount = Object.keys(state.checkins).length;
   const xp = xpOf(state.checkins);
-  const level = 1 + Math.floor(xp / 500);
+  const level = levelOf(xp);
   const streak = computeStreak(state.checkins).streak;
   const shipped = shippedCount(state.checkins);
   const checkinsRef = useRef(state.checkins);
