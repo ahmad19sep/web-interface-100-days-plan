@@ -12,18 +12,26 @@ Built from the high-fidelity design handoff in
 in `lib/challenges/production-ai-2026.ts` (generated from the prepared
 120-day JSON). Site brand lives in `lib/site.ts` — one-line change to rename.
 
-## Screens
+## Screens & flow
 
-- **Landing** — logged-out page for the platform (hero with a live three.js
-  3D journey city, how-it-works, the 20 projects, weekly rhythm, about me,
-  join CTA).
-- **Start / login** — every learner has their own **account**: a username +
-  personal code (min 4 chars, salted-hashed) that opens the same track from
-  any phone or laptop.
-- **Onboarding** — start date (today / align with cohort), daily reminder,
-  profile visibility. Max 3 steps, never shame. Lands on **Courses**.
-- **Courses** — the catalog (own courses only, no external ones): one card
-  per course with progress and a Start/Continue button. Post-login home.
+- **Landing** — a minimal front door: the giant extruded-3D "LEARN AI WITH
+  AHMAD" title (floats + cursor-tilts) over the WebGL backdrop, an evergreen
+  motto, and two buttons: **Create access code** / **Write access code**.
+- **Access code (/start)** — creating asks exactly three things: your
+  **name**, a **3D AI avatar** (six glossy sphere characters), and an
+  **access code** (min 4 chars, salted-hashed) — then you're in. The unique
+  login handle is derived from the name automatically; returning users write
+  name + code from any phone or laptop.
+- **Courses** — the post-login home: the catalog (own courses only, no
+  external ones), one card per course with progress and a Start/Continue
+  button. Until a course is started, the sidebar shows only the platform
+  tabs (Courses, About me, Leaderboard, Profile, Settings).
+- **Course setup** — clicking the course opens 3 quick steps (start date,
+  daily reminder, profile visibility — never shame) and unlocks the course
+  tabs: Today, Journey map, Projects. Route-guarded, not just hidden.
+- **About me** — the person behind the platform: photo (public/ahmad.jpg),
+  role, bio, teaching-now card, social links. Content lives in `ABOUT` in
+  `lib/site.ts`.
 - **Dashboard "Today"** — day counter, today's build card, this-week
   checklist, 3D journey mini-map. One primary button — **Start Day N** — that
   opens the day page; check-in deliberately does NOT live on the dashboard.
@@ -39,9 +47,9 @@ in `lib/challenges/production-ai-2026.ts` (generated from the prepared
 - **Projects** — P1–P20 with SHIPPED / IN PROGRESS / LOCKED states;
   per-project detail with day list and ship criteria.
 - **Leaderboard & community** — real ranked list of everyone with a public
-  profile (name, day, streak, days done, badges, quiz score), live from the
-  database; private profiles never appear. Showcase wall is still preview
-  data (see ARCHITECTURE.md).
+  profile (3D avatar, name, day, streak, days done, badges, quiz score),
+  live from the database; private profiles never appear. Showcase wall is
+  still preview data (see ARCHITECTURE.md).
 - **Profile / Settings / Completion certificate / Share cards** (1200×630 +
   1080×1080 PNG export).
 - **/creator** — owner-only dashboard: sign-ups, per-day check-in funnel,
@@ -56,7 +64,8 @@ in `lib/challenges/production-ai-2026.ts` (generated from the prepared
   days glow emerald, today pulses amber) on the landing hero and dashboard.
 - Every button is an extruded 3D block (raised ledge, presses flat on
   click); every card lifts in 3D on hover; inputs are pressed-in wells;
-  key cards tilt toward the cursor. All of it goes still under
+  key cards tilt toward the cursor; account avatars are glossy 3D spheres
+  (`components/Avatar3D.tsx`). All of it goes still under
   `prefers-reduced-motion`; three.js loads client-side only.
 
 ## Streak rules (streak-with-grace)

@@ -3,9 +3,11 @@
 ## Who sees what (v2 — current, live)
 
 Every learner has their own **account in a shared Postgres database**
-(`db/schema.sql`) — not per-browser storage. A new person picks a **username +
-personal code**; a returning person enters the same two things on any phone
-or laptop and their track opens: streak, check-ins, notes, settings. Sessions
+(`db/schema.sql`) — not per-browser storage. A new person gives exactly three
+things: **name + 3D AI avatar + access code** (the unique login handle is
+derived from the name automatically; a collision returns a friendly
+"add a number" error). A returning person writes name + code on any phone or
+laptop and their account opens: streak, check-ins, notes, settings. Sessions
 are an httpOnly cookie good for 180 days (`lib/session.ts`).
 
 | Person | What they can see |
@@ -21,8 +23,10 @@ a forgotten code means starting a new track).
 ### Data model
 
 ```
-profiles      (id, handle, name, salt, code_hash, github, reminder, visibility,
-               notes_private, start_date, joined, onboarded, is_owner)
+profiles      (id, handle, name, avatar, salt, code_hash, github, reminder,
+               visibility, notes_private, start_date, joined, onboarded,
+               is_owner) ← avatar is a 3D-avatar id from lib/avatars.ts,
+               added via a self-healing migration (lib/db.ts)
 checkins      (profile_id, day, checked_on)      ← one row per checked day
 notes         (profile_id, day, text)            ← private, never sent to /api/community
 quiz_answers  (profile_id, day, question_index, selected_index) ← raw selection only,
