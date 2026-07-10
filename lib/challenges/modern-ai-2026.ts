@@ -293,7 +293,7 @@ const QUIZZES: Record<number, QuizQuestion[]> = {
 };
 
 const CREATOR = {
-  name: "Ahmad · AI Radar",
+  name: "Ahmad X AI",
   handle: "@aixahmad",
   tagline: "teaching modern AI, in public",
 };

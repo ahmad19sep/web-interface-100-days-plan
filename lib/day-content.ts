@@ -7,11 +7,17 @@ import { query } from "./db";
 import { DAYS, getDay } from "./plan";
 import type { QuizMap } from "./quiz";
 
+export interface DayLink {
+  label: string;
+  url: string;
+}
+
 export interface DayContent {
   videoUrl: string | null;
   githubUrl: string | null;
   note: string | null;
   quiz: QuizQuestion[] | null;
+  links: DayLink[] | null;
 }
 
 interface Row {
@@ -19,12 +25,31 @@ interface Row {
   github_url: string | null;
   note: string | null;
   quiz: QuizQuestion[] | null;
+  links: DayLink[] | null;
+}
+
+// Self-healing migration: `links` was added after the first production
+// deploy, and the DATABASE_URL secret can't be pulled locally to run
+// db/schema.sql by hand. Idempotent and cached, so it costs one statement
+// per server instance.
+let linksColumnReady: Promise<unknown> | null = null;
+export function ensureLinksColumn(): Promise<unknown> {
+  if (!linksColumnReady) {
+    linksColumnReady = query(
+      "alter table day_content add column if not exists links jsonb"
+    ).catch((err) => {
+      linksColumnReady = null; // retry on the next request
+      throw err;
+    });
+  }
+  return linksColumnReady;
 }
 
 /** The DB override for one day, or all-null if the owner hasn't set anything. */
 export async function getDayContentRow(day: number): Promise<DayContent> {
+  await ensureLinksColumn();
   const rows = await query<Row>(
-    "select video_url, github_url, note, quiz from day_content where day = $1",
+    "select video_url, github_url, note, quiz, links from day_content where day = $1",
     [day]
   );
   const row = rows[0];
@@ -33,6 +58,7 @@ export async function getDayContentRow(day: number): Promise<DayContent> {
     githubUrl: row?.github_url ?? null,
     note: row?.note ?? null,
     quiz: row?.quiz ?? null,
+    links: row?.links ?? null,
   };
 }
 
@@ -56,6 +82,23 @@ export async function effectiveQuizMap(): Promise<QuizMap> {
   );
   for (const r of rows) if (r.quiz) map[r.day] = r.quiz;
   return map;
+}
+
+/** Validates + trims owner-submitted resource links; drops malformed lines. */
+export function sanitizeLinksInput(raw: unknown): DayLink[] | null {
+  if (!Array.isArray(raw)) return null;
+  const links: DayLink[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const l = item as Record<string, unknown>;
+    const url = typeof l.url === "string" ? l.url.trim() : "";
+    if (!/^https?:\/\//i.test(url)) continue;
+    const label =
+      typeof l.label === "string" && l.label.trim() ? l.label.trim() : url;
+    links.push({ label, url });
+    if (links.length >= 12) break;
+  }
+  return links.length > 0 ? links : null;
 }
 
 /** Validates + trims owner-submitted quiz JSON; drops malformed questions. */

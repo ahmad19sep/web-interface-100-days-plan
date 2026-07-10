@@ -8,11 +8,17 @@
 import { useEffect, useState } from "react";
 import type { QuizQuestion } from "./challenges/types";
 
+export interface DayLink {
+  label: string;
+  url: string;
+}
+
 export interface DayContent {
   videoUrl: string | null;
   githubUrl: string | null;
   note: string | null;
   quiz: QuizQuestion[] | null;
+  links: DayLink[] | null;
 }
 
 const EMPTY_CONTENT: DayContent = {
@@ -20,6 +26,7 @@ const EMPTY_CONTENT: DayContent = {
   githubUrl: null,
   note: null,
   quiz: null,
+  links: null,
 };
 
 /**

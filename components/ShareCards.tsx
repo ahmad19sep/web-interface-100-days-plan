@@ -124,7 +124,7 @@ function drawLandscape(canvas: HTMLCanvasElement, d: CardData) {
   ctx.fillStyle = "#6C7581";
   ctx.font = `13px ${mono}`;
   ctx.textAlign = "right";
-  ctx.fillText(`AI RADAR · ${CREATOR.handle}`, W - P, 76);
+  ctx.fillText(`${CREATOR.name.toUpperCase()} · ${CREATOR.handle}`, W - P, 76);
   ctx.textAlign = "left";
 
   // strip (bottom) — 50 cols, 2 rows
@@ -310,7 +310,7 @@ export default function ShareCards() {
                 </div>
               </div>
               <div className="hidden font-mono text-[13px] text-mut3 sm:block">
-                AI RADAR · {CREATOR.handle}
+                {CREATOR.name.toUpperCase()} · {CREATOR.handle}
               </div>
             </div>
             <div className="flex items-end gap-4 sm:gap-[34px]">

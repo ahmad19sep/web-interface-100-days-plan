@@ -37,7 +37,7 @@ export default function Landing() {
             100 Days of Modern AI
           </div>
           <span className="ml-1 hidden rounded-md border border-[#232B35] px-[7px] py-[2px] font-mono text-[10.5px] text-dim2 sm:inline">
-            AI RADAR
+            AHMAD X AI
           </span>
         </div>
         <div className="flex items-center gap-4 sm:gap-[30px]">
@@ -323,7 +323,7 @@ export default function Landing() {
           Start the challenge
         </Link>
         <div className="mt-11 flex flex-col items-center justify-between gap-2 border-t border-[rgba(255,255,255,.06)] pt-[22px] text-[12.5px] text-dim2 sm:flex-row">
-          <span>© 2026 AI Radar · 100 Days of Modern AI</span>
+          <span>© 2026 Ahmad X AI · 100 Days of Modern AI</span>
           <span className="font-mono">Latin script only · built in public</span>
         </div>
       </section>

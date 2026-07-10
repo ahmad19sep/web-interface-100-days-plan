@@ -73,10 +73,13 @@ create table if not exists day_content (
   note        text,
   -- [{ question, options: string[], correctIndex }, ...] or null
   quiz        jsonb,
+  -- [{ label, url }, ...] or null — creator-curated resource links
+  links       jsonb,
   updated_at  timestamptz not null default now()
 );
 
 alter table day_content add column if not exists quiz jsonb;
+alter table day_content add column if not exists links jsonb;
 
 create index if not exists sessions_profile_id_idx on sessions(profile_id);
 create index if not exists checkins_profile_id_idx on checkins(profile_id);

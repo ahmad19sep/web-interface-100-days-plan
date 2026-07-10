@@ -361,7 +361,27 @@ function QuizBuilder({
   );
 }
 
-/** Owner-only panel to set this day's video/GitHub link/note/quiz live, from the app. */
+/** "Label | https://url" lines ⇆ link objects, for the creator links field. */
+function linksToText(links: { label: string; url: string }[] | null): string {
+  return (links ?? [])
+    .map((l) => (l.label && l.label !== l.url ? `${l.label} | ${l.url}` : l.url))
+    .join("\n");
+}
+
+function textToLinks(text: string): { label: string; url: string }[] {
+  const out: { label: string; url: string }[] = [];
+  for (const line of text.split("\n")) {
+    const t = line.trim();
+    if (!t) continue;
+    const parts = t.split("|").map((s) => s.trim());
+    const url = parts.length > 1 ? parts[1] : parts[0];
+    if (!/^https?:\/\//i.test(url)) continue;
+    out.push({ label: parts.length > 1 && parts[0] ? parts[0] : url, url });
+  }
+  return out;
+}
+
+/** Owner-only panel to set this day's video/GitHub link/note/links/quiz live, from the app. */
 function CreatorDayPanel({
   day,
   content,
@@ -374,6 +394,7 @@ function CreatorDayPanel({
   const [videoUrl, setVideoUrl] = useState(content.videoUrl ?? "");
   const [githubUrl, setGithubUrl] = useState(content.githubUrl ?? "");
   const [note, setNoteText] = useState(content.note ?? "");
+  const [linksText, setLinksText] = useState(linksToText(content.links));
   const [quiz, setQuiz] = useState<QuizDraft[]>(content.quiz ?? []);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -384,7 +405,13 @@ function CreatorDayPanel({
     const res = await fetch(`/api/day-content/${day}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ videoUrl, githubUrl, note, quiz }),
+      body: JSON.stringify({
+        videoUrl,
+        githubUrl,
+        note,
+        quiz,
+        links: textToLinks(linksText),
+      }),
     });
     const body = (await res.json()) as DayContent;
     setBusy(false);
@@ -438,6 +465,20 @@ function CreatorDayPanel({
           />
         </label>
 
+        <label className="block">
+          <span className="mb-1 block text-xs text-mut3">
+            Resource links — one per line, &quot;Label | https://url&quot; (or
+            just the URL)
+          </span>
+          <textarea
+            value={linksText}
+            onChange={(e) => setLinksText(e.target.value)}
+            rows={3}
+            placeholder={"Karpathy — GPT Tokenizer | https://youtu.be/…"}
+            className={`${inputClass} resize-y font-mono`}
+          />
+        </label>
+
         <div>
           <span className="mb-1.5 block text-xs text-mut3">
             Quiz — leave empty for no quiz today
@@ -474,6 +515,7 @@ export default function DayDetail({ day }: { day: number }) {
   const effectiveGithubUrl = dayContent.githubUrl ?? dayFolderUrl(day);
   const effectiveNote = dayContent.note ?? plan.ownerNote;
   const effectiveQuiz = dayContent.quiz ?? plan.quiz;
+  const effectiveLinks = dayContent.links ?? plan.watchLinks ?? null;
   const hasQuiz = Boolean(effectiveQuiz && effectiveQuiz.length > 0);
   const quizPassed = !hasQuiz || (() => {
     const saved = state.quizAnswers[day] ?? {};
@@ -626,8 +668,8 @@ export default function DayDetail({ day }: { day: number }) {
                       </div>
                       <div className="mt-[3px] font-mono text-[11px] text-accent">
                         {effectiveVideo
-                          ? "AI Radar · daily lesson"
-                          : "AI Radar · video coming soon"}
+                          ? `${CREATOR.name} · daily lesson`
+                          : `${CREATOR.name} · video coming soon`}
                       </div>
                     </div>
                   </a>
@@ -649,6 +691,32 @@ export default function DayDetail({ day }: { day: number }) {
                 </a>
               </div>
 
+              <div id="resources">
+                <div className="mb-1.5 font-mono text-[11px] tracking-[.08em] text-mut3">
+                  📚 RESOURCES
+                </div>
+                {effectiveLinks && effectiveLinks.length > 0 ? (
+                  <div className="flex flex-col gap-1.5">
+                    {effectiveLinks.map((l) => (
+                      <a
+                        key={l.url}
+                        href={l.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[13px] !text-accent hover:!text-accent2"
+                      >
+                        ▶ {l.label} ↗
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-[13px] text-mut3">
+                    Curated links coming soon — the resource card below has
+                    today&apos;s reading.
+                  </div>
+                )}
+              </div>
+
               {effectiveQuiz && effectiveQuiz.length > 0 && (
                 <>
                   <div className="h-px bg-edge3" />
@@ -667,7 +735,7 @@ export default function DayDetail({ day }: { day: number }) {
           </div>
 
           {/* build + resource tiles */}
-          <div id="resources" className="mb-3.5 grid gap-3.5 sm:grid-cols-2">
+          <div className="mb-3.5 grid gap-3.5 sm:grid-cols-2">
             <div className="card-std rounded-[14px] p-[18px]">
               <div className="mb-2 text-[11.5px] text-mut3">
                 📺 THE RESOURCE · ~30–45 MIN
@@ -675,21 +743,6 @@ export default function DayDetail({ day }: { day: number }) {
               <div className="text-sm leading-[1.6] text-ink2">
                 {plan.resource}
               </div>
-              {plan.watchLinks && plan.watchLinks.length > 0 && (
-                <div className="mt-3 flex flex-col gap-1.5">
-                  {plan.watchLinks.map((l) => (
-                    <a
-                      key={l.url}
-                      href={l.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[13px] !text-accent hover:!text-accent2"
-                    >
-                      ▶ {l.label} ↗
-                    </a>
-                  ))}
-                </div>
-              )}
               {!plan.isRest && (
                 <a
                   href={youTubeSearchUrl(plan)}
