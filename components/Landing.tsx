@@ -7,7 +7,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { CHALLENGE, TOTAL_DAYS, TOTAL_PROJECTS } from "@/lib/plan";
 import { SITE } from "@/lib/site";
 import { useProfiles } from "@/lib/profiles";
 import Tilt from "./Tilt";
@@ -44,8 +43,8 @@ export default function Landing() {
       </Tilt>
 
       <p className="mb-10 max-w-[540px] text-[15px] leading-[1.7] text-mut sm:text-[17px]">
-        {CHALLENGE.title} — {TOTAL_DAYS} days, {TOTAL_PROJECTS} real projects.
-        Build the primitive, measure the system, ship the evidence.
+        Don&apos;t just watch AI happen — <span className="text-ink">build it</span>.
+        One day at a time, in public, with proof.
       </p>
 
       {/* access-code gate */}
