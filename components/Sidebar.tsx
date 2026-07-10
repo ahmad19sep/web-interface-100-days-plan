@@ -1,18 +1,22 @@
 "use client";
 
+// The design's 68px icon rail, matched exactly: glowing AX tile, then
+// map · today · projects · courses · leaderboard · profile · crown ·
+// sliders. The crown is the Creator Studio (the About-me page; the owner's
+// crown opens the creator dashboard instead). Mobile keeps the top bar.
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Avatar3D from "./Avatar3D";
 import { TOTAL_DAYS } from "@/lib/plan";
 import { computeStreak, currentDay, useProgress } from "@/lib/store";
 import {
-  IconAbout,
   IconCourses,
   IconCreator,
   IconJourney,
   IconLeaderboard,
   IconProfile,
   IconProjects,
+  IconSettings,
   IconToday,
   Logo,
 } from "./icons";
@@ -23,8 +27,7 @@ const NAV = [
   { key: "projects", href: "/projects", label: "Projects", Icon: IconProjects },
   { key: "courses", href: "/courses", label: "Courses", Icon: IconCourses },
   { key: "leaderboard", href: "/leaderboard", label: "Leaderboard", Icon: IconLeaderboard },
-  { key: "about", href: "/about", label: "About me", Icon: IconAbout },
-  { key: "profile", href: "/profile", label: "Profile & settings", Icon: IconProfile },
+  { key: "profile", href: "/profile", label: "Profile", Icon: IconProfile },
 ];
 
 function activeKey(pathname: string): string {
@@ -34,13 +37,8 @@ function activeKey(pathname: string): string {
   if (pathname.startsWith("/courses")) return "courses";
   if (pathname.startsWith("/leaderboard")) return "leaderboard";
   if (pathname.startsWith("/about")) return "about";
-  if (
-    pathname.startsWith("/profile") ||
-    pathname.startsWith("/complete") ||
-    pathname.startsWith("/settings")
-  ) {
-    return "profile";
-  }
+  if (pathname.startsWith("/profile") || pathname.startsWith("/complete")) return "profile";
+  if (pathname.startsWith("/settings")) return "settings";
   if (pathname.startsWith("/creator")) return "creator";
   return "today";
 }
@@ -53,24 +51,32 @@ export default function Sidebar() {
   const { streak } = computeStreak(state.checkins);
   const name = state.name || "Your track";
   // Course tabs unlock once the user starts the course (onboarding done);
-  // until then the sidebar is the platform: Courses, About me, community.
+  // until then the rail is the platform: Courses, Creator Studio, community.
   const COURSE_TABS = ["today", "journey", "projects"];
   const base = state.onboarded
     ? NAV
     : NAV.filter((n) => !COURSE_TABS.includes(n.key));
-  const nav = state.isOwner
-    ? [...base, { key: "creator", href: "/creator", label: "Creator", Icon: IconCreator }]
-    : base;
+  const nav = [
+    ...base,
+    // the crown — the design's Creator Studio slot
+    state.isOwner
+      ? { key: "creator", href: "/creator", label: "Creator Studio", Icon: IconCreator }
+      : { key: "about", href: "/about", label: "Creator Studio — About me", Icon: IconCreator },
+    { key: "settings", href: "/settings", label: "Settings", Icon: IconSettings },
+  ];
 
   return (
     <>
-      {/* Desktop icon rail — the design's slim 68px nav */}
-      <aside className="fixed bottom-0 left-0 top-0 z-50 hidden w-[68px] flex-col items-center gap-1 border-r border-edge bg-[rgba(10,14,23,.95)] py-3.5 lg:flex">
+      {/* Desktop icon rail */}
+      <aside className="fixed bottom-0 left-0 top-0 z-50 hidden w-[68px] flex-col items-center gap-[6px] border-r border-edge bg-[rgba(10,14,23,.95)] py-3.5 lg:flex">
         <Link
           href="/courses"
           title={`Ahmad X AI — ${name}`}
-          className="mb-3 flex h-10 w-10 items-center justify-center rounded-[10px] font-mono text-[14px] font-extrabold !text-[#06121a] shadow-[0_3px_0_#083344]"
-          style={{ background: "linear-gradient(135deg,#0e7490,#22d3ee)" }}
+          className="mb-3.5 flex h-10 w-10 items-center justify-center rounded-[10px] font-mono text-[14px] font-extrabold !text-[#06121a]"
+          style={{
+            background: "linear-gradient(135deg,#0e7490,#22d3ee)",
+            boxShadow: "0 3px 0 #083344, 0 0 22px rgba(34,211,238,.35)",
+          }}
         >
           AX
         </Link>
@@ -88,17 +94,10 @@ export default function Sidebar() {
             <Icon size={20} />
           </Link>
         ))}
-        <Link
-          href="/profile"
-          title={`${name} — Day ${day} · 🔥 ${streak}`}
-          className="mt-auto"
-        >
-          <Avatar3D id={state.avatar} size={38} />
-        </Link>
       </aside>
 
       {/* Mobile top bar */}
-      <div className="sticky top-0 z-30 flex items-center gap-2 border-b border-divider bg-[rgba(13,17,23,.9)] px-4 py-3 backdrop-blur-[10px] lg:hidden">
+      <div className="sticky top-0 z-30 flex items-center gap-2 border-b border-divider bg-[rgba(10,14,23,.9)] px-4 py-3 backdrop-blur-[10px] lg:hidden">
         <Link href="/" className="shrink-0">
           <Logo size={28} radius={8} />
         </Link>
@@ -113,7 +112,7 @@ export default function Sidebar() {
                   : "!text-mut"
               }`}
             >
-              {label}
+              {key === "about" ? "Creator" : label}
             </Link>
           ))}
         </nav>
