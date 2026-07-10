@@ -9,7 +9,7 @@
 // Per-user progress is already namespaced by challenge id (see lib/store.ts),
 // so tracks never collide.
 
-import { MODERN_AI_2026 } from "./challenges/modern-ai-2026";
+import { PRODUCTION_AI_2026 } from "./challenges/production-ai-2026";
 import type { Challenge, DayPlan, WeekPlan } from "./challenges/types";
 
 export type {
@@ -23,11 +23,11 @@ export type {
 } from "./challenges/types";
 
 export const CHALLENGES: Record<string, Challenge> = {
-  [MODERN_AI_2026.id]: MODERN_AI_2026,
+  [PRODUCTION_AI_2026.id]: PRODUCTION_AI_2026,
 };
 
 /** The challenge this deployment currently serves. */
-export const CHALLENGE: Challenge = MODERN_AI_2026;
+export const CHALLENGE: Challenge = PRODUCTION_AI_2026;
 
 // ── convenience exports for the active challenge ───────────────────────────
 
@@ -38,6 +38,8 @@ export const COURSES = CHALLENGE.courses;
 export const COHORT_START_DATE = CHALLENGE.cohortStart;
 export const GITHUB_REPO = CHALLENGE.github;
 export const CREATOR = CHALLENGE.creator;
+export const TOTAL_DAYS = CHALLENGE.totalDays;
+export const TOTAL_PROJECTS = CHALLENGE.projects.length;
 
 export function getDay(n: number): DayPlan | undefined {
   return CHALLENGE.days[n - 1];

@@ -10,20 +10,40 @@ export type ProjectId =
   | "P6"
   | "P7"
   | "P8"
+  | "P9"
+  | "P10"
+  | "P11"
+  | "P12"
+  | "P13"
+  | "P14"
+  | "P15"
+  | "P16"
+  | "P17"
+  | "P18"
+  | "P19"
+  | "P20"
   | "CAP";
 
 export interface DayPlan {
   day: number;
   title: string;
-  /** Plain-language what-and-why of the topic — shown under the title */
+  /** Plain-language goal of the day — shown under the title */
   about?: string;
+  /** Why this matters for real production work */
+  why?: string;
   /** YouTube search phrase for the topic (falls back to the title) */
   search?: string;
-  /** Viewer resource, ~30–45 min */
+  /** What to learn today (the study half of the day) */
   resource: string;
-  /** Viewer build task, ~45–75 min */
+  /** The build task (the making half of the day) */
   build: string;
   doneWhen?: string;
+  /** Public evidence to post — commit, metric, demo GIF */
+  proof?: string;
+  /** Estimated time, e.g. "2-3 h" */
+  time?: string;
+  /** Difficulty/type tag, e.g. "Foundation", "Ship", "Capstone" */
+  difficulty?: string;
   videoTitle?: string;
   /** Lesson video URL (YouTube) — day pages embed it once the owner adds it */
   video?: string;

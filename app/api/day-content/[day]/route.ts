@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { TOTAL_DAYS } from "@/lib/plan";
 import { DbNotConfiguredError, query } from "@/lib/db";
 import {
   ensureLinksColumn,
@@ -10,7 +11,7 @@ import { currentProfile } from "@/lib/session";
 
 function parseDay(raw: string): number | null {
   const day = Number(raw);
-  return Number.isInteger(day) && day >= 1 && day <= 100 ? day : null;
+  return Number.isInteger(day) && day >= 1 && day <= TOTAL_DAYS ? day : null;
 }
 
 export async function GET(

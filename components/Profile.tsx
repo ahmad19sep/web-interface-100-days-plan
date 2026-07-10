@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { initialsOf } from "@/lib/demo";
+import { TOTAL_DAYS } from "@/lib/plan";
 import {
   computeStreak,
   currentDay,
@@ -49,7 +50,7 @@ export default function Profile() {
             </span>
           </div>
           <div className="mb-3 text-[13.5px] text-mut2">
-            Joined {prettyDate(state.joined)} · on the 100-day track
+            Joined {prettyDate(state.joined)} · on the {TOTAL_DAYS}-day track
           </div>
           <a
             href={`https://${github.replace(/^https?:\/\//, "")}`}

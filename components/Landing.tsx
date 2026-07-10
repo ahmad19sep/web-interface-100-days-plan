@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { CREATOR, PROJECTS } from "@/lib/plan";
+import {
+  CHALLENGE,
+  CREATOR,
+  PROJECTS,
+  TOTAL_DAYS,
+  TOTAL_PROJECTS,
+} from "@/lib/plan";
 import { currentDay, expectedDay, useProgress } from "@/lib/store";
 import { demoCells, buildCells, JourneyCells } from "./JourneyGrid";
 import { IconCheck, IconPlay, Logo } from "./icons";
@@ -34,7 +40,7 @@ export default function Landing() {
         <div className="flex items-center gap-[11px]">
           <Logo size={32} />
           <div className="font-display text-[15.5px] font-semibold tracking-[-.01em]">
-            100 Days of Modern AI
+            {CHALLENGE.title}
           </div>
           <span className="ml-1 hidden rounded-md border border-[#232B35] px-[7px] py-[2px] font-mono text-[10.5px] text-dim2 sm:inline">
             AHMAD X AI
@@ -71,13 +77,14 @@ export default function Landing() {
               className="h-1.5 w-1.5 rounded-full bg-accent"
               style={{ boxShadow: "0 0 8px #35D399" }}
             />
-            Cohort live now · Day {liveDay} of 100
+            Cohort live now · Day {liveDay} of {TOTAL_DAYS}
           </div>
           <h1 className="mb-[22px] font-display text-[40px] font-bold leading-[1.03] tracking-[-.025em] sm:text-[57px]">
-            100 days.
-            <br />8 real projects.
+            120 days.
             <br />
-            <span className="text-accent">Modern AI, built by hand.</span>
+            20 real projects.
+            <br />
+            <span className="text-accent">Production AI, built by hand.</span>
           </h1>
           <p className="mb-8 max-w-[480px] text-[17px] leading-[1.6] text-mut">
             A daily training log for a public learning challenge. Watch the
@@ -129,7 +136,7 @@ export default function Landing() {
               Your journey map
             </div>
             <div className="font-mono text-xs text-mut3">
-              {doneCount} / 100
+              {doneCount} / {TOTAL_DAYS}
             </div>
           </div>
           <JourneyCells cells={cells} variant="flat" cols={10} gap={6} />
@@ -207,10 +214,10 @@ export default function Landing() {
           THE OUTPUT
         </div>
         <h2 className="mb-[34px] font-display text-3xl font-bold tracking-[-.02em]">
-          Eight projects you&apos;ll actually ship.
+          {TOTAL_PROJECTS} projects you&apos;ll actually ship.
         </h2>
         <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-          {PROJECTS.filter((p) => p.id !== "CAP").map((p) => (
+          {PROJECTS.map((p) => (
             <div
               key={p.id}
               className="card-std flex min-h-[132px] flex-col justify-between rounded-[14px] p-5"
@@ -323,7 +330,7 @@ export default function Landing() {
           Start the challenge
         </Link>
         <div className="mt-11 flex flex-col items-center justify-between gap-2 border-t border-[rgba(255,255,255,.06)] pt-[22px] text-[12.5px] text-dim2 sm:flex-row">
-          <span>© 2026 Ahmad X AI · 100 Days of Modern AI</span>
+          <span>© 2026 Ahmad X AI · {CHALLENGE.title}</span>
           <span className="font-mono">Latin script only · built in public</span>
         </div>
       </section>

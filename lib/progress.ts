@@ -2,7 +2,7 @@
 // store (lib/store.ts) and the server API routes (app/api/**) so the streak
 // rule is computed identically in both places.
 
-import { DAYS, PROJECTS, type Project } from "./plan";
+import { DAYS, PROJECTS, TOTAL_DAYS, type Project } from "./plan";
 
 export function localToday(): string {
   const d = new Date();
@@ -75,10 +75,10 @@ export function computeStreak(
   return { streak, status, graceAvailable: grace, longest };
 }
 
-/** First incomplete day (1–100); 101 when the whole track is done. */
+/** First incomplete day (1–totalDays); totalDays+1 when the track is done. */
 export function currentDay(checkins: Record<number, string>): number {
-  for (let n = 1; n <= 100; n++) if (!checkins[n]) return n;
-  return 101;
+  for (let n = 1; n <= TOTAL_DAYS; n++) if (!checkins[n]) return n;
+  return TOTAL_DAYS + 1;
 }
 
 /** Where the schedule/cohort says you "should" be, from your start date. */
@@ -88,7 +88,7 @@ export function expectedDay(
 ): number {
   if (!startDate) return 1;
   const diff = epochDay(today) - epochDay(startDate);
-  return Math.max(1, Math.min(100, diff + 1));
+  return Math.max(1, Math.min(TOTAL_DAYS, diff + 1));
 }
 
 export type DayState = "done" | "current" | "locked";
@@ -135,7 +135,7 @@ export function projectDone(
   return c;
 }
 
-/** Projects shipped out of P1–P8 (capstone tracked separately). */
+/** Projects shipped, capstone included — the docx's "0/20" counter. */
 export function shippedCount(checkins: Record<number, string>): number {
-  return PROJECTS.filter((p) => p.id !== "CAP" && checkins[p.shipDay]).length;
+  return PROJECTS.filter((p) => checkins[p.shipDay]).length;
 }

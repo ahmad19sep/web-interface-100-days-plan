@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { PROJECTS } from "@/lib/plan";
+import { PROJECTS, TOTAL_DAYS, TOTAL_PROJECTS } from "@/lib/plan";
 import {
   currentDay,
   projectDone,
@@ -15,7 +15,7 @@ export default function ProjectsBoard() {
   const state = useProgress();
   const current = currentDay(state.checkins);
   const shipped = shippedCount(state.checkins);
-  const capstone = PROJECTS.find((p) => p.id === "CAP")!;
+  const capstone = PROJECTS[PROJECTS.length - 1];
   const capstoneStatus = projectStatus(capstone, state.checkins, current);
 
   return (
@@ -23,7 +23,7 @@ export default function ProjectsBoard() {
       <div className="mb-[22px] flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="text-sm text-mut2">
-            What you&apos;ll ship across 100 days
+            What you&apos;ll ship across {TOTAL_DAYS} days
           </div>
           <h1 className="font-display text-[26px] font-bold tracking-[-.02em]">
             Projects
@@ -34,7 +34,7 @@ export default function ProjectsBoard() {
             {shipped}
           </span>
           <span className="text-xs text-mut2">
-            / 8 shipped · Capstone{" "}
+            / {TOTAL_PROJECTS} shipped · Capstone{" "}
             {capstoneStatus === "locked" ? "locked" : capstoneStatus === "shipped" ? "shipped" : "in progress"}
           </span>
         </div>

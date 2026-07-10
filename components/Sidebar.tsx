@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { initialsOf } from "@/lib/demo";
+import { TOTAL_DAYS } from "@/lib/plan";
 import { computeStreak, currentDay, useProgress } from "@/lib/store";
 import {
   IconCourses,
@@ -42,7 +43,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const state = useProgress();
   const active = activeKey(pathname);
-  const day = Math.min(currentDay(state.checkins), 100);
+  const day = Math.min(currentDay(state.checkins), TOTAL_DAYS);
   const { streak } = computeStreak(state.checkins);
   const name = state.name || "Your track";
   const nav = state.isOwner
@@ -56,10 +57,10 @@ export default function Sidebar() {
         <Link href="/" className="flex items-center gap-2.5 px-2 pb-[22px]">
           <Logo size={30} radius={8} />
           <div className="font-display text-[13.5px] font-semibold leading-[1.15] text-ink">
-            100 Days
+            120 Days
             <br />
             <span className="text-[11px] font-normal text-mut3">
-              of Modern AI
+              of Production AI
             </span>
           </div>
         </Link>

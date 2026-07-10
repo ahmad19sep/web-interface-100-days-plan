@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { DAYS, pad3, type Project } from "@/lib/plan";
+import { DAYS, TOTAL_DAYS, pad3, type Project } from "@/lib/plan";
 import {
   currentDay,
   projectDone,
@@ -146,7 +146,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
               <ProgressBar pct={pct} />
             </div>
             <div className="text-xs text-mut3">
-              {pct}% · you&apos;re on Day {Math.min(current, 100)} of your track
+              {pct}% · you&apos;re on Day {Math.min(current, TOTAL_DAYS)} of your track
             </div>
           </div>
 

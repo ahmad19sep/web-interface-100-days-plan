@@ -1,3 +1,4 @@
+import { TOTAL_DAYS } from "@/lib/plan";
 import { NextResponse } from "next/server";
 import { DbNotConfiguredError, query } from "@/lib/db";
 import { effectiveQuizForDay } from "@/lib/day-content";
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const day = Number(body?.day);
     const answers = body?.answers as AnswerInput[] | undefined;
-    if (!Number.isInteger(day) || day < 1 || day > 100 || !Array.isArray(answers)) {
+    if (!Number.isInteger(day) || day < 1 || day > TOTAL_DAYS || !Array.isArray(answers)) {
       return NextResponse.json({ error: "Invalid submission." }, { status: 400 });
     }
 

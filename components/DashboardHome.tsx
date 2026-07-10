@@ -3,7 +3,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
-import { DAYS, PROJECTS, getDay, pad3, weekOf } from "@/lib/plan";
+import {
+  DAYS,
+  PROJECTS,
+  TOTAL_DAYS,
+  TOTAL_PROJECTS,
+  getDay,
+  pad3,
+  weekOf,
+} from "@/lib/plan";
 import {
   computeStreak,
   currentDay,
@@ -57,20 +65,22 @@ function DayCounterCard({
       <div className="stat-md font-mono font-extrabold leading-[.9] tracking-[-.04em] text-accent">
         {pad3(day)}
       </div>
-      <div className="mt-1 font-mono text-[15px] text-mut3">/ 100</div>
+      <div className="mt-1 font-mono text-[15px] text-mut3">/ {TOTAL_DAYS}</div>
       <div className="my-[22px] h-px bg-edge3" />
       {extra ?? (
         <>
           <div className="mb-3 flex justify-between">
             <span className="text-[13px] text-mut2">Progress</span>
-            <span className="font-mono text-[13px] text-ink">{done}%</span>
+            <span className="font-mono text-[13px] text-ink">
+              {Math.round((done / TOTAL_DAYS) * 100)}%
+            </span>
           </div>
           <div className="mb-5">
-            <ProgressBar pct={done} />
+            <ProgressBar pct={Math.round((done / TOTAL_DAYS) * 100)} />
           </div>
           <div className="flex justify-between text-[12.5px] text-mut2">
             <span>Projects shipped</span>
-            <span className="font-mono text-ink">{shipped} / 8</span>
+            <span className="font-mono text-ink">{shipped} / {TOTAL_PROJECTS}</span>
           </div>
         </>
       )}
@@ -85,7 +95,7 @@ function ThisWeekCard({
   day: number;
   checkins: Record<number, string>;
 }) {
-  const week = weekOf(Math.min(day, 100));
+  const week = weekOf(Math.min(day, TOTAL_DAYS));
   const days = DAYS.filter((d) => d.day >= week.start && d.day <= week.end);
   return (
     <div className="card-std p-[22px]">
@@ -183,12 +193,12 @@ export default function DashboardHome() {
   const mounted = useHydrated();
 
   const day = currentDay(state.checkins);
-  const plan = day <= 100 ? getDay(day) : undefined;
+  const plan = day <= TOTAL_DAYS ? getDay(day) : undefined;
   const doneCount = Object.keys(state.checkins).length;
   const streak = computeStreak(state.checkins);
   const shipped = shippedCount(state.checkins);
   const expected = expectedDay(state.startDate);
-  const behind = Math.max(0, expected - Math.min(day, 100));
+  const behind = Math.max(0, expected - Math.min(day, TOTAL_DAYS));
   const firstName = (state.name || "").split(/\s+/)[0];
 
   const mode: "complete" | "paused" | "rest" | "catchup" | "today" = !plan
@@ -238,7 +248,7 @@ export default function DashboardHome() {
             CHALLENGE COMPLETE
           </div>
           <h2 className="mb-2 font-display text-3xl font-bold tracking-[-.02em]">
-            All 100 days are done.
+            All {TOTAL_DAYS} days are done.
           </h2>
           <p className="mx-auto mb-6 max-w-[440px] text-[15px] text-mut">
             Eight projects shipped, a capstone built, and a habit that&apos;s
@@ -291,7 +301,7 @@ export default function DashboardHome() {
                     {plan.resource}
                   </div>
                   <div className="mt-1 font-mono text-[11px] text-accent">
-                    ~30–45 min
+                    {plan.time ?? "2–3 h"}
                   </div>
                 </div>
                 <div className="flex-1 rounded-xl border border-edge3 bg-panel p-3.5">

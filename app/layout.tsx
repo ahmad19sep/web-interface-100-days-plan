@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { CHALLENGE } from "@/lib/plan";
 import "./globals.css";
 
 const inter = Inter({
@@ -23,11 +24,10 @@ const jbmono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "100 Days of Modern AI",
-    template: "%s · 100 Days of Modern AI",
+    default: CHALLENGE.title,
+    template: `%s · ${CHALLENGE.title}`,
   },
-  description:
-    "A daily training log for the 100 Days of Modern AI public learning challenge — watch the lesson, ship the build, check in. Streak with grace, 8 real projects, one capstone.",
+  description: `A daily training log for the ${CHALLENGE.title} public learning challenge — learn, build, prove it, check in. Streak with grace, ${CHALLENGE.projects.length} real projects, one production capstone.`,
 };
 
 export default function RootLayout({

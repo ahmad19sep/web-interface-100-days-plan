@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { PROJECTS } from "@/lib/plan";
+import { PROJECTS, TOTAL_DAYS } from "@/lib/plan";
 import { computeStreak, localToday, useProgress } from "@/lib/store";
 
 function prettyMonth(iso: string | null): string {
@@ -34,7 +34,7 @@ export default function Complete() {
     : done;
   const range = state.startDate
     ? `${prettyMonth(state.startDate)} – ${prettyMonth(localToday())}`
-    : "your 100 days";
+    : `your ${TOTAL_DAYS} days`;
 
   return (
     <div className="anim-fade-up-slow mx-auto my-2.5 max-w-[720px]">
@@ -57,17 +57,17 @@ export default function Complete() {
             {done}
           </div>
           <div className="mb-[26px] font-mono text-base text-mut3">
-            / 100 days · {done >= 100 ? "done" : "so far"}
+            / {TOTAL_DAYS} days · {done >= TOTAL_DAYS ? "done" : "so far"}
           </div>
           <h1 className="mb-3 font-display text-3xl font-bold tracking-[-.02em]">
-            {done >= 100
-              ? "You finished the 100 days."
-              : "The certificate unlocks at Day 100."}
+            {done >= TOTAL_DAYS
+              ? `You finished the ${TOTAL_DAYS} days.`
+              : `The certificate unlocks at Day ${TOTAL_DAYS}.`}
           </h1>
           <p className="mx-auto mb-7 max-w-[440px] text-[15.5px] text-mut">
             {state.name || "You"} · {range}.{" "}
-            {done >= 100
-              ? "Eight projects shipped, a capstone built, and a habit that's now yours. This is the hard part most people never reach."
+            {done >= TOTAL_DAYS
+              ? "Twenty projects shipped, a production capstone built, and a habit that's now yours. This is the hard part most people never reach."
               : "Keep checking in — every day here is one most people never reach."}
           </p>
           <div className="mb-8 flex justify-center gap-[34px]">

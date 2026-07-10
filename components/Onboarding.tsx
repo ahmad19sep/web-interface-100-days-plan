@@ -414,7 +414,8 @@ function SetupSteps() {
   async function start() {
     setBusy(true);
     await completeOnboarding({ startToday, reminder, visibility, name });
-    router.push("/today");
+    // land on Courses — the user picks the course there and starts
+    router.push("/courses");
   }
 
   return (

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { CREATOR } from "@/lib/plan";
+import { CHALLENGE, CREATOR, TOTAL_DAYS, TOTAL_PROJECTS } from "@/lib/plan";
 import {
   computeStreak,
   currentDay,
@@ -120,21 +120,23 @@ function drawLandscape(canvas: HTMLCanvasElement, d: CardData) {
   drawLogo(ctx, P, 52, 40, mono);
   ctx.fillStyle = "#ECE6DA";
   ctx.font = `600 19px ${grotesk}`;
-  ctx.fillText("100 Days of Modern AI", P + 52, 78);
+  ctx.fillText(CHALLENGE.title, P + 52, 78);
   ctx.fillStyle = "#6C7581";
   ctx.font = `13px ${mono}`;
   ctx.textAlign = "right";
   ctx.fillText(`${CREATOR.name.toUpperCase()} · ${CREATOR.handle}`, W - P, 76);
   ctx.textAlign = "left";
 
-  // strip (bottom) — 50 cols, 2 rows
-  const stripCols = 50;
+  // strip (bottom) — cols sized so the cell rows divide evenly
+  const stripCols = 40;
   const stripGap = 3;
+  const stripCell = (W - 2 * P - (stripCols - 1) * stripGap) / stripCols;
+  const stripRows = Math.ceil(d.cells.length / stripCols);
   const stripH = drawStrip(
     ctx,
     d.cells,
     P,
-    H - 52 - ((W - 2 * P - (stripCols - 1) * stripGap) / stripCols) * 2 - stripGap,
+    H - 52 - (stripRows * (stripCell + stripGap) - stripGap),
     W - 2 * P,
     stripCols,
     stripGap
@@ -152,7 +154,7 @@ function drawLandscape(canvas: HTMLCanvasElement, d: CardData) {
   const numW = ctx.measureText(num).width;
   ctx.fillStyle = "#3A4552";
   ctx.font = `34px ${mono}`;
-  ctx.fillText("/ 100", P + numW + 22, baseY - 8);
+  ctx.fillText(`/ ${TOTAL_DAYS}`, P + numW + 22, baseY - 8);
 
   // name + stats
   const nx = P + numW + 200;
@@ -168,7 +170,7 @@ function drawLandscape(canvas: HTMLCanvasElement, d: CardData) {
   ctx.fillText("streak", nx, baseY - 22);
   ctx.fillStyle = "#ECE6DA";
   ctx.font = `700 22px ${mono}`;
-  ctx.fillText(`${d.shipped}/8`, nx + sW + 46, baseY - 42);
+  ctx.fillText(`${d.shipped}/${TOTAL_PROJECTS}`, nx + sW + 46, baseY - 42);
   ctx.fillStyle = "#6C7581";
   ctx.font = `12px ${grotesk}`;
   ctx.fillText("projects", nx + sW + 46, baseY - 22);
@@ -187,7 +189,7 @@ function drawSquare(canvas: HTMLCanvasElement, d: CardData) {
   drawLogo(ctx, P, P, 44, mono);
   ctx.fillStyle = "#ECE6DA";
   ctx.font = `600 22px ${grotesk}`;
-  ctx.fillText("100 Days of Modern AI", P + 58, P + 30);
+  ctx.fillText(CHALLENGE.title, P + 58, P + 30);
 
   // centered number
   ctx.textAlign = "center";
@@ -199,16 +201,21 @@ function drawSquare(canvas: HTMLCanvasElement, d: CardData) {
   ctx.fillText(("00" + d.day).slice(-3), W / 2, 560);
   ctx.fillStyle = "#3A4552";
   ctx.font = `30px ${mono}`;
-  ctx.fillText("/ 100", W / 2, 620);
+  ctx.fillText(`/ ${TOTAL_DAYS}`, W / 2, 620);
   ctx.textAlign = "left";
 
-  // name + streak
+  // strip laid out from the bottom edge, then the name just above it
+  const sCols = 20;
+  const sGap = 5;
+  const sCell = (W - 2 * P - (sCols - 1) * sGap) / sCols;
+  const sRows = Math.ceil(d.cells.length / sCols);
+  const sY = H - P - (sRows * (sCell + sGap) - sGap);
+
   ctx.fillStyle = "#ECE6DA";
   ctx.font = `700 28px ${grotesk}`;
-  ctx.fillText(`${d.name} · 🔥 ${d.streak}-day streak`, P, H - 300);
+  ctx.fillText(`${d.name} · 🔥 ${d.streak}-day streak`, P, sY - 26);
 
-  // 20-col strip
-  drawStrip(ctx, d.cells, P, H - 260, W - 2 * P, 20, 5);
+  drawStrip(ctx, d.cells, P, sY, W - 2 * P, sCols, sGap);
 }
 
 // ── component ───────────────────────────────────────────────────────────────
@@ -217,7 +224,7 @@ export default function ShareCards() {
   const state = useProgress();
   const [note, setNote] = useState<string | null>(null);
   const streak = computeStreak(state.checkins);
-  const day = Math.min(currentDay(state.checkins), 100);
+  const day = Math.min(currentDay(state.checkins), TOTAL_DAYS);
   const done = Object.keys(state.checkins).length;
   const shipped = shippedCount(state.checkins);
   const name = state.name || "Your Name";
@@ -242,7 +249,7 @@ export default function ShareCards() {
     const canvas = await render(kind === "landscape" ? drawLandscape : drawSquare);
     const a = document.createElement("a");
     a.href = canvas.toDataURL("image/png");
-    a.download = `day-${day}-of-100-${kind === "landscape" ? "1200x630" : "1080x1080"}.png`;
+    a.download = `day-${day}-of-${TOTAL_DAYS}-${kind === "landscape" ? "1200x630" : "1080x1080"}.png`;
     a.click();
     flash("PNG downloaded ✓");
   }
@@ -264,7 +271,7 @@ export default function ShareCards() {
 
   function shareToX() {
     const text = encodeURIComponent(
-      `Day ${day} / 100 of #100DaysOfModernAI — ${streak.streak}-day streak 🔥 ${shipped}/8 projects shipped. Building modern AI by hand, in public.`
+      `Day ${day} / ${TOTAL_DAYS} of ${CHALLENGE.title} — ${streak.streak}-day streak 🔥 ${shipped}/${TOTAL_PROJECTS} projects shipped. Building production AI by hand, in public.`
     );
     window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
   }
@@ -306,7 +313,7 @@ export default function ShareCards() {
               <div className="flex items-center gap-3">
                 <Logo size={40} radius={11} />
                 <div className="font-display text-[19px] font-semibold">
-                  100 Days of Modern AI
+                  {CHALLENGE.title}
                 </div>
               </div>
               <div className="hidden font-mono text-[13px] text-mut3 sm:block">
@@ -324,7 +331,7 @@ export default function ShareCards() {
               </div>
               <div className="pb-2 sm:pb-4">
                 <div className="font-mono text-xl tracking-[-.02em] text-[#3A4552] sm:text-[34px]">
-                  / 100
+                  / {TOTAL_DAYS}
                 </div>
               </div>
               <div className="flex-1 pb-2 sm:pb-3.5">
@@ -347,7 +354,7 @@ export default function ShareCards() {
                 </div>
               </div>
             </div>
-            <JourneyCells cells={cells} variant="share" cols={50} gap={3} />
+            <JourneyCells cells={cells} variant="share" cols={40} gap={3} />
           </div>
         </div>
 
@@ -369,7 +376,7 @@ export default function ShareCards() {
                 <div className="mb-auto flex items-center gap-[11px]">
                   <Logo size={36} radius={10} />
                   <div className="font-display text-base font-semibold">
-                    100 Days of Modern AI
+                    {CHALLENGE.title}
                   </div>
                 </div>
                 <div className="my-auto text-center">
@@ -380,7 +387,7 @@ export default function ShareCards() {
                     {("00" + day).slice(-3)}
                   </div>
                   <div className="font-mono text-[22px] text-[#3A4552]">
-                    / 100
+                    / {TOTAL_DAYS}
                   </div>
                 </div>
                 <div className="mt-auto">

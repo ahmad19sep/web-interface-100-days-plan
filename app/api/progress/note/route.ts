@@ -1,3 +1,4 @@
+import { TOTAL_DAYS } from "@/lib/plan";
 import { NextResponse } from "next/server";
 import { DbNotConfiguredError, query } from "@/lib/db";
 import { currentProfile } from "@/lib/session";
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const day = Number(body?.day);
     const text = String(body?.text ?? "");
-    if (!Number.isInteger(day) || day < 1 || day > 100) {
+    if (!Number.isInteger(day) || day < 1 || day > TOTAL_DAYS) {
       return NextResponse.json({ error: "Invalid day." }, { status: 400 });
     }
 

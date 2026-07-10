@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { TOTAL_DAYS } from "@/lib/plan";
 import {
   currentDay,
   expectedDay,
@@ -16,15 +17,16 @@ export default function JourneyMap() {
 
   const day = currentDay(state.checkins);
   const done = Object.keys(state.checkins).length;
-  const toGo = 100 - done - (day <= 100 ? 1 : 0);
+  const toGo = TOTAL_DAYS - done - (day <= TOTAL_DAYS ? 1 : 0);
   const expected = expectedDay(state.startDate);
-  const cohortRow = Math.min(10, Math.ceil(expected / 10));
+  const gridRows = Math.ceil(TOTAL_DAYS / 10);
+  const cohortRowPct = (Math.min(gridRows, Math.ceil(expected / 10)) / gridRows) * 100;
 
   return (
     <div>
       <div className="mb-[22px] flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className="text-sm text-mut2">Your 100-day track</div>
+          <div className="text-sm text-mut2">Your {TOTAL_DAYS}-day track</div>
           <h1 className="font-display text-[26px] font-bold tracking-[-.02em]">
             Journey map
           </h1>
@@ -38,10 +40,10 @@ export default function JourneyMap() {
           </div>
           <div>
             <div className="font-mono text-[22px] font-extrabold text-today">
-              {Math.min(day, 100)}
+              {Math.min(day, TOTAL_DAYS)}
             </div>
             <div className="text-[11.5px] text-mut3">
-              {day > 100 ? "complete" : "today"}
+              {day > TOTAL_DAYS ? "complete" : "today"}
             </div>
           </div>
           <div>
@@ -95,7 +97,7 @@ export default function JourneyMap() {
             <div
               className="pointer-events-none absolute left-0 right-0 h-0.5"
               style={{
-                top: `calc(${cohortRow * 10}% - 1px)`,
+                top: `calc(${cohortRowPct}% - 1px)`,
                 background:
                   "repeating-linear-gradient(90deg,#F5B54B 0 8px,transparent 8px 14px)",
               }}

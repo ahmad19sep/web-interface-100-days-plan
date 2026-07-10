@@ -8,6 +8,7 @@ import {
   getDay,
   pad3,
   PROJECTS,
+  TOTAL_DAYS,
   youTubeSearchUrl,
 } from "@/lib/plan";
 import type { QuizQuestion } from "@/lib/challenges/types";
@@ -545,7 +546,9 @@ export default function DayDetail({ day }: { day: number }) {
     }
   }
 
-  const around = [day - 1, day, day + 1].filter((n) => n >= 1 && n <= 100);
+  const around = [day - 1, day, day + 1].filter(
+    (n) => n >= 1 && n <= TOTAL_DAYS
+  );
 
   return (
     <div>
@@ -569,11 +572,21 @@ export default function DayDetail({ day }: { day: number }) {
               {pad3(day)}
             </div>
             <div className="pt-1.5">
-              <div className="font-mono text-xs text-mut3">/ 100</div>
+              <div className="font-mono text-xs text-mut3">/ {TOTAL_DAYS}</div>
               <div className="mt-1 flex flex-wrap gap-2">
                 {project && (
                   <span className="tag-mono !px-[9px] !py-[3px] bg-[rgba(53,211,153,.1)] text-accent">
                     {project.id} · {project.short}
+                  </span>
+                )}
+                {plan.difficulty && (
+                  <span className="tag-mono !px-[9px] !py-[3px] bg-locked text-mut">
+                    {plan.difficulty.toUpperCase()}
+                  </span>
+                )}
+                {plan.time && (
+                  <span className="tag-mono !px-[9px] !py-[3px] bg-locked text-mut">
+                    ⏱ {plan.time}
                   </span>
                 )}
                 {plan.isRest && (
@@ -602,11 +615,20 @@ export default function DayDetail({ day }: { day: number }) {
             {plan.title}
           </h1>
           {plan.about ? (
-            <p className="mb-[22px] max-w-[680px] text-[14.5px] leading-[1.7] text-mut">
+            <p className="mb-[18px] max-w-[680px] text-[14.5px] leading-[1.7] text-mut">
               {plan.about}
             </p>
           ) : (
-            <div className="mb-[22px]" />
+            <div className="mb-[18px]" />
+          )}
+
+          {plan.why && (
+            <div className="card-std mb-[22px] rounded-[14px] p-[18px]">
+              <div className="mb-2 text-[11.5px] text-mut3">
+                💡 WHY IT MATTERS
+              </div>
+              <div className="text-sm leading-[1.6] text-ink2">{plan.why}</div>
+            </div>
           )}
 
           {state.isOwner && dayContentReady && (
@@ -738,7 +760,7 @@ export default function DayDetail({ day }: { day: number }) {
           <div className="mb-3.5 grid gap-3.5 sm:grid-cols-2">
             <div className="card-std rounded-[14px] p-[18px]">
               <div className="mb-2 text-[11.5px] text-mut3">
-                📺 THE RESOURCE · ~30–45 MIN
+                📚 WHAT TO LEARN{plan.time ? ` · ${plan.time.toUpperCase()}` : ""}
               </div>
               <div className="text-sm leading-[1.6] text-ink2">
                 {plan.resource}
@@ -756,7 +778,7 @@ export default function DayDetail({ day }: { day: number }) {
             </div>
             <div className="card-std rounded-[14px] p-[18px]">
               <div className="mb-2 text-[11.5px] text-mut3">
-                📖 THE BUILD · ~45–75 MIN
+                🛠 THE BUILD
               </div>
               <div className="text-sm leading-[1.6] text-ink2">
                 {plan.build}
@@ -764,10 +786,21 @@ export default function DayDetail({ day }: { day: number }) {
             </div>
           </div>
           {plan.doneWhen && (
-            <div className="card-std mb-[22px] rounded-[14px] p-[18px]">
+            <div className="card-std mb-3.5 rounded-[14px] p-[18px]">
               <div className="mb-2 text-[11.5px] text-mut3">✓ DONE WHEN</div>
               <div className="text-sm leading-[1.6] text-ink2">
                 {plan.doneWhen}
+              </div>
+            </div>
+          )}
+
+          {plan.proof && (
+            <div className="card-std mb-[22px] rounded-[14px] p-[18px]">
+              <div className="mb-2 text-[11.5px] text-mut3">
+                📸 PROOF TO POST
+              </div>
+              <div className="text-sm leading-[1.6] text-ink2">
+                {plan.proof}
               </div>
             </div>
           )}
