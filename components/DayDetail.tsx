@@ -232,7 +232,7 @@ function QuizCard({
         type="button"
         onClick={() => void onSubmit()}
         disabled={!allAnswered || busy || disabled}
-        className="btn-primary mt-4 w-full py-3 text-sm disabled:cursor-default disabled:opacity-50"
+        className="btn-amber mt-4 w-full py-3 text-sm disabled:cursor-default disabled:opacity-50"
       >
         {disabled
           ? "🔒 Locked"
@@ -891,7 +891,7 @@ export default function DayDetail({ day }: { day: number }) {
                 <button
                   type="button"
                   onClick={onCheckIn}
-                  className="btn-primary w-full py-3 text-[14px] !font-bold"
+                  className="btn-amber w-full py-3 text-[14px]"
                 >
                   <IconCheck size={16} strokeWidth={2.5} />
                   Log check-in — open the gate

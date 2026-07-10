@@ -59,7 +59,7 @@
   --color-rest-done: var(--rest-done);
   --color-today: var(--today);
   --color-locked: var(--locked);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-grotesk);
   --font-display: var(--font-grotesk);
   --font-mono: var(--font-jbmono);
 }
@@ -217,6 +217,39 @@ a:hover {
   .btn-ghost:hover {
     border-color: #34404f;
   }
+  .btn-amber {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    border: none;
+    color: #1a1204;
+    font-family: inherit;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow:
+      0 5px 0 #92580a,
+      0 14px 22px -10px rgba(245, 158, 11, 0.35);
+    transition:
+      transform 0.1s ease,
+      box-shadow 0.1s ease,
+      filter 0.15s ease;
+  }
+  .btn-amber:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+    box-shadow:
+      0 7px 0 #92580a,
+      0 18px 26px -10px rgba(245, 158, 11, 0.4);
+  }
+  .btn-amber:active {
+    transform: translateY(4px);
+    box-shadow:
+      0 1px 0 #92580a,
+      0 6px 12px -8px rgba(245, 158, 11, 0.3);
+  }
   .card-std {
     background: var(--card);
     border: 1px solid var(--edge);
@@ -295,21 +328,21 @@ a:hover {
 }
 .btn-primary {
   box-shadow:
-    0 5px 0 #0b7a56,
-    0 14px 22px -10px rgba(20, 160, 110, 0.45);
+    0 5px 0 #083344,
+    0 14px 22px -10px rgba(14, 116, 144, 0.45);
 }
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 7px 0 #0b7a56,
-    0 18px 26px -10px rgba(20, 160, 110, 0.5);
+    0 7px 0 #083344,
+    0 18px 26px -10px rgba(14, 116, 144, 0.5);
   filter: brightness(1.06);
 }
 .btn-primary:active {
   transform: translateY(4px);
   box-shadow:
-    0 1px 0 #0b7a56,
-    0 6px 12px -8px rgba(20, 160, 110, 0.4);
+    0 1px 0 #083344,
+    0 6px 12px -8px rgba(14, 116, 144, 0.4);
 }
 .btn-ghost {
   box-shadow:

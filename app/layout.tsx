@@ -1,15 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SITE } from "@/lib/site";
 import Background3DMount from "@/components/Background3DMount";
 import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 const grotesk = Space_Grotesk({
   variable: "--font-grotesk",
@@ -40,7 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${grotesk.variable} ${jbmono.variable} h-full antialiased`}
+      className={`${grotesk.variable} ${jbmono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <Background3DMount />

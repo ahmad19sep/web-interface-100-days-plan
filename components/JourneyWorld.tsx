@@ -692,7 +692,7 @@ export default function JourneyWorld() {
               type="button"
               onClick={() => openDay(selected)}
               disabled={!!walking}
-              className="btn-primary block w-full cursor-pointer py-3.5 text-center text-[14.5px] !font-bold disabled:opacity-60"
+              className="btn-amber block w-full cursor-pointer py-3.5 text-center text-[14.5px] disabled:opacity-60"
             >
               {walking
                 ? "Traveling…"
