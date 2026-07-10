@@ -105,7 +105,7 @@ export function JourneyCells({
               type="button"
               title={title}
               onClick={() => router.push(`/day/${c.n}`)}
-              className={`flex cursor-pointer items-center justify-center ${pulse}`}
+              className={`cell3d flex cursor-pointer items-center justify-center ${pulse}`}
               style={{
                 aspectRatio: "1",
                 borderRadius: 9,
@@ -132,7 +132,7 @@ export function JourneyCells({
             onClick={
               interactive ? () => router.push(`/day/${c.n}`) : undefined
             }
-            className={`${interactive ? "cursor-pointer" : ""} ${pulse}`}
+            className={`${interactive ? "cell3d cursor-pointer" : ""} ${pulse}`}
             style={{
               aspectRatio: "1",
               borderRadius: 4,

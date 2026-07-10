@@ -18,6 +18,7 @@ import {
 } from "@/lib/store";
 import { Logo } from "./icons";
 import { ProgressBar } from "./ProgressBar";
+import Tilt from "./Tilt";
 
 export default function CoursesBoard() {
   const state = useProgress();
@@ -38,9 +39,10 @@ export default function CoursesBoard() {
         </h1>
       </div>
 
+      <Tilt max={5} className="max-w-[760px] rounded-[20px]">
       <Link
         href="/today"
-        className="card-grad block max-w-[760px] p-6 !text-ink transition-transform hover:-translate-y-0.5 sm:p-8"
+        className="card-grad block p-6 !text-ink sm:p-8"
       >
         <div className="mb-4 flex items-center gap-3.5">
           <Logo size={46} radius={13} />
@@ -95,6 +97,7 @@ export default function CoursesBoard() {
               : "Start the course →"}
         </span>
       </Link>
+      </Tilt>
     </div>
   );
 }

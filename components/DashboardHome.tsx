@@ -21,6 +21,7 @@ import {
 } from "@/lib/store";
 import { buildCells, JourneyCells } from "./JourneyGrid";
 import { ProgressBar } from "./ProgressBar";
+import Tilt from "./Tilt";
 import { IconCheck, IconClockBack } from "./icons";
 
 // Check-in deliberately does NOT live on the dashboard: the only way to
@@ -58,7 +59,8 @@ function DayCounterCard({
   extra?: React.ReactNode;
 }) {
   return (
-    <div className="card-grad flex flex-col p-[26px] py-7">
+    <Tilt className="rounded-[20px]">
+    <div className="card-grad flex h-full flex-col p-[26px] py-7">
       <div className="mb-1.5 font-mono text-xs tracking-[.1em] text-mut3">
         {label}
       </div>
@@ -85,6 +87,7 @@ function DayCounterCard({
         </>
       )}
     </div>
+    </Tilt>
   );
 }
 

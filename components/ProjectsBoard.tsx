@@ -110,7 +110,7 @@ export default function ProjectsBoard() {
             <Link
               key={p.id}
               href={`/projects/${p.id}`}
-              className="card-std block p-5 !text-ink transition-transform hover:-translate-y-0.5"
+              className="card-std lift3d block p-5 !text-ink"
               style={{ borderColor: border }}
             >
               {body}

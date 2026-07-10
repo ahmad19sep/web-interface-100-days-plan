@@ -12,6 +12,7 @@ import {
 } from "@/lib/plan";
 import { currentDay, expectedDay, useProgress } from "@/lib/store";
 import { demoCells, buildCells, JourneyCells } from "./JourneyGrid";
+import Tilt from "./Tilt";
 import { IconCheck, IconPlay, Logo } from "./icons";
 
 export default function Landing() {
@@ -124,6 +125,7 @@ export default function Landing() {
         </div>
 
         {/* journey preview */}
+        <Tilt max={6} className="rounded-[20px]">
         <div
           className="rounded-[20px] border border-edge p-6"
           style={{
@@ -159,6 +161,7 @@ export default function Landing() {
             </span>
           </div>
         </div>
+        </Tilt>
       </section>
 
       {/* how it works */}
@@ -220,7 +223,7 @@ export default function Landing() {
           {PROJECTS.map((p) => (
             <div
               key={p.id}
-              className="card-std flex min-h-[132px] flex-col justify-between rounded-[14px] p-5"
+              className="card-std lift3d flex min-h-[132px] flex-col justify-between rounded-[14px] p-5"
             >
               <div>
                 <div className="mb-2.5 font-mono text-xs text-accent">

@@ -301,7 +301,7 @@ export default function ShareCards() {
           1200 × 630 · LANDSCAPE
         </div>
         <div
-          className="relative mb-9 w-full overflow-hidden rounded-[18px] border border-edge"
+          className="lift3d relative mb-9 w-full overflow-hidden rounded-[18px] border border-edge"
           style={{
             aspectRatio: "1200/630",
             background:
@@ -365,7 +365,7 @@ export default function ShareCards() {
               1080 × 1080 · SQUARE
             </div>
             <div
-              className="relative w-full overflow-hidden rounded-[18px] border border-edge"
+              className="lift3d relative w-full overflow-hidden rounded-[18px] border border-edge"
               style={{
                 aspectRatio: "1/1",
                 background:

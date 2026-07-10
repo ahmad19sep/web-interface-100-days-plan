@@ -227,3 +227,64 @@ a:hover {
     font-size: var(--stat-md);
   }
 }
+
+/* ── 3D depth system ────────────────────────────────────────────────────── */
+.tilt3d {
+  transform-style: preserve-3d;
+  transition: transform 0.18s ease-out;
+  will-change: transform;
+}
+
+/* card hover: lifts toward you on a slight 3D axis */
+.lift3d {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+.lift3d:hover {
+  transform: perspective(700px) translateY(-4px) rotateX(1.6deg)
+    scale3d(1.012, 1.012, 1);
+  box-shadow: 0 26px 48px -26px rgba(0, 0, 0, 0.7);
+}
+
+/* journey-map cells: pop out of the grid plane */
+.cell3d {
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.14s ease;
+}
+.cell3d:hover {
+  transform: perspective(400px) translateZ(14px) scale(1.1);
+  box-shadow: 0 8px 18px -6px rgba(0, 0, 0, 0.65);
+  position: relative;
+  z-index: 2;
+}
+
+/* buttons: shallow 3D press */
+.btn-primary,
+.btn-ghost {
+  transition:
+    transform 0.12s ease,
+    filter 0.15s ease,
+    border-color 0.15s ease;
+}
+.btn-primary:hover,
+.btn-ghost:hover {
+  transform: translateY(-1px);
+}
+.btn-primary:active,
+.btn-ghost:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt3d,
+  .lift3d,
+  .cell3d,
+  .btn-primary,
+  .btn-ghost {
+    transition: none !important;
+    transform: none !important;
+  }
+}
