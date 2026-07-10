@@ -10,6 +10,7 @@ import type { Badge } from "@/lib/badges";
 import { TOTAL_DAYS } from "@/lib/plan";
 import { useProgress } from "@/lib/store";
 import Avatar3D from "./Avatar3D";
+import LeaderboardPodium from "./LeaderboardPodium";
 
 interface Member {
   handle: string;
@@ -111,6 +112,16 @@ export default function Leaderboard() {
 
       {community.state === "ready" && community.members.length > 0 && (
         <>
+          {/* ── the 3D podium ── */}
+          <LeaderboardPodium
+            winners={community.members.slice(0, 3).map((u) => ({
+              handle: u.handle,
+              name: u.name,
+              avatar: u.avatar,
+              xp: xpOf(u),
+            }))}
+          />
+
           {/* ── the same road ── */}
           <div className="mb-[22px] rounded-[18px] border border-edge bg-card px-5 py-5 sm:px-7">
             <div className="mb-3 font-mono text-[10px] tracking-[.22em] text-mut3">
