@@ -135,19 +135,82 @@ export function buildAvatarModel(T: ThreeNS, id: string) {
   return g;
 }
 
+// ── GLB avatars ─────────────────────────────────────────────────────────
+// Real rigged characters (e.g. Ahmad's Avaturn scan) served from
+// /public/avatars. The parsed file is cached once; every placement gets a
+// SkeletonUtils clone so skinned meshes stay independent while sharing
+// geometry + textures with the template (which is why clones are never
+// deep-disposed).
+
+const GLB_AVATARS: Record<string, string> = { ahmad: "/avatars/ahmad.glb" };
+
+export function isGlbAvatar(id: string): boolean {
+  return id in GLB_AVATARS;
+}
+
+type Object3DT = InstanceType<ThreeNS["Object3D"]>;
+type ClipT = InstanceType<ThreeNS["AnimationClip"]>;
+
+const glbCache = new Map<string, Promise<{ template: Object3DT; clips: ClipT[] }>>();
+
+async function loadGlbTemplate(T: ThreeNS, id: string) {
+  let hit = glbCache.get(id);
+  if (!hit) {
+    hit = (async () => {
+      const { GLTFLoader } = await import("three/examples/jsm/loaders/GLTFLoader.js");
+      const gltf = await new GLTFLoader().loadAsync(GLB_AVATARS[id]);
+      const template = gltf.scene;
+      // normalize to the voxel characters' frame: ~3 units tall, feet at y=0
+      const box = new T.Box3().setFromObject(template);
+      const height = Math.max(0.001, box.max.y - box.min.y);
+      const s = 3.05 / height;
+      template.scale.setScalar(s);
+      template.position.set(
+        -((box.min.x + box.max.x) / 2) * s,
+        -box.min.y * s,
+        -((box.min.z + box.max.z) / 2) * s
+      );
+      const root = new T.Group();
+      root.add(template);
+      return { template: root as Object3DT, clips: gltf.animations };
+    })();
+    glbCache.set(id, hit);
+  }
+  return hit;
+}
+
+/**
+ * Any avatar as a scene object: voxel builds return instantly, GLB avatars
+ * load once and clone. `clips` is non-empty when the character can animate.
+ */
+export async function buildAvatarObject(
+  T: ThreeNS,
+  id: string
+): Promise<{ object: Object3DT; clips: ClipT[] }> {
+  if (!isGlbAvatar(id)) return { object: buildAvatarModel(T, id), clips: [] };
+  const { template, clips } = await loadGlbTemplate(T, id);
+  const { clone } = await import("three/examples/jsm/utils/SkeletonUtils.js");
+  return { object: clone(template), clips };
+}
+
 /** Shared scene setup for both snapshots and live views. */
-export function stageFor(T: ThreeNS, id: string) {
+export async function stageFor(T: ThreeNS, id: string) {
   const scene = new T.Scene();
   scene.add(new T.HemisphereLight(0xffffff, 0x28303c, 1.2));
   const key = new T.DirectionalLight(0xffffff, 1.6);
   key.position.set(3, 5, 4);
   scene.add(key);
-  const model = buildAvatarModel(T, id);
+  const { object: model, clips } = await buildAvatarObject(T, id);
   scene.add(model);
+  let mixer: InstanceType<ThreeNS["AnimationMixer"]> | null = null;
+  if (clips.length) {
+    mixer = new T.AnimationMixer(model);
+    mixer.clipAction(clips[0]).play();
+  }
   const camera = new T.PerspectiveCamera(34, 1, 0.1, 50);
   camera.position.set(0, 2.3, 4.9);
   camera.lookAt(0, 1.4, 0);
-  return { scene, model, camera };
+  return { scene, model, camera, mixer };
 }
 
 // ── snapshot cache ──────────────────────────────────────────────────────
@@ -172,15 +235,20 @@ export async function avatarSnapshot(id: string): Promise<string> {
     snapRenderer.setSize(256, 256);
     snapRenderer.setClearColor(0x000000, 0);
   }
-  const { scene, model, camera } = stageFor(T, id);
+  const { scene, model, camera, mixer } = await stageFor(T, id);
   model.rotation.y = 0.5; // three-quarter view
+  if (mixer) mixer.update(0.6); // settle animated characters out of the bind pose
   snapRenderer.render(scene, camera);
   const url = snapRenderer.domElement.toDataURL("image/png");
   snapCache.set(id, url);
-  model.traverse((o) => {
-    const mesh = o as { geometry?: { dispose(): void }; material?: { dispose(): void } };
-    mesh.geometry?.dispose();
-    mesh.material?.dispose();
-  });
+  // GLB clones share geometry/textures with the cached template — never
+  // dispose those, or every later clone renders black.
+  if (!isGlbAvatar(id)) {
+    model.traverse((o) => {
+      const mesh = o as { geometry?: { dispose(): void }; material?: { dispose(): void } };
+      mesh.geometry?.dispose();
+      mesh.material?.dispose();
+    });
+  }
   return url;
 }
