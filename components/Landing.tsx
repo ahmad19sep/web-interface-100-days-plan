@@ -11,9 +11,18 @@ import {
   TOTAL_PROJECTS,
 } from "@/lib/plan";
 import { currentDay, expectedDay, useProgress } from "@/lib/store";
-import { demoCells, buildCells, JourneyCells } from "./JourneyGrid";
-import Tilt from "./Tilt";
+import dynamic from "next/dynamic";
+import { demoCells, buildCells } from "./JourneyGrid";
 import { IconCheck, IconPlay, Logo } from "./icons";
+
+const Journey3D = dynamic(() => import("./Journey3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[330px] items-center justify-center font-mono text-xs text-mut3">
+      loading 3D…
+    </div>
+  ),
+});
 
 export default function Landing() {
   const router = useRouter();
@@ -124,8 +133,7 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* journey preview */}
-        <Tilt max={6} className="rounded-[20px]">
+        {/* journey preview — live 3D city of the track */}
         <div
           className="rounded-[20px] border border-edge p-6"
           style={{
@@ -141,7 +149,7 @@ export default function Landing() {
               {doneCount} / {TOTAL_DAYS}
             </div>
           </div>
-          <JourneyCells cells={cells} variant="flat" cols={10} gap={6} />
+          <Journey3D cells={cells} height={330} />
           <div className="mt-4 flex gap-4 text-[11.5px] text-mut3">
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-[3px] bg-done" />
@@ -161,7 +169,6 @@ export default function Landing() {
             </span>
           </div>
         </div>
-        </Tilt>
       </section>
 
       {/* how it works */}

@@ -19,10 +19,20 @@ import {
   shippedCount,
   useProgress,
 } from "@/lib/store";
-import { buildCells, JourneyCells } from "./JourneyGrid";
+import dynamic from "next/dynamic";
+import { buildCells } from "./JourneyGrid";
 import { ProgressBar } from "./ProgressBar";
 import Tilt from "./Tilt";
 import { IconCheck, IconClockBack } from "./icons";
+
+const Journey3D = dynamic(() => import("./Journey3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[228px] items-center justify-center font-mono text-xs text-mut3">
+      loading 3D…
+    </div>
+  ),
+});
 
 // Check-in deliberately does NOT live on the dashboard: the only way to
 // finish a day is to open its page — where the creator's video, notes,
@@ -179,13 +189,7 @@ function JourneyMini({
           Open full →
         </Link>
       </div>
-      <JourneyCells
-        cells={buildCells(checkins, current)}
-        variant="flat"
-        cols={10}
-        gap={5}
-        interactive
-      />
+      <Journey3D cells={buildCells(checkins, current)} height={228} />
     </div>
   );
 }
