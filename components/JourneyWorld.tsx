@@ -7,10 +7,11 @@
 // zoom, click a building to inspect it in the side panel and jump to the
 // day page. Falls back to the classic 2D grid if WebGL is unavailable.
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { buildAvatarModel, loadThree } from "@/lib/avatar-models";
 import { DAYS, PROJECTS, TOTAL_DAYS, WEEKS, getDay, weekOf } from "@/lib/plan";
+import { computeStreak, shippedCount } from "@/lib/progress";
 import { currentDay, useProgress } from "@/lib/store";
 import JourneyMap from "./JourneyMap";
 
@@ -35,20 +36,57 @@ interface WorldRefs {
   dispose(): void;
   selectExternally(n: number): void;
   refreshStates(done: Record<number, string>, today: number): void;
+  /** Walk the explorer along the road to day n, then call onArrive. */
+  walkTo(n: number, onArrive: () => void): void;
+  /** Teleport to the end of the current walk (fires onArrive). */
+  skipWalk(): void;
+}
+
+/** Purely derived gamification — nothing is stored, just counted. */
+function xpOf(checkins: Record<number, string>): number {
+  let xp = 0;
+  for (const key of Object.keys(checkins)) {
+    const n = Number(key);
+    xp += SHIP_DAYS.has(n) ? 250 : DAYS[n - 1]?.isRest ? 40 : 100;
+  }
+  return xp;
 }
 
 export default function JourneyWorld() {
   const state = useProgress();
+  const router = useRouter();
   const mountRef = useRef<HTMLDivElement>(null);
   const worldRef = useRef<WorldRefs | null>(null);
   const [failed, setFailed] = useState(false);
   const [selected, setSelected] = useState(() =>
     Math.min(currentDay(state.checkins), TOTAL_DAYS)
   );
+  const [walking, setWalking] = useState<number | null>(null);
   const [tip, setTip] = useState<{ day: number; x: number; y: number } | null>(null);
+
+  /** Walk the explorer to day n, then open its lesson page. */
+  const openDay = (n: number) => {
+    if (walking) return;
+    const world = worldRef.current;
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!world || reduced) {
+      router.push(`/day/${n}`);
+      return;
+    }
+    setSelected(n);
+    world.selectExternally(n);
+    setWalking(n);
+    world.walkTo(n, () => router.push(`/day/${n}`));
+  };
 
   const today = Math.min(currentDay(state.checkins), TOTAL_DAYS);
   const doneCount = Object.keys(state.checkins).length;
+  const xp = xpOf(state.checkins);
+  const level = 1 + Math.floor(xp / 500);
+  const streak = computeStreak(state.checkins).streak;
+  const shipped = shippedCount(state.checkins);
   const checkinsRef = useRef(state.checkins);
   checkinsRef.current = state.checkins;
   const avatarId = state.avatar;
@@ -252,6 +290,10 @@ export default function JourneyWorld() {
       let doneLine: InstanceType<ThreeNS["Line"]> | null = null;
       const markerPos = (n: number) => markers[n - 1].g.position as V3;
 
+      // walking state — the explorer's position along the road [0..1]
+      const startT = (Math.min(currentDay(checkinsRef.current), TOTAL_DAYS) - 0.5) / TOTAL_DAYS;
+      const walk = { t: startT, target: startT, onArrive: null as null | (() => void) };
+
       const refreshStates = (done: Record<number, string>, todayN: number) => {
         for (const m of markers) {
           const plan = DAYS[m.n - 1];
@@ -274,8 +316,10 @@ export default function JourneyWorld() {
         }
         const tp = markerPos(todayN);
         amber.position.set(tp.x, 7, tp.z);
-        const ap = curve.getPointAt(dayT(todayN));
-        explorer.position.set(ap.x, 0, ap.z);
+        // send the explorer home to today's marker — unless mid-walk
+        if (!walk.onArrive && walk.t === walk.target) {
+          walk.t = walk.target = dayT(todayN);
+        }
         if (doneLine) {
           scene.remove(doneLine);
           doneLine.geometry.dispose();
@@ -388,14 +432,39 @@ export default function JourneyWorld() {
           focus.z + cam.radius * Math.sin(cam.phi) * Math.cos(cam.theta)
         );
         camera.lookAt(focus.x, focus.y + 2, focus.z);
+        // walk the explorer toward its target along the road
+        const dtw = walk.target - walk.t;
+        const moving = Math.abs(dtw) > 0.00005;
+        if (moving) {
+          walk.t += reduced ? dtw : Math.sign(dtw) * Math.min(Math.abs(dtw), 0.0018);
+          if (Math.abs(walk.target - walk.t) <= 0.00005) {
+            walk.t = walk.target;
+            const arrived = walk.onArrive;
+            walk.onArrive = null;
+            if (arrived) arrived();
+          }
+        }
+        const wt = Math.max(0.0001, Math.min(0.9999, walk.t));
+        const ap = curve.getPointAt(wt);
+        explorer.position.set(
+          ap.x,
+          reduced ? 0 : moving ? Math.abs(Math.sin(clock * 8)) * 0.22 : Math.sin(clock * 2.2) * 0.16,
+          ap.z
+        );
+        if (moving) {
+          const tan = curve.getTangentAt(wt);
+          explorer.rotation.y = Math.atan2(tan.x, tan.z) + (dtw < 0 ? Math.PI : 0);
+          character.rotation.y = 0;
+          focusTarget.set(ap.x, 0, ap.z); // camera follows the traveler
+        } else if (!reduced) {
+          character.rotation.y = Math.sin(clock * 0.4) * 0.5;
+        }
         if (!reduced) {
           const todayN = Math.min(currentDay(checkinsRef.current), TOTAL_DAYS);
           const cur = markers[todayN - 1];
           if (!checkinsRef.current[todayN]) {
             cur.mat.emissiveIntensity = 0.65 + Math.sin(clock * 3) * 0.3;
           }
-          explorer.position.y = Math.sin(clock * 2.2) * 0.16;
-          character.rotation.y = Math.sin(clock * 0.4) * 0.5;
           particles.rotation.y = Math.sin(clock * 0.05) * 0.02;
         }
         renderer.render(scene, camera);
@@ -406,6 +475,17 @@ export default function JourneyWorld() {
         renderer,
         selectExternally,
         refreshStates,
+        walkTo(n, onArrive) {
+          walk.target = dayT(n);
+          if (Math.abs(walk.target - walk.t) <= 0.00005) {
+            onArrive();
+            return;
+          }
+          walk.onArrive = onArrive;
+        },
+        skipWalk() {
+          if (walk.onArrive) walk.t = walk.target - Math.sign(walk.target - walk.t) * 0.0001;
+        },
         dispose() {
           cancelAnimationFrame(raf);
           ro.disconnect();
@@ -497,8 +577,24 @@ export default function JourneyWorld() {
             </div>
           )}
 
+          {/* transit banner */}
+          {walking && (
+            <div className="absolute bottom-[70px] left-1/2 z-10 flex -translate-x-1/2 items-center gap-3">
+              <div className="animate-pulse whitespace-nowrap font-mono text-[11px] tracking-[.14em] text-today">
+                EN ROUTE TO DAY {walking}…
+              </div>
+              <button
+                type="button"
+                onClick={() => worldRef.current?.skipWalk()}
+                className="cursor-pointer rounded-lg border border-edge2 bg-[rgba(13,18,32,.9)] px-3.5 py-1.5 font-mono text-[11px] text-ink hover:border-[#2A3542]"
+              >
+                SKIP ⏭
+              </button>
+            </div>
+          )}
+
           {/* back to today */}
-          {selected !== today && (
+          {!walking && selected !== today && (
             <button
               type="button"
               onClick={() => {
@@ -526,7 +622,16 @@ export default function JourneyWorld() {
               />
             </div>
             <div className="whitespace-nowrap font-mono text-[12px] text-mut2">
-              ✓ <span className="text-ink">{doneCount}</span>
+              LVL <span className="text-ink">{level}</span>
+            </div>
+            <div className="whitespace-nowrap font-mono text-[12px] text-mut2">
+              🔥 <span className="text-ink">{streak}</span>
+            </div>
+            <div className="hidden whitespace-nowrap font-mono text-[12px] text-mut2 sm:block">
+              XP <span className="text-accent">{xp}</span>
+            </div>
+            <div className="hidden whitespace-nowrap font-mono text-[12px] text-mut2 sm:block">
+              📦 {shipped}
             </div>
           </div>
         </div>
@@ -591,12 +696,20 @@ export default function JourneyWorld() {
               🔒 SEALED — CLEAR DAY {today} FIRST
             </div>
           ) : (
-            <Link
-              href={`/day/${selected}`}
-              className="btn-primary block w-full py-3.5 text-center text-[14.5px] !font-bold"
+            <button
+              type="button"
+              onClick={() => openDay(selected)}
+              disabled={!!walking}
+              className="btn-primary block w-full cursor-pointer py-3.5 text-center text-[14.5px] !font-bold disabled:opacity-60"
             >
-              {isDone ? `Revisit Day ${selected}` : ship ? `Enter ${ship.name}` : `Start Day ${selected} →`}
-            </Link>
+              {walking
+                ? "Traveling…"
+                : isDone
+                  ? `Revisit Day ${selected}`
+                  : ship
+                    ? `Enter ${ship.name}`
+                    : `Start Day ${selected} →`}
+            </button>
           )}
         </aside>
       </div>
