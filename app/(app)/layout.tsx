@@ -1,19 +1,18 @@
 import AuthGate from "@/components/AuthGate";
 import Sidebar from "@/components/Sidebar";
+import WorldChrome from "@/components/WorldChrome";
 
 export default function AppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // The 3D world (inside WorldChrome) lives at the layout level so it
+  // persists across every route; screens float above it as overlays.
   return (
     <AuthGate>
-      <div className="flex min-h-screen flex-col lg:flex-row">
-        <Sidebar />
-        <main className="mx-auto w-full min-w-0 max-w-[1030px] flex-1 px-5 py-8 pb-20 sm:px-8 lg:px-[46px] lg:py-[34px]">
-          {children}
-        </main>
-      </div>
+      <Sidebar />
+      <WorldChrome>{children}</WorldChrome>
     </AuthGate>
   );
 }

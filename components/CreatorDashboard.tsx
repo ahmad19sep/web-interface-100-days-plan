@@ -70,7 +70,7 @@ export default function CreatorDashboard() {
       <div className="mb-[22px]">
         <div className="text-sm text-mut2">Only you can see this</div>
         <h1 className="font-display text-[26px] font-bold tracking-[-.02em]">
-          Creator dashboard
+          Creator Studio
         </h1>
       </div>
 

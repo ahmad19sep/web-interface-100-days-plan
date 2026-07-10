@@ -7,7 +7,7 @@
 // zoom, click a building to inspect it in the side panel and jump to the
 // day page. Falls back to the classic 2D grid if WebGL is unavailable.
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { buildAvatarObject, loadThree } from "@/lib/avatar-models";
 import { DAYS, PROJECTS, TOTAL_DAYS, WEEKS, getDay, weekOf } from "@/lib/plan";
@@ -55,6 +55,9 @@ function xpOf(checkins: Record<number, string>): number {
 export default function JourneyWorld() {
   const state = useProgress();
   const router = useRouter();
+  // Mounted persistently from WorldChrome — the scene always runs, but the
+  // HUD/panel UI shows only while the journey route itself is active.
+  const uiActive = usePathname().startsWith("/journey");
   const mountRef = useRef<HTMLDivElement>(null);
   const worldRef = useRef<WorldRefs | null>(null);
   const [failed, setFailed] = useState(false);
@@ -531,8 +534,9 @@ export default function JourneyWorld() {
   }, [state.checkins, today]);
 
   if (failed) {
+    if (!uiActive) return null; // other tabs still work without WebGL
     return (
-      <div className="fixed inset-x-0 bottom-0 top-[52px] z-20 overflow-y-auto bg-bg p-5 sm:p-8 lg:left-[250px] lg:top-0">
+      <div className="fixed inset-x-0 bottom-0 top-[52px] z-20 overflow-y-auto bg-bg p-5 sm:p-8 lg:left-[68px] lg:top-0">
         <JourneyMap />
       </div>
     );
@@ -548,11 +552,13 @@ export default function JourneyWorld() {
   const ship = PROJECTS.find((p) => p.shipDay === selected);
   const statusColor = isDone ? "#22d3ee" : isToday ? "#f5b54b" : isSealed ? "#61708a" : "#f5b54b";
 
-  // Full-screen game world — fills everything right of the sidebar (below
+  // Full-screen game world — fills everything right of the nav rail (below
   // the mobile top bar); the context panel floats over it like the design.
   return (
-    <div className="fixed inset-x-0 bottom-0 top-[52px] z-20 bg-bg lg:left-[250px] lg:top-0">
+    <div className="fixed inset-x-0 bottom-0 top-[52px] z-20 bg-bg lg:left-[68px] lg:top-0">
       <div ref={mountRef} className="absolute inset-0" />
+      {uiActive && (
+        <>
 
           {/* region label */}
           <div className="pointer-events-none absolute left-4 top-4">
@@ -717,6 +723,8 @@ export default function JourneyWorld() {
             DRAG TO ORBIT · SCROLL TO ZOOM · CLICK A BUILDING
           </div>
         </aside>
+        </>
+      )}
     </div>
   );
 }

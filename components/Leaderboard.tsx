@@ -61,7 +61,7 @@ export default function Leaderboard() {
           Ranked by consistency — never speed
         </div>
         <h1 className="font-display text-[26px] font-bold tracking-[-.02em]">
-          Leaderboard &amp; community
+          The Leaderboard Road
         </h1>
         <div className="mt-1 font-mono text-[11px] text-mut3">
           everyone who&apos;s chosen a public profile shows up here

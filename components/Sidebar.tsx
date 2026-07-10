@@ -19,8 +19,8 @@ import {
 } from "./icons";
 
 const NAV = [
+  { key: "journey", href: "/journey", label: "Journey world", Icon: IconJourney },
   { key: "today", href: "/today", label: "Today", Icon: IconToday },
-  { key: "journey", href: "/journey", label: "Journey map", Icon: IconJourney },
   { key: "projects", href: "/projects", label: "Projects", Icon: IconProjects },
   { key: "courses", href: "/courses", label: "Courses", Icon: IconCourses },
   { key: "leaderboard", href: "/leaderboard", label: "Leaderboard", Icon: IconLeaderboard },
@@ -61,51 +61,36 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-[250px] shrink-0 flex-col border-r border-divider bg-panel px-4 py-6 lg:flex">
-        <Link href="/" className="flex items-center gap-2.5 px-2 pb-[22px]">
-          <Logo size={30} radius={8} />
-          <div className="font-display text-[13.5px] font-semibold leading-[1.15] text-ink">
-            Ahmad X AI
-            <br />
-            <span className="text-[11px] font-normal text-mut3">
-              learn AI by building
-            </span>
-          </div>
+      {/* Desktop icon rail — the design's slim 68px nav */}
+      <aside className="fixed bottom-0 left-0 top-0 z-50 hidden w-[68px] flex-col items-center gap-1 border-r border-edge bg-[rgba(10,14,23,.95)] py-3.5 lg:flex">
+        <Link
+          href="/courses"
+          title={`Ahmad X AI — ${name}`}
+          className="mb-3 flex h-10 w-10 items-center justify-center rounded-[10px] font-mono text-[14px] font-extrabold !text-[#06121a] shadow-[0_3px_0_#083344]"
+          style={{ background: "linear-gradient(135deg,#0e7490,#22d3ee)" }}
+        >
+          AX
         </Link>
-        <nav className="flex flex-col gap-[3px]">
-          {nav.map(({ key, href, label, Icon }) => (
-            <Link
-              key={key}
-              href={href}
-              className={`nav3d flex w-full items-center gap-[11px] rounded-[10px] px-3 py-2.5 text-[13.5px] font-medium transition-colors ${
-                key === active
-                  ? "bg-[rgba(34,211,238,.1)] !text-accent"
-                  : "!text-mut hover:!text-ink"
-              }`}
-            >
-              <span className="flex w-[18px]">
-                <Icon />
-              </span>
-              <span>{label}</span>
-            </Link>
-          ))}
-        </nav>
+        {nav.map(({ key, href, label, Icon }) => (
+          <Link
+            key={key}
+            href={href}
+            title={label}
+            className={`flex h-[46px] w-[46px] items-center justify-center rounded-[11px] border transition-colors ${
+              key === active
+                ? "border-[rgba(34,211,238,.4)] bg-[rgba(34,211,238,.12)] !text-accent"
+                : "border-transparent !text-mut3 hover:bg-[rgba(34,211,238,.08)] hover:!text-ink"
+            }`}
+          >
+            <Icon size={20} />
+          </Link>
+        ))}
         <Link
           href="/profile"
-          className="mt-auto block rounded-xl border border-[#202832] bg-card p-3.5"
+          title={`${name} — Day ${day} · 🔥 ${streak}`}
+          className="mt-auto"
         >
-          <div className="flex items-center gap-2.5">
-            <Avatar3D id={state.avatar} size={36} />
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-[13px] font-semibold text-ink">
-                {name}
-              </div>
-              <div className="font-mono text-[11px] text-accent">
-                Day {day} · 🔥 {streak}
-              </div>
-            </div>
-          </div>
+          <Avatar3D id={state.avatar} size={38} />
         </Link>
       </aside>
 

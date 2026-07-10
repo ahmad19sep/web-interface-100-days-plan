@@ -26,7 +26,7 @@ export default function ProjectsBoard() {
             What you&apos;ll ship across {TOTAL_DAYS} days
           </div>
           <h1 className="font-display text-[26px] font-bold tracking-[-.02em]">
-            Projects
+            Project Landmarks
           </h1>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-edge2 bg-card2 px-3.5 py-2">
