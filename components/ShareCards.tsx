@@ -56,16 +56,16 @@ function drawBase(ctx: CanvasRenderingContext2D, W: number, H: number) {
   ctx.fillStyle = lin;
   ctx.fillRect(0, 0, W, H);
   const rad = ctx.createRadialGradient(W * 0.82, -H * 0.2, 0, W * 0.82, -H * 0.2, W * 0.6);
-  rad.addColorStop(0, "rgba(53,211,153,.16)");
-  rad.addColorStop(1, "rgba(53,211,153,0)");
+  rad.addColorStop(0, "rgba(34,211,238,.16)");
+  rad.addColorStop(1, "rgba(34,211,238,0)");
   ctx.fillStyle = rad;
   ctx.fillRect(0, 0, W, H);
 }
 
 function drawLogo(ctx: CanvasRenderingContext2D, x: number, y: number, s: number, mono: string) {
   const g = ctx.createLinearGradient(x, y, x + s, y + s);
-  g.addColorStop(0, "#35D399");
-  g.addColorStop(1, "#16A97E");
+  g.addColorStop(0, "#22D3EE");
+  g.addColorStop(1, "#0E7490");
   ctx.fillStyle = g;
   rr(ctx, x, y, s, s, s * 0.28);
   ctx.fill();
@@ -147,7 +147,7 @@ function drawLandscape(canvas: HTMLCanvasElement, d: CardData) {
   ctx.fillStyle = "#6C7581";
   ctx.font = `15px ${mono}`;
   ctx.fillText("D A Y", P, baseY - 150);
-  ctx.fillStyle = "#35D399";
+  ctx.fillStyle = "#22D3EE";
   ctx.font = `800 150px ${mono}`;
   const num = ("00" + d.day).slice(-3);
   ctx.fillText(num, P - 6, baseY);
@@ -196,7 +196,7 @@ function drawSquare(canvas: HTMLCanvasElement, d: CardData) {
   ctx.fillStyle = "#6C7581";
   ctx.font = `17px ${mono}`;
   ctx.fillText("D A Y", W / 2, 380);
-  ctx.fillStyle = "#35D399";
+  ctx.fillStyle = "#22D3EE";
   ctx.font = `800 190px ${mono}`;
   ctx.fillText(("00" + d.day).slice(-3), W / 2, 560);
   ctx.fillStyle = "#3A4552";
@@ -305,7 +305,7 @@ export default function ShareCards() {
           style={{
             aspectRatio: "1200/630",
             background:
-              "radial-gradient(700px 400px at 82% -20%,rgba(53,211,153,.14),transparent 60%),linear-gradient(160deg,#0F151C,#0A0E13)",
+              "radial-gradient(700px 400px at 82% -20%,rgba(34,211,238,.14),transparent 60%),linear-gradient(160deg,#0F151C,#0A0E13)",
           }}
         >
           <div className="absolute inset-0 flex flex-col justify-between p-6 sm:p-[52px] sm:px-14">
@@ -369,7 +369,7 @@ export default function ShareCards() {
               style={{
                 aspectRatio: "1/1",
                 background:
-                  "radial-gradient(500px 400px at 50% -10%,rgba(53,211,153,.14),transparent 60%),linear-gradient(160deg,#0F151C,#0A0E13)",
+                  "radial-gradient(500px 400px at 50% -10%,rgba(34,211,238,.14),transparent 60%),linear-gradient(160deg,#0F151C,#0A0E13)",
               }}
             >
               <div className="absolute inset-0 flex flex-col p-6 sm:p-11">

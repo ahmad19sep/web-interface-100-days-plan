@@ -171,7 +171,7 @@ function Funnel({ funnel }: { funnel: Record<number, number> }) {
                 className="h-full rounded-full"
                 style={{
                   width: `${Math.max(4, (funnel[d] / max) * 100)}%`,
-                  background: "linear-gradient(90deg,#1DBA89,#35D399)",
+                  background: "linear-gradient(90deg,#0E7490,#22D3EE)",
                 }}
               />
             </div>

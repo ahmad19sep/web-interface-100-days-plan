@@ -11,7 +11,7 @@ export function ProgressBar({
         className="h-full rounded-full"
         style={{
           width: `${pct}%`,
-          background: color ?? "linear-gradient(90deg,#1DBA89,#35D399)",
+          background: color ?? "linear-gradient(90deg,#0E7490,#22D3EE)",
         }}
       />
     </div>

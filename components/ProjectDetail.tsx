@@ -28,7 +28,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
     st === "progress"
       ? { color: "var(--today)", bg: "rgba(245,181,75,.14)" }
       : st === "shipped"
-        ? { color: "var(--accent)", bg: "rgba(53,211,153,.12)" }
+        ? { color: "var(--accent)", bg: "rgba(34,211,238,.12)" }
         : { color: "var(--mut3)", bg: "var(--locked)" };
 
   return (

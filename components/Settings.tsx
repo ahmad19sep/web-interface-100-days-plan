@@ -87,7 +87,7 @@ export default function Settings() {
                 onClick={() => setReminder(r.key)}
                 className={`cursor-pointer rounded-full px-[15px] py-[9px] text-[13px] transition-colors ${
                   state.reminder === r.key
-                    ? "border border-[rgba(53,211,153,.4)] bg-[rgba(53,211,153,.1)] text-accent"
+                    ? "border border-[rgba(34,211,238,.4)] bg-[rgba(34,211,238,.1)] text-accent"
                     : "border border-edge3 bg-panel text-mut hover:border-[#2A3542]"
                 }`}
               >
@@ -143,7 +143,7 @@ export default function Settings() {
                 value={state.name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
-                className="w-full rounded-[10px] border border-edge3 bg-panel px-3 py-2.5 text-[13px] text-ink placeholder:text-dim focus:border-[rgba(53,211,153,.5)] focus:outline-none"
+                className="w-full rounded-[10px] border border-edge3 bg-panel px-3 py-2.5 text-[13px] text-ink placeholder:text-dim focus:border-[rgba(34,211,238,.5)] focus:outline-none"
               />
             </label>
             <label className="block">
@@ -153,7 +153,7 @@ export default function Settings() {
                 value={state.github}
                 onChange={(e) => setGithub(e.target.value)}
                 placeholder="github.com/you"
-                className="w-full rounded-[10px] border border-edge3 bg-panel px-3 py-2.5 text-[13px] text-ink placeholder:text-dim focus:border-[rgba(53,211,153,.5)] focus:outline-none"
+                className="w-full rounded-[10px] border border-edge3 bg-panel px-3 py-2.5 text-[13px] text-ink placeholder:text-dim focus:border-[rgba(34,211,238,.5)] focus:outline-none"
               />
             </label>
           </div>

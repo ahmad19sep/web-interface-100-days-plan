@@ -51,7 +51,7 @@ function cellColors(c: CellData) {
 // Used as a canvas fillStyle in ShareCards.tsx, which can't resolve CSS
 // custom properties — keep these as literal hex/rgba, not var(--...).
 export function shareCellColor(c: CellData): string {
-  if (c.state === "done") return c.rest ? "rgba(53,211,153,.28)" : "#35D399";
+  if (c.state === "done") return c.rest ? "rgba(34,211,238,.28)" : "#22D3EE";
   if (c.state === "current") return "#F5B54B";
   return "rgba(255,255,255,.07)";
 }

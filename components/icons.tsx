@@ -147,7 +147,7 @@ export const IconInfo = ({ size = 14 }: { size?: number }) => (
 );
 
 export const IconClockBack = ({ size = 20 }: { size?: number }) => (
-  <Base size={size} stroke="#35D399">
+  <Base size={size} stroke="#22D3EE">
     <path d="M12 2a10 10 0 1 0 10 10" />
     <path d="M12 7v5l3 2" />
   </Base>
@@ -168,7 +168,7 @@ export function Logo({ size = 32, radius = 9 }: { size?: number; radius?: number
         width: size,
         height: size,
         borderRadius: radius,
-        background: "linear-gradient(150deg,#35D399,#16A97E)",
+        background: "linear-gradient(150deg,#22D3EE,#0E7490)",
         fontSize: size * 0.47,
       }}
     >

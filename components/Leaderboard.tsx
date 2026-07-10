@@ -79,7 +79,7 @@ export default function Leaderboard() {
                 onClick={() => setFilter(i)}
                 className={`cursor-pointer rounded-full px-3.5 py-[7px] text-xs transition-colors ${
                   filter === i
-                    ? "border border-[rgba(53,211,153,.4)] bg-[rgba(53,211,153,.1)] text-accent"
+                    ? "border border-[rgba(34,211,238,.4)] bg-[rgba(34,211,238,.1)] text-accent"
                     : "border border-[#232B35] bg-transparent text-mut2 hover:text-ink"
                 }`}
               >
@@ -125,7 +125,7 @@ export default function Leaderboard() {
                     key={u.handle}
                     className={`flex items-center gap-3 rounded-[11px] px-3 py-[11px] ${
                       me
-                        ? "border border-[rgba(53,211,153,.28)] bg-[rgba(53,211,153,.08)]"
+                        ? "border border-[rgba(34,211,238,.28)] bg-[rgba(34,211,238,.08)]"
                         : "border border-transparent"
                     }`}
                   >

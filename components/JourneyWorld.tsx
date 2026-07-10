@@ -530,7 +530,13 @@ export default function JourneyWorld() {
     worldRef.current?.refreshStates(state.checkins, today);
   }, [state.checkins, today]);
 
-  if (failed) return <JourneyMap />;
+  if (failed) {
+    return (
+      <div className="fixed inset-x-0 bottom-0 top-[52px] z-20 overflow-y-auto bg-bg p-5 sm:p-8 lg:left-[250px] lg:top-0">
+        <JourneyMap />
+      </div>
+    );
+  }
 
   // ── selected-day panel data ──
   const plan = getDay(selected);
@@ -542,27 +548,11 @@ export default function JourneyWorld() {
   const ship = PROJECTS.find((p) => p.shipDay === selected);
   const statusColor = isDone ? "#22d3ee" : isToday ? "#f5b54b" : isSealed ? "#61708a" : "#f5b54b";
 
+  // Full-screen game world — fills everything right of the sidebar (below
+  // the mobile top bar); the context panel floats over it like the design.
   return (
-    <div>
-      <div className="mb-[18px] flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <div className="text-sm text-mut2">Your {TOTAL_DAYS}-day world</div>
-          <h1 className="font-display text-[26px] font-bold tracking-[-.02em]">
-            Journey world
-          </h1>
-        </div>
-        <div className="font-mono text-[11px] tracking-[.06em] text-mut3">
-          DRAG TO ORBIT · SCROLL TO ZOOM · CLICK A BUILDING
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-4 xl:flex-row">
-        {/* the world */}
-        <div
-          className="relative min-w-0 flex-1 overflow-hidden rounded-[20px] border border-edge"
-          style={{ height: "min(72vh, 760px)", minHeight: 420 }}
-        >
-          <div ref={mountRef} className="absolute inset-0" />
+    <div className="fixed inset-x-0 bottom-0 top-[52px] z-20 bg-bg lg:left-[250px] lg:top-0">
+      <div ref={mountRef} className="absolute inset-0" />
 
           {/* region label */}
           <div className="pointer-events-none absolute left-4 top-4">
@@ -592,7 +582,7 @@ export default function JourneyWorld() {
 
           {/* transit banner */}
           {walking && (
-            <div className="absolute bottom-[70px] left-1/2 z-10 flex -translate-x-1/2 items-center gap-3">
+            <div className="absolute bottom-[70px] left-4 z-10 flex items-center gap-3">
               <div className="animate-pulse whitespace-nowrap font-mono text-[11px] tracking-[.14em] text-today">
                 EN ROUTE TO DAY {walking}…
               </div>
@@ -620,8 +610,8 @@ export default function JourneyWorld() {
             </button>
           )}
 
-          {/* bottom HUD */}
-          <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-4 rounded-[14px] border border-edge2 bg-[rgba(13,18,32,.88)] px-5 py-2.5 shadow-[0_6px_24px_rgba(0,0,0,.45)] backdrop-blur-md">
+          {/* bottom HUD — hidden on phones, where the panel is a bottom sheet */}
+          <div className="absolute bottom-4 left-4 z-10 hidden items-center gap-4 rounded-[14px] border border-edge2 bg-[rgba(13,18,32,.88)] px-5 py-2.5 shadow-[0_6px_24px_rgba(0,0,0,.45)] backdrop-blur-md sm:flex">
             <div className="whitespace-nowrap font-mono text-[12px]">
               DAY <span className="font-bold text-today">{today}</span> / {TOTAL_DAYS}
             </div>
@@ -647,10 +637,9 @@ export default function JourneyWorld() {
               📦 {shipped}
             </div>
           </div>
-        </div>
 
-        {/* context panel */}
-        <aside className="flex w-full shrink-0 flex-col gap-3.5 rounded-[20px] border border-edge bg-card p-[22px] xl:w-[300px]">
+        {/* context panel — floating right rail; bottom sheet on phones */}
+        <aside className="absolute inset-x-2 bottom-2 z-10 flex max-h-[46%] flex-col gap-3 overflow-y-auto rounded-[18px] border border-edge2 bg-[rgba(13,18,32,.92)] p-4 shadow-[0_10px_36px_rgba(0,0,0,.5)] backdrop-blur-md sm:inset-x-auto sm:bottom-4 sm:right-4 sm:top-4 sm:max-h-none sm:w-[300px] sm:gap-3.5 sm:p-[20px]">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full" style={{ background: wCss }} />
             <span className="font-mono text-[10px] tracking-[.2em] text-mut3">
@@ -724,8 +713,10 @@ export default function JourneyWorld() {
                     : `Start Day ${selected} →`}
             </button>
           )}
+          <div className="hidden text-center font-mono text-[9.5px] tracking-[.1em] text-mut3 sm:block">
+            DRAG TO ORBIT · SCROLL TO ZOOM · CLICK A BUILDING
+          </div>
         </aside>
-      </div>
     </div>
   );
 }

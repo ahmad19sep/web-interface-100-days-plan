@@ -29,7 +29,7 @@ export default function Tilt({
     el.style.transform = `perspective(900px) rotateX(${((0.5 - py) * max).toFixed(2)}deg) rotateY(${((px - 0.5) * max).toFixed(2)}deg) scale3d(1.015,1.015,1)`;
     const g = glare.current;
     if (g) {
-      g.style.background = `radial-gradient(420px circle at ${(px * 100).toFixed(1)}% ${(py * 100).toFixed(1)}%, rgba(53,211,153,.10), transparent 55%)`;
+      g.style.background = `radial-gradient(420px circle at ${(px * 100).toFixed(1)}% ${(py * 100).toFixed(1)}%, rgba(34,211,238,.10), transparent 55%)`;
       g.style.opacity = "1";
     }
   }

@@ -41,14 +41,14 @@ export default function Complete() {
     <div className="anim-fade-up-slow mx-auto my-2.5 max-w-[720px]">
       <Tilt max={4} className="rounded-3xl">
       <div
-        className="relative overflow-hidden rounded-3xl border border-[rgba(53,211,153,.28)] p-8 text-center sm:p-11"
+        className="relative overflow-hidden rounded-3xl border border-[rgba(34,211,238,.28)] p-8 text-center sm:p-11"
         style={{ background: "linear-gradient(180deg,#12181F,#0E1319)" }}
       >
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(500px 240px at 50% -10%,rgba(53,211,153,.12),transparent 70%)",
+              "radial-gradient(500px 240px at 50% -10%,rgba(34,211,238,.12),transparent 70%)",
           }}
         />
         <div className="relative">

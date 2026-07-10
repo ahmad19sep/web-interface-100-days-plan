@@ -39,7 +39,7 @@ export default function Background3D() {
     const N = 340;
     const pos = new Float32Array(N * 3);
     const col = new Float32Array(N * 3);
-    const emerald = new THREE.Color(0x35d399);
+    const emerald = new THREE.Color(0x22d3ee);
     const amber = new THREE.Color(0xf5b54b);
     const dim = new THREE.Color(0x4a5460);
     for (let i = 0; i < N; i++) {

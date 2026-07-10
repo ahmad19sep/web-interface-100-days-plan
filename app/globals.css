@@ -2,29 +2,29 @@
 
 /* ── Design tokens (design_handoff_100_days_ai) ─────────────────────────── */
 :root {
-  --bg: #0d1117;
-  --panel: #0f141a;
-  --card: #12181f;
-  --card2: #161c24;
-  --inset: #0c1116;
-  --edge: #212934;
-  --edge2: #262e39;
-  --edge3: #1e262f;
-  --divider: #1b222b;
-  --ink: #ece6da;
-  --ink2: #c6cdd6;
-  --mut: #9aa3af;
-  --mut2: #8a93a0;
-  --mut3: #6c7581;
-  --dim: #4a5460;
-  --dim2: #5d6672;
-  --accent: #35d399;
-  --accent2: #5be3b0;
-  --accent-deep: #1dba89;
-  --done: #2ab98a;
-  --rest-done: #164034;
-  --today: #f5b54b;
-  --locked: #1c2530;
+  --bg: #0a0e17;
+  --panel: #0d1220;
+  --card: #0d1424;
+  --card2: #111a2e;
+  --inset: #090d18;
+  --edge: #1c2434;
+  --edge2: #223048;
+  --edge3: #182136;
+  --divider: #141d30;
+  --ink: #e6ecf5;
+  --ink2: #c3cddc;
+  --mut: #9fb0c8;
+  --mut2: #8b98ad;
+  --mut3: #61708a;
+  --dim: #46536b;
+  --dim2: #556380;
+  --accent: #22d3ee;
+  --accent2: #67e8f9;
+  --accent-deep: #0e7490;
+  --done: #1fc0dd;
+  --rest-done: #0f3a49;
+  --today: #f59e0b;
+  --locked: #1a2333;
 
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -71,7 +71,7 @@ html {
 body {
   background: radial-gradient(
       1200px 600px at 78% -8%,
-      rgba(53, 211, 153, 0.06),
+      rgba(34, 211, 238, 0.06),
       transparent 60%
     ),
     var(--bg);
@@ -88,7 +88,7 @@ a:hover {
 }
 
 ::selection {
-  background: rgba(53, 211, 153, 0.28);
+  background: rgba(34, 211, 238, 0.28);
 }
 
 ::-webkit-scrollbar {
@@ -175,9 +175,9 @@ a:hover {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: linear-gradient(150deg, #35d399, #1dba89);
+    background: linear-gradient(150deg, #22d3ee, #0e7490);
     border: none;
-    color: #062018;
+    color: #06121a;
     font-family: inherit;
     font-weight: 600;
     border-radius: 12px;
@@ -210,7 +210,7 @@ a:hover {
     border-radius: var(--radius-lg);
   }
   .card-grad {
-    background: linear-gradient(180deg, #12181f, #0e1319);
+    background: linear-gradient(180deg, #0f1729, #0b1120);
     border: 1px solid var(--edge);
     border-radius: var(--radius-xl);
   }
@@ -361,7 +361,7 @@ select {
 
 /* ── 3D extruded display title (landing) ────────────────────────────────── */
 .text3d {
-  color: #35d399;
+  color: #22d3ee;
   text-shadow:
     0 1px 0 #23b083,
     0 2px 0 #1ca173,

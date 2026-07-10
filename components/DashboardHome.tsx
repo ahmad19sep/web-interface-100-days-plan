@@ -288,7 +288,7 @@ export default function DashboardHome() {
                   TODAY&apos;S BUILD
                 </span>
                 {badge && (
-                  <span className="tag-mono bg-[rgba(53,211,153,.1)] text-accent">
+                  <span className="tag-mono bg-[rgba(34,211,238,.1)] text-accent">
                     {badge}
                   </span>
                 )}
@@ -341,12 +341,12 @@ export default function DashboardHome() {
       {mode === "catchup" && plan && (
         <div className="anim-fade-up">
           <div
-            className="mb-5 flex items-start gap-3.5 rounded-2xl border border-[rgba(53,211,153,.2)] p-5 px-[22px]"
+            className="mb-5 flex items-start gap-3.5 rounded-2xl border border-[rgba(34,211,238,.2)] p-5 px-[22px]"
             style={{
-              background: "linear-gradient(150deg,rgba(53,211,153,.08),#12181F)",
+              background: "linear-gradient(150deg,rgba(34,211,238,.08),#12181F)",
             }}
           >
-            <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[11px] bg-[rgba(53,211,153,.12)]">
+            <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[11px] bg-[rgba(34,211,238,.12)]">
               <IconClockBack />
             </div>
             <div>
@@ -380,7 +380,7 @@ export default function DashboardHome() {
             <div className="card-grad flex flex-col p-7">
               <div className="mb-3.5 flex items-center gap-2.5">
                 {badge && (
-                  <span className="tag-mono bg-[rgba(53,211,153,.1)] text-accent">
+                  <span className="tag-mono bg-[rgba(34,211,238,.1)] text-accent">
                     {badge}
                   </span>
                 )}
@@ -469,7 +469,7 @@ export default function DashboardHome() {
                 <div className="flex items-center gap-3 rounded-xl border border-edge3 bg-panel p-3">
                   <div
                     className="h-[34px] w-[34px] rounded-lg"
-                    style={{ background: "linear-gradient(150deg,#35D399,#16A97E)" }}
+                    style={{ background: "linear-gradient(150deg,#22D3EE,#0E7490)" }}
                   />
                   <div className="flex-1">
                     <div className="text-[13.5px] font-medium">

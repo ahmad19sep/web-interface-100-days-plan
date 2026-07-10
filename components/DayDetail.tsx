@@ -209,11 +209,11 @@ function QuizCard({
                     }}
                     className={`flex items-center gap-2.5 rounded-[10px] border p-2.5 text-left text-[13px] transition-colors ${
                       graded && isCorrect
-                        ? "border-[rgba(53,211,153,.5)] bg-[rgba(53,211,153,.08)] !text-accent"
+                        ? "border-[rgba(34,211,238,.5)] bg-[rgba(34,211,238,.08)] !text-accent"
                         : graded && isSelected && !isCorrect
                           ? "border-[rgba(245,181,75,.5)] bg-[rgba(245,181,75,.08)] !text-today"
                           : isSelected
-                            ? "border-[rgba(53,211,153,.4)] bg-panel !text-ink"
+                            ? "border-[rgba(34,211,238,.4)] bg-panel !text-ink"
                             : "border-edge3 bg-panel !text-ink2 hover:border-[#2A3542]"
                     }`}
                   >
@@ -253,7 +253,7 @@ interface QuizDraft {
 }
 
 const smallInputClass =
-  "flex-1 rounded-[8px] border border-edge3 bg-card px-2.5 py-1.5 text-[13px] text-ink placeholder:text-dim focus:border-[rgba(53,211,153,.5)] focus:outline-none";
+  "flex-1 rounded-[8px] border border-edge3 bg-card px-2.5 py-1.5 text-[13px] text-ink placeholder:text-dim focus:border-[rgba(34,211,238,.5)] focus:outline-none";
 
 function QuizBuilder({
   quiz,
@@ -321,7 +321,7 @@ function QuizBuilder({
                   checked={q.correctIndex === oi}
                   onChange={() => updateQuestion(qi, { correctIndex: oi })}
                   title="Mark as the correct answer"
-                  className="accent-[#35D399]"
+                  className="accent-[#22D3EE]"
                 />
                 <input
                   type="text"
@@ -423,7 +423,7 @@ function CreatorDayPanel({
   }
 
   const inputClass =
-    "w-full rounded-[10px] border border-edge3 bg-panel px-3 py-2.5 text-[13px] text-ink placeholder:text-dim focus:border-[rgba(53,211,153,.5)] focus:outline-none";
+    "w-full rounded-[10px] border border-edge3 bg-panel px-3 py-2.5 text-[13px] text-ink placeholder:text-dim focus:border-[rgba(34,211,238,.5)] focus:outline-none";
 
   return (
     <div className="mb-[22px] rounded-[14px] border border-[rgba(245,181,75,.3)] bg-[rgba(245,181,75,.05)] p-[18px]">
@@ -575,7 +575,7 @@ export default function DayDetail({ day }: { day: number }) {
               <div className="font-mono text-xs text-mut3">/ {TOTAL_DAYS}</div>
               <div className="mt-1 flex flex-wrap gap-2">
                 {project && (
-                  <span className="tag-mono !px-[9px] !py-[3px] bg-[rgba(53,211,153,.1)] text-accent">
+                  <span className="tag-mono !px-[9px] !py-[3px] bg-[rgba(34,211,238,.1)] text-accent">
                     {project.id} · {project.short}
                   </span>
                 )}
@@ -595,7 +595,7 @@ export default function DayDetail({ day }: { day: number }) {
                   </span>
                 )}
                 {done ? (
-                  <span className="tag-mono !px-[9px] !py-[3px] bg-[rgba(53,211,153,.12)] text-accent">
+                  <span className="tag-mono !px-[9px] !py-[3px] bg-[rgba(34,211,238,.12)] text-accent">
                     DONE{state.checkins[day] ? ` · ${state.checkins[day]}` : ""}
                   </span>
                 ) : isToday ? (
@@ -678,7 +678,7 @@ export default function DayDetail({ day }: { day: number }) {
                       className="absolute inset-0"
                       style={{
                         background:
-                          "linear-gradient(135deg,rgba(53,211,153,.08),transparent)",
+                          "linear-gradient(135deg,rgba(34,211,238,.08),transparent)",
                       }}
                     />
                     <div className="z-[1] flex h-[60px] w-[60px] cursor-pointer items-center justify-center rounded-full bg-[rgba(255,255,255,.1)] backdrop-blur-[4px]">
@@ -818,7 +818,7 @@ export default function DayDetail({ day }: { day: number }) {
               onChange={(e) => setNote(day, e.target.value)}
               placeholder="What clicked? What broke? What will you try tomorrow?"
               rows={4}
-              className="min-h-[88px] w-full resize-y rounded-[10px] border border-edge3 bg-panel p-3.5 text-[13.5px] leading-[1.6] text-ink placeholder:text-dim focus:border-[rgba(53,211,153,.5)] focus:outline-none"
+              className="min-h-[88px] w-full resize-y rounded-[10px] border border-edge3 bg-panel p-3.5 text-[13.5px] leading-[1.6] text-ink placeholder:text-dim focus:border-[rgba(34,211,238,.5)] focus:outline-none"
             />
           </div>
         </div>
@@ -830,9 +830,9 @@ export default function DayDetail({ day }: { day: number }) {
               <button
                 type="button"
                 onClick={onCheckIn}
-                className="btn-ghost w-full !border-[rgba(53,211,153,.4)] py-3.5 text-[14.5px] !text-accent"
+                className="btn-ghost w-full !border-[rgba(34,211,238,.4)] py-3.5 text-[14.5px] !text-accent"
               >
-                <IconCheck size={17} stroke="#35D399" strokeWidth={2.5} />
+                <IconCheck size={17} stroke="#22D3EE" strokeWidth={2.5} />
                 Day {day} done · tap to undo
               </button>
             ) : locked ? (

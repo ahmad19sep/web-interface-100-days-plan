@@ -80,7 +80,7 @@ export default function Sidebar() {
               href={href}
               className={`nav3d flex w-full items-center gap-[11px] rounded-[10px] px-3 py-2.5 text-[13.5px] font-medium transition-colors ${
                 key === active
-                  ? "bg-[rgba(53,211,153,.1)] !text-accent"
+                  ? "bg-[rgba(34,211,238,.1)] !text-accent"
                   : "!text-mut hover:!text-ink"
               }`}
             >
@@ -121,7 +121,7 @@ export default function Sidebar() {
               href={href}
               className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium ${
                 key === active
-                  ? "bg-[rgba(53,211,153,.1)] !text-accent"
+                  ? "bg-[rgba(34,211,238,.1)] !text-accent"
                   : "!text-mut"
               }`}
             >

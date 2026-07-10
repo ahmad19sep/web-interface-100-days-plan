@@ -55,7 +55,7 @@ export default function Journey3D({
     const key = new THREE.DirectionalLight(0xffffff, 1.4);
     key.position.set(6, 14, 8);
     scene.add(key);
-    const emeraldGlow = new THREE.PointLight(0x35d399, 220, 60);
+    const emeraldGlow = new THREE.PointLight(0x22d3ee, 220, 60);
     emeraldGlow.position.set(-8, 8, 6);
     scene.add(emeraldGlow);
     const amberGlow = new THREE.PointLight(0xf5b54b, 90, 40);

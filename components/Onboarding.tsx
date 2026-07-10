@@ -56,7 +56,7 @@ function OptionCard({
       onClick={onClick}
       className={`cursor-pointer rounded-xl p-4 text-left transition-colors ${
         selected
-          ? "border-[1.5px] border-[rgba(53,211,153,.5)] bg-[rgba(53,211,153,.08)]"
+          ? "border-[1.5px] border-[rgba(34,211,238,.5)] bg-[rgba(34,211,238,.08)]"
           : "border-[1.5px] border-edge3 bg-panel hover:border-[#2A3542]"
       }`}
     >
@@ -85,7 +85,7 @@ function Pill({
       onClick={onClick}
       className={`cursor-pointer rounded-full px-[15px] py-[9px] text-[13px] transition-colors ${
         selected
-          ? "border border-[rgba(53,211,153,.4)] bg-[rgba(53,211,153,.1)] text-accent"
+          ? "border border-[rgba(34,211,238,.4)] bg-[rgba(34,211,238,.1)] text-accent"
           : "border border-edge3 bg-panel text-mut hover:border-[#2A3542]"
       }`}
     >
@@ -95,7 +95,7 @@ function Pill({
 }
 
 const inputClass =
-  "w-full rounded-xl border border-edge3 bg-panel px-4 py-3 text-sm text-ink placeholder:text-dim focus:border-[rgba(53,211,153,.5)] focus:outline-none";
+  "w-full rounded-xl border border-edge3 bg-panel px-4 py-3 text-sm text-ink placeholder:text-dim focus:border-[rgba(34,211,238,.5)] focus:outline-none";
 
 type Phase = "boot" | "entry" | "login" | "signup" | "setup";
 

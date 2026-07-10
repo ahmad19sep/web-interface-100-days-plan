@@ -12,7 +12,7 @@ export function Toggle({
   color?: "accent" | "today";
 }) {
   const trackOn =
-    color === "today" ? "rgba(245,181,75,.5)" : "rgba(53,211,153,.5)";
+    color === "today" ? "rgba(245,181,75,.5)" : "rgba(34,211,238,.5)";
   return (
     <button
       type="button"

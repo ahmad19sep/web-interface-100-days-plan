@@ -15,7 +15,7 @@ function PhotoFallback() {
     return (
       <div
         className="flex h-full w-full items-center justify-center font-display text-6xl font-bold text-[#062018]"
-        style={{ background: "linear-gradient(150deg,#35D399,#16A97E)" }}
+        style={{ background: "linear-gradient(150deg,#22D3EE,#0E7490)" }}
       >
         A
       </div>
@@ -64,7 +64,7 @@ export default function CreatorAvatar({
         const key = new T.DirectionalLight(0xffffff, 1.7);
         key.position.set(3, 5, 4);
         scene.add(key);
-        const rim = new T.DirectionalLight(0x35d399, 0.7);
+        const rim = new T.DirectionalLight(0x22d3ee, 0.7);
         rim.position.set(-4, 3, -3);
         scene.add(rim);
 
@@ -160,7 +160,7 @@ export default function CreatorAvatar({
       className={`relative shrink-0 overflow-hidden rounded-[22px] border border-edge2 ${className}`}
       style={{
         background:
-          "radial-gradient(circle at 50% 18%, rgba(53,211,153,.16), rgba(15,20,26,.9) 68%)",
+          "radial-gradient(circle at 50% 18%, rgba(34,211,238,.16), rgba(15,20,26,.9) 68%)",
       }}
       title={`${ABOUT.fullName} — drag to spin`}
     >

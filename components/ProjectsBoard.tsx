@@ -48,14 +48,14 @@ export default function ProjectsBoard() {
           const pct = Math.round((done / total) * 100);
 
           const tagColor =
-            st === "shipped" ? "#35D399" : st === "progress" ? "#F5B54B" : "#5D6672";
-          const barColor = st === "progress" ? "#F5B54B" : "#35D399";
+            st === "shipped" ? "#22D3EE" : st === "progress" ? "#F5B54B" : "#5D6672";
+          const barColor = st === "progress" ? "#F5B54B" : "#22D3EE";
           const border =
             st === "progress" ? "rgba(245,181,75,.3)" : "var(--edge)";
 
           const badge =
             st === "shipped" ? (
-              <span className="tag-mono bg-[rgba(53,211,153,.12)] text-accent">
+              <span className="tag-mono bg-[rgba(34,211,238,.12)] text-accent">
                 SHIPPED
               </span>
             ) : st === "progress" ? (
