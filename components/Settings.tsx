@@ -1,8 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { AVATARS } from "@/lib/avatars";
 import { logout } from "@/lib/profiles";
 import {
+  setAvatar,
   setGithub,
   setName,
   setNotesPrivate,
@@ -11,6 +13,7 @@ import {
   useProgress,
   type Reminder,
 } from "@/lib/store";
+import Avatar3D from "./Avatar3D";
 import { Toggle } from "./Toggle";
 
 const REMINDERS: { key: Reminder; label: string }[] = [
@@ -33,6 +36,38 @@ export default function Settings() {
       </div>
 
       <div className="flex max-w-[640px] flex-col gap-3.5">
+        <div className="card-std p-[22px]">
+          <div className="mb-3">
+            <div className="mb-[3px] text-[14.5px] font-semibold">
+              Your 3D character
+            </div>
+            <div className="text-[13px] text-mut2">
+              Shown on your profile, the sidebar and the leaderboard.
+            </div>
+          </div>
+          <div className="mb-2 flex flex-wrap gap-3">
+            {AVATARS.map((a) => (
+              <button
+                key={a.id}
+                type="button"
+                onClick={() => setAvatar(a.id)}
+                className={`cursor-pointer rounded-full p-1 transition-transform ${
+                  state.avatar === a.id
+                    ? "scale-110 ring-2 ring-accent"
+                    : "opacity-60 hover:scale-105 hover:opacity-100"
+                }`}
+                aria-label={a.label}
+              >
+                <Avatar3D id={a.id} size={52} live={state.avatar === a.id} />
+              </button>
+            ))}
+          </div>
+          <div className="font-mono text-[11px] tracking-[.08em] text-accent">
+            {AVATARS.find((a) => a.id === state.avatar)?.label.toUpperCase() ??
+              "PICK A CHARACTER"}
+          </div>
+        </div>
+
         <div className="card-std p-[22px]">
           <div className="mb-3 flex items-center justify-between gap-4">
             <div>

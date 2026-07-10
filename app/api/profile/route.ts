@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { DbNotConfiguredError, query } from "@/lib/db";
+import { isAvatarId } from "@/lib/avatars";
+import { DbNotConfiguredError, ensureAvatarColumn, query } from "@/lib/db";
 import { profileSnapshot } from "@/lib/profile-snapshot";
 import { currentProfile } from "@/lib/session";
 
@@ -36,6 +37,11 @@ export async function PATCH(request: Request) {
     if (typeof body.notesPrivate === "boolean") {
       sets.push(`notes_private = $${i++}`);
       values.push(body.notesPrivate);
+    }
+    if (isAvatarId(body.avatar)) {
+      await ensureAvatarColumn();
+      sets.push(`avatar = $${i++}`);
+      values.push(body.avatar);
     }
     if (typeof body.startDate === "string") {
       sets.push(`start_date = $${i++}`);

@@ -225,6 +225,10 @@ export function setVisibility(visibility: Visibility) {
   applyOptimistic({ profile: { visibility } });
   void patchProfile({ visibility });
 }
+export function setAvatar(avatar: string) {
+  applyOptimistic({ profile: { avatar } });
+  void patchProfile({ avatar });
+}
 export function setNotesPrivate(notesPrivate: boolean) {
   applyOptimistic({ profile: { notesPrivate } });
   void patchProfile({ notesPrivate });
