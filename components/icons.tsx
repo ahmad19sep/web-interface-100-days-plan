@@ -4,7 +4,7 @@ function Base({
   children,
   size = 18,
   stroke = "currentColor",
-  strokeWidth = 2,
+  strokeWidth = 1.8,
   fill = "none",
 }: {
   children: React.ReactNode;
@@ -38,16 +38,17 @@ export const IconToday = ({ size = 18 }: { size?: number }) => (
 
 export const IconJourney = ({ size = 18 }: { size?: number }) => (
   <Base size={size}>
-    <rect x="3" y="3" width="7" height="7" rx="1" />
-    <rect x="14" y="3" width="7" height="7" rx="1" />
-    <rect x="3" y="14" width="7" height="7" rx="1" />
-    <rect x="14" y="14" width="7" height="7" rx="1" />
+    <path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z" />
+    <path d="M9 3v15" />
+    <path d="M15 6v15" />
   </Base>
 );
 
 export const IconProjects = ({ size = 18 }: { size?: number }) => (
   <Base size={size}>
-    <path d="M3 7h18M3 12h18M3 17h18" />
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+    <path d="M3.27 6.96L12 12.01l8.73-5.05" />
+    <path d="M12 22.08V12" />
   </Base>
 );
 
@@ -60,7 +61,12 @@ export const IconCourses = ({ size = 18 }: { size?: number }) => (
 
 export const IconLeaderboard = ({ size = 18 }: { size?: number }) => (
   <Base size={size}>
-    <path d="M6 20V10M12 20V4M18 20v-6" />
+    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+    <path d="M4 22h16" />
+    <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+    <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+    <path d="M18 2H6v7a6 6 0 0 0 12 0V2z" />
   </Base>
 );
 
@@ -88,7 +94,8 @@ export const IconSettings = ({ size = 18 }: { size?: number }) => (
 
 export const IconCreator = ({ size = 18 }: { size?: number }) => (
   <Base size={size}>
-    <path d="M4 20V10M12 20V4M20 20v-6" />
+    <path d="M2 6l4 5 6-8 6 8 4-5v12H2z" />
+    <path d="M2 20h20" />
   </Base>
 );
 

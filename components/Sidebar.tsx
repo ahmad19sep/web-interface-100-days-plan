@@ -1,38 +1,36 @@
 "use client";
 
-// The design's 68px icon rail, matched exactly: glowing AX tile, then
-// map · today · projects · courses · leaderboard · profile · crown ·
-// sliders. The crown is the Creator Studio (the About-me page; the owner's
-// crown opens the creator dashboard instead). Mobile keeps the top bar.
+// The design's 68px icon rail: glowing AX tile (opens Courses), then
+// map · clock (today's lesson) · box · trophy · person · crown last.
+// The crown is the Creator Studio (About-me for students, the creator
+// dashboard for the owner). Settings lives inside Profile; the Courses
+// icon is gone — AX is the courses button. Mobile keeps the top bar.
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { TOTAL_DAYS } from "@/lib/plan";
 import { computeStreak, currentDay, useProgress } from "@/lib/store";
 import {
-  IconCourses,
   IconCreator,
   IconJourney,
   IconLeaderboard,
   IconProfile,
   IconProjects,
-  IconSettings,
   IconToday,
   Logo,
 } from "./icons";
 
 const NAV = [
   { key: "journey", href: "/journey", label: "Journey world", Icon: IconJourney },
-  { key: "today", href: "/today", label: "Today", Icon: IconToday },
-  { key: "projects", href: "/projects", label: "Projects", Icon: IconProjects },
-  { key: "courses", href: "/courses", label: "Courses", Icon: IconCourses },
+  { key: "today", href: "/today", label: "Today's lesson", Icon: IconToday },
+  { key: "projects", href: "/projects", label: "Project Landmarks", Icon: IconProjects },
   { key: "leaderboard", href: "/leaderboard", label: "Leaderboard", Icon: IconLeaderboard },
-  { key: "profile", href: "/profile", label: "Profile", Icon: IconProfile },
+  { key: "profile", href: "/profile", label: "Profile & settings", Icon: IconProfile },
 ];
 
 function activeKey(pathname: string): string {
-  if (pathname.startsWith("/today")) return "today";
-  if (pathname.startsWith("/journey") || pathname.startsWith("/day")) return "journey";
+  if (pathname.startsWith("/today") || pathname.startsWith("/day")) return "today";
+  if (pathname.startsWith("/journey")) return "journey";
   if (pathname.startsWith("/projects")) return "projects";
   if (pathname.startsWith("/courses")) return "courses";
   if (pathname.startsWith("/leaderboard")) return "leaderboard";
@@ -57,12 +55,14 @@ export default function Sidebar() {
     ? NAV
     : NAV.filter((n) => !COURSE_TABS.includes(n.key));
   const nav = [
-    ...base,
-    // the crown — the design's Creator Studio slot
+    // the clock opens today's actual lesson, straight into the room
+    ...base.map((n) =>
+      n.key === "today" ? { ...n, href: `/day/${day}` } : n
+    ),
+    // the crown — the design's Creator Studio slot, always last
     state.isOwner
       ? { key: "creator", href: "/creator", label: "Creator Studio", Icon: IconCreator }
       : { key: "about", href: "/about", label: "Creator Studio — About me", Icon: IconCreator },
-    { key: "settings", href: "/settings", label: "Settings", Icon: IconSettings },
   ];
 
   return (
