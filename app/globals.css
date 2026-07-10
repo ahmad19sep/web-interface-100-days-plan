@@ -228,24 +228,33 @@ a:hover {
   }
 }
 
-/* ── 3D depth system ────────────────────────────────────────────────────── */
+/* ── 3D depth system (site-wide) ────────────────────────────────────────── */
 .tilt3d {
   transform-style: preserve-3d;
   transition: transform 0.18s ease-out;
   will-change: transform;
 }
 
-/* card hover: lifts toward you on a slight 3D axis */
+/* EVERY card lifts toward you in 3D on hover */
+.card-std,
+.card-grad,
 .lift3d {
   transition:
     transform 0.18s ease,
     box-shadow 0.18s ease,
     border-color 0.18s ease;
 }
+.card-std:hover,
+.card-grad:hover,
 .lift3d:hover {
-  transform: perspective(700px) translateY(-4px) rotateX(1.6deg)
-    scale3d(1.012, 1.012, 1);
-  box-shadow: 0 26px 48px -26px rgba(0, 0, 0, 0.7);
+  transform: perspective(800px) translateY(-4px) rotateX(1.4deg)
+    scale3d(1.008, 1.008, 1);
+  box-shadow: 0 26px 48px -26px rgba(0, 0, 0, 0.72);
+  border-color: #2b3646;
+}
+/* inside a pointer-tracked Tilt wrapper the wrapper owns the motion */
+.tilt3d :is(.card-std, .card-grad):hover {
+  transform: none;
 }
 
 /* journey-map cells: pop out of the grid plane */
@@ -261,27 +270,88 @@ a:hover {
   z-index: 2;
 }
 
-/* buttons: shallow 3D press */
+/* EVERY button is a physically extruded 3D block: raised ledge at rest,
+   rises further on hover, presses flat when clicked */
 .btn-primary,
 .btn-ghost {
   transition:
-    transform 0.12s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease,
     filter 0.15s ease,
     border-color 0.15s ease;
 }
-.btn-primary:hover,
-.btn-ghost:hover {
-  transform: translateY(-1px);
+.btn-primary {
+  box-shadow:
+    0 5px 0 #0b7a56,
+    0 14px 22px -10px rgba(20, 160, 110, 0.45);
 }
-.btn-primary:active,
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 7px 0 #0b7a56,
+    0 18px 26px -10px rgba(20, 160, 110, 0.5);
+  filter: brightness(1.06);
+}
+.btn-primary:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 1px 0 #0b7a56,
+    0 6px 12px -8px rgba(20, 160, 110, 0.4);
+}
+.btn-ghost {
+  box-shadow:
+    0 4px 0 #0b0f15,
+    0 12px 20px -12px rgba(0, 0, 0, 0.7);
+}
+.btn-ghost:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 0 #0b0f15,
+    0 16px 24px -12px rgba(0, 0, 0, 0.75);
+  border-color: #34404f;
+}
 .btn-ghost:active {
-  transform: translateY(1px) scale(0.99);
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 #0b0f15,
+    0 6px 10px -8px rgba(0, 0, 0, 0.6);
+}
+
+/* inputs & textareas: pressed-in 3D wells */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+textarea,
+select {
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.45),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* chips/tags: shallow extrusion */
+.tag-mono {
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* nav items: slide off the sidebar plane */
+.nav3d {
+  transition:
+    transform 0.14s ease,
+    background 0.14s ease,
+    color 0.14s ease;
+}
+.nav3d:hover {
+  transform: translateX(3px) scale(1.02);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .tilt3d,
+  .card-std,
+  .card-grad,
   .lift3d,
   .cell3d,
+  .nav3d,
   .btn-primary,
   .btn-ghost {
     transition: none !important;

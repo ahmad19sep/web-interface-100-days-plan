@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { PROJECTS, TOTAL_DAYS } from "@/lib/plan";
+import Tilt from "./Tilt";
 import { computeStreak, localToday, useProgress } from "@/lib/store";
 
 function prettyMonth(iso: string | null): string {
@@ -38,6 +39,7 @@ export default function Complete() {
 
   return (
     <div className="anim-fade-up-slow mx-auto my-2.5 max-w-[720px]">
+      <Tilt max={4} className="rounded-3xl">
       <div
         className="relative overflow-hidden rounded-3xl border border-[rgba(53,211,153,.28)] p-8 text-center sm:p-11"
         style={{ background: "linear-gradient(180deg,#12181F,#0E1319)" }}
@@ -100,6 +102,7 @@ export default function Complete() {
           </div>
         </div>
       </div>
+      </Tilt>
     </div>
   );
 }

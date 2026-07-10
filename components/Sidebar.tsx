@@ -69,7 +69,7 @@ export default function Sidebar() {
             <Link
               key={key}
               href={href}
-              className={`flex w-full items-center gap-[11px] rounded-[10px] px-3 py-2.5 text-[13.5px] font-medium transition-colors ${
+              className={`nav3d flex w-full items-center gap-[11px] rounded-[10px] px-3 py-2.5 text-[13.5px] font-medium transition-colors ${
                 key === active
                   ? "bg-[rgba(53,211,153,.1)] !text-accent"
                   : "!text-mut hover:!text-ink"

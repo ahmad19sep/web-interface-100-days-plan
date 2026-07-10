@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { CHALLENGE } from "@/lib/plan";
+import Background3DMount from "@/components/Background3DMount";
 import "./globals.css";
 
 const inter = Inter({
@@ -41,6 +42,7 @@ export default function RootLayout({
       className={`${inter.variable} ${grotesk.variable} ${jbmono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
+        <Background3DMount />
         {children}
         <Analytics />
       </body>
