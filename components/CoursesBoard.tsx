@@ -36,7 +36,7 @@ export default function CoursesBoard() {
   return (
     <div>
       <div className="mb-[22px]">
-        <div className="text-sm text-mut2">Your courses</div>
+        <div className="text-sm text-mut2">Pick a course to study</div>
         <h1 className="font-display text-[26px] font-bold tracking-[-.02em]">
           Courses
         </h1>
@@ -101,6 +101,20 @@ export default function CoursesBoard() {
         </span>
       </Link>
       </Tilt>
+
+      {/* the next course — a sealed portal at the edge of the catalog */}
+      <div className="mt-4 max-w-[760px] rounded-[20px] border border-dashed border-edge2 p-6 opacity-60 sm:p-8">
+        <div className="mb-1.5 font-mono text-[10px] tracking-[.2em] text-mut3">
+          COURSE 02 · LOCKED
+        </div>
+        <div className="font-display text-[18px] font-bold text-mut2">
+          Applied AI Products — a new region of the world
+        </div>
+        <div className="mt-1 text-[12.5px] text-mut3">
+          Opens after the Launch Zone. A new portal appears at the edge of the
+          map.
+        </div>
+      </div>
     </div>
   );
 }

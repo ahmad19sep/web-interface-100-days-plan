@@ -133,8 +133,9 @@ export default function Onboarding() {
 
   useEffect(() => {
     if (!ready || !activeId) return;
-    if (onboarded) router.replace("/today");
-    else if (!setupRequested) router.replace("/courses");
+    // Udemy-style: every login lands on the course catalog first — the
+    // user picks their course there, even while we only have one.
+    if (onboarded || !setupRequested) router.replace("/courses");
   }, [ready, activeId, onboarded, setupRequested, router]);
 
   // ── actions ───────────────────────────────────────────────────────────────
