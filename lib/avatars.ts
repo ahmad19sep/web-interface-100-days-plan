@@ -1,5 +1,6 @@
-// 3D AI avatars — picked at signup, shown everywhere the account appears.
-// Pure data: safe to import from client and server code.
+// 3D character avatars — five low-poly people built in code with three.js
+// (see lib/avatar-models.ts). Picked at signup, shown everywhere the
+// account appears. Pure data here: safe to import from client and server.
 
 export interface AiAvatar {
   id: string;
@@ -10,16 +11,15 @@ export interface AiAvatar {
 }
 
 export const AVATARS: AiAvatar[] = [
-  { id: "bot", emoji: "🤖", from: "#35D399", to: "#0E7A56", label: "Bot" },
-  { id: "spark", emoji: "⚡", from: "#F5B54B", to: "#B06F1E", label: "Spark" },
-  { id: "alien", emoji: "👾", from: "#7C6CF5", to: "#4A3BC0", label: "Alien" },
-  { id: "brain", emoji: "🧠", from: "#EC6A9C", to: "#B03A6E", label: "Brain" },
-  { id: "cyber", emoji: "🦾", from: "#4AA8FF", to: "#1E5C99", label: "Cyber" },
-  { id: "astro", emoji: "🛸", from: "#2DD4BF", to: "#0E766B", label: "Astro" },
+  { id: "postman", emoji: "📮", from: "#EF6A6A", to: "#B22B2B", label: "Postman" },
+  { id: "police", emoji: "👮", from: "#4A7DE0", to: "#1D326E", label: "Police Officer" },
+  { id: "girl", emoji: "👧", from: "#F08BB8", to: "#B84378", label: "Girl" },
+  { id: "builder", emoji: "👷", from: "#F5C518", to: "#B07708", label: "Builder" },
+  { id: "bot", emoji: "🤖", from: "#9AA8BA", to: "#39424F", label: "Robot" },
 ];
 
 export function avatarById(id?: string | null): AiAvatar {
-  return AVATARS.find((a) => a.id === id) ?? AVATARS[0];
+  return AVATARS.find((a) => a.id === id) ?? AVATARS[AVATARS.length - 1];
 }
 
 export function isAvatarId(id: unknown): id is string {

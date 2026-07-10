@@ -34,7 +34,7 @@ export default function Profile() {
   return (
     <div>
       <div className="mb-[26px] flex flex-col items-start gap-5 sm:flex-row">
-        <Avatar3D id={state.avatar} size={80} />
+        <Avatar3D id={state.avatar} size={80} live />
         <div className="flex-1 pt-1">
           <div className="mb-1 flex flex-wrap items-center gap-2.5">
             <h1 className="font-display text-2xl font-bold tracking-[-.02em]">

@@ -341,9 +341,9 @@ export default function Onboarding() {
             />
 
             <div className="mb-2.5 font-display text-base font-semibold">
-              Pick your AI avatar
+              Pick your 3D character
             </div>
-            <div className="mb-5 flex flex-wrap gap-3">
+            <div className="mb-2 flex flex-wrap gap-3">
               {AVATARS.map((a) => (
                 <button
                   key={a.id}
@@ -356,9 +356,12 @@ export default function Onboarding() {
                   }`}
                   aria-label={a.label}
                 >
-                  <Avatar3D id={a.id} size={48} />
+                  <Avatar3D id={a.id} size={52} live={avatar === a.id} />
                 </button>
               ))}
+            </div>
+            <div className="mb-5 font-mono text-[11px] tracking-[.08em] text-accent">
+              {AVATARS.find((a) => a.id === avatar)?.label.toUpperCase()}
             </div>
 
             <div className="mb-1 font-display text-base font-semibold">
