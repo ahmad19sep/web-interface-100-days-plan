@@ -778,62 +778,6 @@ export default function DayDetail({ day }: { day: number }) {
 
           <div className="card-std p-5">
             <div className="mb-3.5 font-display text-sm font-semibold">
-              Helping material
-            </div>
-            <div className="flex flex-col gap-2">
-              {effectiveNote && (
-                <a
-                  href="#creator-note"
-                  className="btn-ghost w-full py-2.5 text-[13px] !rounded-[11px] !font-normal !text-ink"
-                >
-                  📝 Creator&apos;s note
-                </a>
-              )}
-              {effectiveVideo ? (
-                <a
-                  href={effectiveVideo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-ghost w-full py-2.5 text-[13px] !rounded-[11px] !font-normal !text-ink"
-                >
-                  🎬 Watch the video
-                </a>
-              ) : (
-                <a
-                  href="#creator-video"
-                  className="btn-ghost w-full py-2.5 text-[13px] !rounded-[11px] !font-normal !text-ink"
-                >
-                  🎬 Video (coming soon)
-                </a>
-              )}
-              <a
-                href={effectiveGithubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-ghost w-full py-2.5 text-[13px] !rounded-[11px] !font-normal !text-ink"
-              >
-                <IconGitHub />
-                View the code
-              </a>
-              <a
-                href="#resources"
-                className="btn-ghost w-full py-2.5 text-[13px] !rounded-[11px] !font-normal !text-ink"
-              >
-                📚 Resources
-              </a>
-              {hasQuiz && (
-                <a
-                  href="#quiz"
-                  className="btn-ghost w-full py-2.5 text-[13px] !rounded-[11px] !font-normal !text-ink"
-                >
-                  🧩 Quiz
-                </a>
-              )}
-            </div>
-          </div>
-
-          <div className="card-std p-5">
-            <div className="mb-3.5 font-display text-sm font-semibold">
               Around today
             </div>
             <div className="flex flex-col gap-0.5">
