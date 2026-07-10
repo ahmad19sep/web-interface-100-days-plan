@@ -56,22 +56,22 @@ export default function Avatar3D({
       r.setSize(size, size);
       r.setClearColor(0x000000, 0);
       mount.appendChild(r.domElement);
-      const { scene, model, camera, mixer } = await stageFor(T, a.id);
+      const { scene, model, camera, tick } = await stageFor(T, a.id);
       if (disposed) return;
       const reduced = window.matchMedia(
         "(prefers-reduced-motion: reduce)"
       ).matches;
       if (reduced) {
         model.rotation.y = 0.5;
-        if (mixer) mixer.update(0.6); // pose animated characters, no loop
+        tick(0.6); // pose animated characters, no loop
       }
-      const tick = () => {
+      const frame = () => {
         model.rotation.y += 0.014;
-        if (mixer) mixer.update(1 / 60);
+        tick(1 / 60);
         r.render(scene, camera);
-        if (!reduced) raf = requestAnimationFrame(tick);
+        if (!reduced) raf = requestAnimationFrame(frame);
       };
-      tick();
+      frame();
     })();
     return () => {
       disposed = true;

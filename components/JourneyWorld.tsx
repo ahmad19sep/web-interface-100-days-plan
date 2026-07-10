@@ -274,7 +274,7 @@ export default function JourneyWorld() {
 
       // the explorer — the user's own 3D character at today's marker
       const explorer = new T.Group();
-      const { object: character, clips } = await buildAvatarObject(T, avatarId);
+      const { object: character, tick: charTick } = await buildAvatarObject(T, avatarId);
       if (disposed) {
         renderer.dispose();
         if (renderer.domElement.parentElement) {
@@ -284,11 +284,6 @@ export default function JourneyWorld() {
       }
       character.scale.multiplyScalar(1.15);
       explorer.add(character);
-      let mixer: InstanceType<ThreeNS["AnimationMixer"]> | null = null;
-      if (clips.length) {
-        mixer = new T.AnimationMixer(character);
-        mixer.clipAction(clips[0]).play();
-      }
       const ring = new T.Mesh(
         new T.TorusGeometry(1.5, 0.07, 8, 40),
         new T.MeshBasicMaterial({ color: 0xf5b54b, transparent: true, opacity: 0.4 })
@@ -472,15 +467,15 @@ export default function JourneyWorld() {
           character.rotation.y = Math.sin(clock * 0.4) * 0.5;
         }
         if (!reduced) {
-          if (mixer) mixer.update(1 / 60);
+          charTick(1 / 60);
           const todayN = Math.min(currentDay(checkinsRef.current), TOTAL_DAYS);
           const cur = markers[todayN - 1];
           if (!checkinsRef.current[todayN]) {
             cur.mat.emissiveIntensity = 0.65 + Math.sin(clock * 3) * 0.3;
           }
           particles.rotation.y = Math.sin(clock * 0.05) * 0.02;
-        } else if (mixer) {
-          mixer.update(0);
+        } else {
+          charTick(0);
         }
         renderer.render(scene, camera);
       };

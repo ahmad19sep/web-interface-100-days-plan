@@ -68,7 +68,7 @@ export default function CreatorAvatar({
         rim.position.set(-4, 3, -3);
         scene.add(rim);
 
-        const { object: model, clips } = await buildAvatarObject(T, "ahmad");
+        const { object: model, tick: charTick } = await buildAvatarObject(T, "ahmad");
         if (disposed) {
           renderer.dispose();
           renderer.domElement.remove();
@@ -76,12 +76,6 @@ export default function CreatorAvatar({
         }
         scene.add(model);
         setLoaded(true);
-
-        let mixer: InstanceType<(typeof T)["AnimationMixer"]> | null = null;
-        if (clips.length) {
-          mixer = new T.AnimationMixer(model);
-          mixer.clipAction(clips[0]).play();
-        }
 
         // portrait framing: full body, eyes near the upper third
         const camera = new T.PerspectiveCamera(32, 1, 0.1, 50);
@@ -123,12 +117,12 @@ export default function CreatorAvatar({
         const reduced = window.matchMedia(
           "(prefers-reduced-motion: reduce)"
         ).matches;
-        if (reduced && mixer) mixer.update(0.6);
+        if (reduced) charTick(0.6);
 
         const tick = () => {
           if (!reduced) {
             if (!dragging && ++idle > 90) model.rotation.y += 0.005;
-            if (mixer) mixer.update(1 / 60);
+            charTick(1 / 60);
           }
           renderer.render(scene, camera);
           if (!reduced || dragging) raf = requestAnimationFrame(tick);
