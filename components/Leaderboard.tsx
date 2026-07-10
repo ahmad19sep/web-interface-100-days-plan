@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Badge } from "@/lib/badges";
 import { DEMO_SHOWCASE } from "@/lib/demo";
+import { TOTAL_DAYS } from "@/lib/plan";
 import { useProgress } from "@/lib/store";
 import Avatar3D from "./Avatar3D";
 import { IconHeart } from "./icons";
@@ -67,6 +68,60 @@ export default function Leaderboard() {
           everyone who&apos;s chosen a public profile shows up here
         </div>
       </div>
+
+      {/* the same road — every explorer's 3D character at their day */}
+      {community.state === "ready" && community.members.length > 0 && (
+        <div className="mb-[22px] rounded-[18px] border border-edge bg-card px-5 py-5 sm:px-7">
+          <div className="mb-3 font-mono text-[10px] tracking-[.22em] text-mut3">
+            THE SAME ROAD — EVERYONE&apos;S POSITION ON THE {TOTAL_DAYS}-DAY
+            PATH
+          </div>
+          <div className="relative h-[104px]">
+            <div
+              className="absolute left-0 right-0 top-[58px] h-[3px] rounded-[2px]"
+              style={{ background: "linear-gradient(90deg,#0e7490,#1a2338)" }}
+            />
+            {community.members.slice(0, 14).map((u, i) => {
+              const me = Boolean(state.handle) && u.handle === state.handle;
+              const pct = 3 + (Math.min(u.day, TOTAL_DAYS) / TOTAL_DAYS) * 94;
+              const above = i % 2 === 0;
+              const size = me ? 42 : 30;
+              const showTag =
+                me || community.members.length <= 9 || i % 2 === 0;
+              return (
+                <div
+                  key={u.handle}
+                  className="absolute bottom-0 top-0"
+                  style={{ left: `${pct}%` }}
+                >
+                  {showTag && (
+                    <div
+                      className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[9px] tracking-[.08em]"
+                      style={{
+                        top: above ? 12 : 84,
+                        color: me ? "#f59e0b" : "#61708a",
+                      }}
+                    >
+                      {me ? "YOU" : u.name.split(" ")[0].toUpperCase()}
+                    </div>
+                  )}
+                  <div
+                    className="absolute left-1/2 -translate-x-1/2"
+                    style={{ top: 58 - size / 2 }}
+                    title={`${u.name} — Day ${u.day}`}
+                  >
+                    <Avatar3D
+                      id={u.avatar}
+                      size={size}
+                      className={me ? "ring-2 ring-[#f59e0b]" : ""}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="grid items-start gap-[22px] lg:grid-cols-[1.15fr_1fr]">
         {/* ranking */}
