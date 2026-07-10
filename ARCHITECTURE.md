@@ -88,27 +88,53 @@ No auth provider (Clerk etc.) is used — the existing username + code UX is
 the whole login system, just checked against the database instead of
 `localStorage`.
 
-## Multi-challenge structure (ready now)
+## Course platform roadmap (radar.hafizahmad.com)
 
-A challenge is **pure data** — no UI code knows the curriculum:
+This site is Ahmad's **course platform**, not a one-off tracker. Course #1 —
+"120 Days of Production AI Engineering" — is live; more courses launch on the
+same domain later. The Courses tab is the catalog (own courses only, never
+external ones) and is where users land after login.
+
+A course is **pure data** — no UI code knows the curriculum:
 
 ```
 lib/
   challenges/
-    types.ts             ← Challenge / DayPlan / WeekPlan / Project types
-    modern-ai-2026.ts    ← the full 100-day curriculum (data only)
-  plan.ts                ← registry + ACTIVE challenge selector
+    types.ts                 ← Challenge / DayPlan / WeekPlan / Project types
+    production-ai-2026.ts    ← course #1 (ACTIVE): 120 days, 20 projects
+    modern-ai-2026.ts        ← retired 100-day curriculum (kept, unregistered)
+  plan.ts                    ← registry + ACTIVE course selector
 ```
 
-**To add a second challenge later:**
+**Launch checklist for course #2 (when the time comes):**
 
-1. Create `lib/challenges/<new-slug>.ts` exporting a `Challenge` object
-   (id, title, cohortStart, days, weeks, projects).
-2. Register it in `CHALLENGES` in `lib/plan.ts`.
-3. Either point `CHALLENGE` at it (this deployment serves the new one), or add
-   `/c/[slug]` routes and resolve the challenge from the URL to serve several
-   at once. `checkins`/`notes` would need a `challenge_id` column to keep
-   tracks separate per challenge — not needed while only one challenge exists.
+1. **Data** — create `lib/challenges/<new-slug>.ts` exporting a `Challenge`
+   (id, title, totalDays, cohortStart, days, weeks, projects). If the
+   curriculum arrives as JSON like course #1 did, reuse the generator-script
+   approach.
+2. **Register** it in `CHALLENGES` in `lib/plan.ts`.
+3. **Database** — add `challenge_id` to the per-course tables, defaulted to
+   course #1 so every existing row stays correct with zero backfill:
+   ```sql
+   alter table checkins     add column if not exists challenge_id text not null default 'production-ai-2026';
+   alter table notes        add column if not exists challenge_id text not null default 'production-ai-2026';
+   alter table quiz_answers add column if not exists challenge_id text not null default 'production-ai-2026';
+   alter table day_content  add column if not exists challenge_id text not null default 'production-ai-2026';
+   -- and widen the primary keys to include challenge_id
+   ```
+   (Deliberately NOT added yet — with one course it only adds noise, and
+   adding it later with a default is lossless.)
+4. **Routing** — move app screens under `/c/[slug]/…` and resolve the course
+   from the URL instead of the `CHALLENGE` constant; the Courses catalog
+   then lists every registered course with its own progress and Start
+   button. Per-user progress is independent per course by design.
+5. **Enrollment** — `enrollments (profile_id, challenge_id, start_date,
+   reminder)` replaces the single `start_date` on profiles, so one account
+   can run several courses with separate cohort dates, streaks and
+   certificates.
+
+Accounts, codes, badges and the leaderboard machinery are already
+course-agnostic and carry over unchanged.
 
 ## v3 — not built yet
 
