@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { computeBadges, quizScorePercent, type Badge } from "@/lib/badges";
 import { effectiveQuizMap } from "@/lib/day-content";
-import { DbNotConfiguredError, query } from "@/lib/db";
+import { DbNotConfiguredError, ensureAvatarColumn, query } from "@/lib/db";
 import { CHALLENGE } from "@/lib/plan";
 import { computeStreak, currentDay, shippedCount } from "@/lib/progress";
 import { gradeAll, type StoredAnswer } from "@/lib/quiz";
@@ -9,6 +9,7 @@ import { gradeAll, type StoredAnswer } from "@/lib/quiz";
 interface Row {
   handle: string;
   name: string;
+  avatar: string | null;
   github: string;
   joined: string;
   checkins: Record<number, string> | null;
@@ -18,6 +19,7 @@ interface Row {
 export interface CommunityMember {
   handle: string;
   name: string;
+  avatar: string;
   github: string;
   joined: string;
   day: number;
@@ -31,13 +33,14 @@ export interface CommunityMember {
 export async function GET() {
   try {
     const quizMap = await effectiveQuizMap();
+    await ensureAvatarColumn();
 
     // Two LEFT JOIN LATERAL subqueries, each pre-aggregated to one row per
     // profile — a plain LEFT JOIN on both checkins AND quiz_answers would
     // fan out (every checkin paired with every quiz answer) and corrupt
     // both aggregates.
     const rows = await query<Row>(
-      `select p.handle, p.name, p.github, p.joined::text as joined,
+      `select p.handle, p.name, p.avatar, p.github, p.joined::text as joined,
               coalesce(ck.checkins, '{}'::jsonb) as checkins,
               coalesce(qz.answers, '[]'::jsonb) as quiz_answers
        from profiles p
@@ -63,6 +66,7 @@ export async function GET() {
       return {
         handle: r.handle,
         name: r.name,
+        avatar: r.avatar ?? "bot",
         github: r.github,
         joined: r.joined,
         day: Math.min(currentDay(checkins), CHALLENGE.totalDays),

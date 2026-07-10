@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { initialsOf } from "@/lib/demo";
+import Avatar3D from "./Avatar3D";
 import { TOTAL_DAYS } from "@/lib/plan";
 import {
   computeStreak,
@@ -34,12 +34,7 @@ export default function Profile() {
   return (
     <div>
       <div className="mb-[26px] flex flex-col items-start gap-5 sm:flex-row">
-        <div
-          className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[22px] font-display text-3xl font-bold text-white"
-          style={{ background: "linear-gradient(150deg,#7C6CF5,#5B4BD6)" }}
-        >
-          {initialsOf(name)}
-        </div>
+        <Avatar3D id={state.avatar} size={80} />
         <div className="flex-1 pt-1">
           <div className="mb-1 flex flex-wrap items-center gap-2.5">
             <h1 className="font-display text-2xl font-bold tracking-[-.02em]">

@@ -29,6 +29,8 @@ create table if not exists profiles (
 -- EXISTS above is a no-op on an already-existing table)
 alter table profiles add column if not exists is_owner boolean not null default false;
 
+alter table profiles add column if not exists avatar text not null default 'bot';
+
 create table if not exists checkins (
   profile_id  uuid not null references profiles(id) on delete cascade,
   day         int not null,

@@ -10,6 +10,7 @@ export interface ProfileSnapshot {
     id: string;
     handle: string;
     name: string;
+    avatar: string;
     github: string;
     reminder: "morning" | "evening" | "none";
     visibility: "public" | "private";
@@ -56,6 +57,7 @@ export async function profileSnapshot(
       id: p.id,
       handle: p.handle,
       name: p.name,
+      avatar: p.avatar ?? "bot",
       github: p.github,
       reminder: p.reminder,
       visibility: p.visibility,

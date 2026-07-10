@@ -3,7 +3,7 @@
 
 import { randomBytes } from "crypto";
 import { cookies } from "next/headers";
-import { query } from "./db";
+import { ensureAvatarColumn, query } from "./db";
 
 const COOKIE = "session_id";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 180; // 180 days
@@ -12,6 +12,7 @@ export interface SessionProfile {
   id: string;
   handle: string;
   name: string;
+  avatar: string;
   github: string;
   reminder: "morning" | "evening" | "none";
   visibility: "public" | "private";
@@ -50,8 +51,9 @@ export async function currentProfile(): Promise<SessionProfile | null> {
   const jar = await cookies();
   const token = jar.get(COOKIE)?.value;
   if (!token) return null;
+  await ensureAvatarColumn();
   const rows = await query<SessionProfile>(
-    `select p.id, p.handle, p.name, p.github, p.reminder, p.visibility,
+    `select p.id, p.handle, p.name, p.avatar, p.github, p.reminder, p.visibility,
             p.notes_private, p.start_date::text as start_date,
             p.joined::text as joined, p.onboarded, p.is_owner
      from sessions s join profiles p on p.id = s.profile_id

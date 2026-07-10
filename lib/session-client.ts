@@ -13,6 +13,7 @@ export interface Profile {
   id: string;
   handle: string;
   name: string;
+  avatar: string;
   github: string;
   reminder: Reminder;
   visibility: Visibility;
@@ -114,12 +115,13 @@ export function currentSnapshot(): Snapshot | null {
 export async function signup(
   handle: string,
   name: string,
-  code: string
+  code: string,
+  avatar: string
 ): Promise<Snapshot> {
   const res = await fetch("/api/auth/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ handle, name, code }),
+    body: JSON.stringify({ handle, name, code, avatar }),
   });
   const body = (await parseOrThrow(res)) as unknown as Snapshot;
   setState({ ready: true, snapshot: body });

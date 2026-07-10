@@ -58,6 +58,7 @@ export interface ProgressState {
   onboarded: boolean;
   isOwner: boolean;
   handle: string;
+  avatar: string;
   name: string;
   github: string;
   /** "YYYY-MM-DD" — the user's personal Day 1 */
@@ -78,6 +79,7 @@ const EMPTY: ProgressState = {
   onboarded: false,
   isOwner: false,
   handle: "",
+  avatar: "bot",
   name: "",
   github: "",
   startDate: null,
@@ -98,6 +100,7 @@ export function useProgress(): ProgressState {
     onboarded: p.onboarded,
     isOwner: p.isOwner,
     handle: p.handle,
+    avatar: p.avatar,
     name: p.name,
     github: p.github,
     startDate: p.startDate,

@@ -26,8 +26,13 @@ export function useProfiles(): ProfilesState {
 }
 
 /** Create an account and log in. Throws with a user-facing message on failure. */
-export async function signup(handle: string, name: string, code: string) {
-  await session.signup(handle, name, code);
+export async function signup(
+  handle: string,
+  name: string,
+  code: string,
+  avatar: string
+) {
+  await session.signup(handle, name, code, avatar);
 }
 
 /** Log in to an existing account. Throws with a user-facing message on failure. */

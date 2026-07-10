@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { initialsOf } from "@/lib/demo";
+import Avatar3D from "./Avatar3D";
 import { TOTAL_DAYS } from "@/lib/plan";
 import { computeStreak, currentDay, useProgress } from "@/lib/store";
 import {
@@ -96,12 +96,7 @@ export default function Sidebar() {
           className="mt-auto block rounded-xl border border-[#202832] bg-card p-3.5"
         >
           <div className="flex items-center gap-2.5">
-            <div
-              className="flex h-9 w-9 items-center justify-center rounded-full font-display text-sm font-bold text-white"
-              style={{ background: "linear-gradient(150deg,#7C6CF5,#5B4BD6)" }}
-            >
-              {initialsOf(name)}
-            </div>
+            <Avatar3D id={state.avatar} size={36} />
             <div className="min-w-0 flex-1">
               <div className="truncate text-[13px] font-semibold text-ink">
                 {name}

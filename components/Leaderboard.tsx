@@ -2,23 +2,17 @@
 
 import { useEffect, useState } from "react";
 import type { Badge } from "@/lib/badges";
-import { DEMO_SHOWCASE, initialsOf } from "@/lib/demo";
+import { DEMO_SHOWCASE } from "@/lib/demo";
 import { useProgress } from "@/lib/store";
+import Avatar3D from "./Avatar3D";
 import { IconHeart } from "./icons";
 
 const FILTERS = ["This week", "All time"];
 
-const AVATARS = [
-  "linear-gradient(150deg,#7C6CF5,#5B4BD6)",
-  "linear-gradient(150deg,#35D399,#16A97E)",
-  "linear-gradient(150deg,#F5B54B,#D98A2B)",
-  "linear-gradient(150deg,#EC6A9C,#C13E77)",
-  "linear-gradient(150deg,#4AA8FF,#2B7FD6)",
-];
-
 interface Member {
   handle: string;
   name: string;
+  avatar?: string;
   day: number;
   streak: number;
   totalDays: number;
@@ -144,12 +138,7 @@ export default function Leaderboard() {
                     >
                       {i + 1}
                     </span>
-                    <div
-                      className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full font-display text-[13px] font-bold text-white"
-                      style={{ background: AVATARS[i % AVATARS.length] }}
-                    >
-                      {initialsOf(u.name)}
-                    </div>
+                    <Avatar3D id={u.avatar} size={34} />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
                         <span className="truncate text-[13.5px] font-semibold">

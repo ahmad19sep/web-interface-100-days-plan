@@ -53,10 +53,10 @@ export default function Landing() {
           href="/start"
           className="btn-primary px-8 py-4 text-[16px] !font-bold"
         >
-          Set your access code →
+          ✨ Create access code →
         </Link>
         <Link href="/start" className="btn-ghost px-6 py-4 text-[15px]">
-          I already have a code
+          🔑 Write access code
         </Link>
       </div>
 

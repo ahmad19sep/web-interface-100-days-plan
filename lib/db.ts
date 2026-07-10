@@ -37,3 +37,19 @@ export async function query<R extends QueryResultRow = QueryResultRow>(
   const { rows } = await getPool().query<R>(text, params);
   return rows;
 }
+
+// Self-healing migration for profiles.avatar (added after first deploy;
+// DATABASE_URL is a sensitive env var, so schema.sql can't be run by hand
+// from a dev machine). Idempotent, one statement per server instance.
+let avatarColumnReady: Promise<unknown> | null = null;
+export function ensureAvatarColumn(): Promise<unknown> {
+  if (!avatarColumnReady) {
+    avatarColumnReady = query(
+      "alter table profiles add column if not exists avatar text not null default 'bot'"
+    ).catch((err) => {
+      avatarColumnReady = null; // retry on the next request
+      throw err;
+    });
+  }
+  return avatarColumnReady;
+}

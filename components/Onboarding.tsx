@@ -21,6 +21,15 @@ import {
   signup,
   useProfiles,
 } from "@/lib/profiles";
+import { AVATARS } from "@/lib/avatars";
+import Avatar3D from "./Avatar3D";
+
+/** People sign in with their NAME — we derive the unique handle from it. */
+function nameToHandle(raw: string): string {
+  const cleaned = raw.trim().toLowerCase();
+  if (HANDLE_RE.test(cleaned)) return cleaned;
+  return cleaned.replace(/[^a-z0-9]+/g, "").slice(0, 24);
+}
 import {
   completeOnboarding,
   expectedDay,
@@ -100,7 +109,7 @@ export default function Onboarding() {
   const [handle, setHandle] = useState("");
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
-  const [confirmCode, setConfirmCode] = useState("");
+  const [avatar, setAvatar] = useState("bot");
 
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -131,29 +140,26 @@ export default function Onboarding() {
   // ── actions ───────────────────────────────────────────────────────────────
 
   async function submitSignup() {
-    const cleanHandle = handle.trim().toLowerCase();
-    if (!HANDLE_RE.test(cleanHandle)) {
-      setError("Username must be 3-24 characters: letters, numbers, - or _.");
+    const cleanName = name.trim();
+    if (!cleanName) {
+      setError("Add your name.");
       return;
     }
-    if (!name.trim()) {
-      setError("Add a name so we know whose track this is.");
+    const derivedHandle = nameToHandle(cleanName);
+    if (derivedHandle.length < 3) {
+      setError("Use a name with at least 3 letters or numbers.");
       return;
     }
     if (code.length < MIN_CODE_LENGTH) {
       setError(`Your code needs at least ${MIN_CODE_LENGTH} characters.`);
       return;
     }
-    if (code !== confirmCode) {
-      setError("The two codes don't match — type them again.");
-      return;
-    }
     setError("");
     setBusy(true);
     try {
-      await signup(cleanHandle, name.trim(), code);
+      await signup(derivedHandle, cleanName, code, avatar);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't create your track.");
+      setError(err instanceof Error ? err.message : "Couldn't create your access code.");
     } finally {
       setBusy(false);
     }
@@ -164,7 +170,7 @@ export default function Onboarding() {
     setError("");
     setBusy(true);
     try {
-      await login(handle.trim().toLowerCase(), code);
+      await login(nameToHandle(handle), code);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't log in.");
       setCode("");
@@ -177,7 +183,6 @@ export default function Onboarding() {
     setHandle("");
     setName("");
     setCode("");
-    setConfirmCode("");
     setError("");
     setSubPhase(next);
   }
@@ -188,10 +193,10 @@ export default function Onboarding() {
     phase === "login"
       ? "Welcome back"
       : phase === "signup"
-        ? "Create your track"
+        ? "Create your access code"
         : phase === "entry"
-          ? "Join the challenge"
-          : "Set up your track";
+          ? "Your access code"
+          : "Set up your course";
 
   return (
     <div className="flex min-h-screen items-center justify-center p-5 sm:p-10">
@@ -227,10 +232,10 @@ export default function Onboarding() {
         {phase === "entry" && (
           <div className="anim-fade-up card-std rounded-[20px] p-6 sm:p-[30px]">
             <div className="mb-1 font-display text-base font-semibold">
-              Your track, everywhere
+              One code, everything
             </div>
             <div className="mb-5 text-[13px] text-mut2">
-              One username + code opens your streak, check-ins and notes on
+              Your name + access code opens your courses, streak and notes on
               any phone or laptop.
             </div>
             <div className="flex flex-col gap-2.5">
@@ -239,14 +244,14 @@ export default function Onboarding() {
                 onClick={() => goTo("signup")}
                 className="btn-primary w-full py-[13px] text-sm"
               >
-                Create a new track →
+                ✨ Create access code →
               </button>
               <button
                 type="button"
                 onClick={() => goTo("login")}
                 className="btn-ghost w-full py-[13px] text-sm"
               >
-                I already have a track — log in
+                🔑 Write access code
               </button>
             </div>
           </div>
@@ -256,7 +261,7 @@ export default function Onboarding() {
         {phase === "login" && (
           <div className="anim-fade-up card-std rounded-[20px] p-6 sm:p-[30px]">
             <div className="mb-4 text-[13px] text-mut2">
-              Enter your username and code to open your track.
+              Write your name and access code to open your account.
             </div>
             <form
               onSubmit={(e) => {
@@ -272,7 +277,7 @@ export default function Onboarding() {
                   setHandle(e.target.value);
                   setError("");
                 }}
-                placeholder="Username"
+                placeholder="Your name"
                 autoComplete="username"
                 autoCapitalize="none"
                 className={`${inputClass} mb-2.5`}
@@ -284,7 +289,7 @@ export default function Onboarding() {
                   setCode(e.target.value);
                   setError("");
                 }}
-                placeholder="Your code"
+                placeholder="Your access code"
                 autoComplete="current-password"
                 className={`${inputClass} mb-2.5 font-mono tracking-[.2em]`}
               />
@@ -296,7 +301,7 @@ export default function Onboarding() {
                 disabled={busy || !handle.trim() || code.length === 0}
                 className="btn-primary w-full py-[13px] text-sm disabled:cursor-default disabled:opacity-60"
               >
-                {busy ? "Checking…" : "Open my track →"}
+                {busy ? "Checking…" : "Open →"}
               </button>
             </form>
             <button
@@ -304,11 +309,11 @@ export default function Onboarding() {
               onClick={() => goTo("signup")}
               className="mt-3 cursor-pointer text-[12.5px] text-mut3 hover:text-ink"
             >
-              New here? Create a track instead
+              New here? Create an access code
             </button>
             <p className="mt-4 text-xs leading-[1.6] text-mut3">
-              Codes can&apos;t be recovered — if it&apos;s truly gone, start a
-              new track and keep building.
+              Codes can&apos;t be recovered — if it&apos;s truly gone, create a
+              new one and keep building.
             </p>
           </div>
         )}
@@ -317,40 +322,50 @@ export default function Onboarding() {
         {phase === "signup" && (
           <div className="anim-fade-up card-std rounded-[20px] p-6 sm:p-[30px]">
             <div className="mb-1 font-display text-base font-semibold">
-              1 · Username &amp; name
+              Your name
             </div>
-            <div className="mb-3 text-[13px] text-mut2">
-              Your username is how you log back in — pick something you&apos;ll
-              remember. Your name is shown on your dashboard and share card.
+            <div className="mb-2.5 text-[13px] text-mut2">
+              You&apos;ll write this name + your code to log in anywhere.
             </div>
             <input
               type="text"
-              value={handle}
-              onChange={(e) => {
-                setHandle(e.target.value);
-                setError("");
-              }}
-              placeholder="Username (e.g. saadkhan)"
-              autoComplete="username"
-              autoCapitalize="none"
-              className={`${inputClass} mb-2.5`}
-            />
-            <input
-              type="text"
+              autoFocus
               value={name}
               onChange={(e) => {
                 setName(e.target.value);
                 setError("");
               }}
-              placeholder="Display name (e.g. Saad Khan)"
+              placeholder="e.g. Saad Khan"
+              autoComplete="name"
               className={`${inputClass} mb-5`}
             />
+
+            <div className="mb-2.5 font-display text-base font-semibold">
+              Pick your AI avatar
+            </div>
+            <div className="mb-5 flex flex-wrap gap-3">
+              {AVATARS.map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() => setAvatar(a.id)}
+                  className={`cursor-pointer rounded-full p-1 transition-transform ${
+                    avatar === a.id
+                      ? "scale-110 ring-2 ring-accent"
+                      : "opacity-60 hover:scale-105 hover:opacity-100"
+                  }`}
+                  aria-label={a.label}
+                >
+                  <Avatar3D id={a.id} size={48} />
+                </button>
+              ))}
+            </div>
+
             <div className="mb-1 font-display text-base font-semibold">
-              2 · Set your code
+              Set your access code
             </div>
             <div className="mb-3 text-[13px] text-mut2">
-              You&apos;ll enter this — with your username — to open your track
-              on any device.
+              It can&apos;t be recovered — pick one you&apos;ll remember.
             </div>
             <form
               onSubmit={(e) => {
@@ -365,18 +380,7 @@ export default function Onboarding() {
                   setCode(e.target.value);
                   setError("");
                 }}
-                placeholder={`Code — at least ${MIN_CODE_LENGTH} characters`}
-                autoComplete="new-password"
-                className={`${inputClass} mb-2.5 font-mono tracking-[.2em]`}
-              />
-              <input
-                type="password"
-                value={confirmCode}
-                onChange={(e) => {
-                  setConfirmCode(e.target.value);
-                  setError("");
-                }}
-                placeholder="Repeat the code"
+                placeholder={`Access code — at least ${MIN_CODE_LENGTH} characters`}
                 autoComplete="new-password"
                 className={`${inputClass} mb-2.5 font-mono tracking-[.2em]`}
               />
@@ -388,7 +392,7 @@ export default function Onboarding() {
                 disabled={busy}
                 className="btn-primary w-full py-[13px] text-sm disabled:cursor-default disabled:opacity-60"
               >
-                {busy ? "Creating…" : "Continue →"}
+                {busy ? "Creating…" : "Create & enter →"}
               </button>
             </form>
             <button
@@ -396,12 +400,8 @@ export default function Onboarding() {
               onClick={() => goTo("login")}
               className="mt-3 cursor-pointer text-[12.5px] text-mut3 hover:text-ink"
             >
-              ← Already have a track? Log in
+              ← Already have a code? Write it
             </button>
-            <p className="mt-4 text-xs leading-[1.6] text-mut3">
-              Your code can&apos;t be recovered if forgotten — pick one
-              you&apos;ll remember. Nobody else can see it.
-            </p>
           </div>
         )}
 
