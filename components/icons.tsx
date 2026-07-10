@@ -71,6 +71,14 @@ export const IconProfile = ({ size = 18 }: { size?: number }) => (
   </Base>
 );
 
+export const IconAbout = ({ size = 18 }: { size?: number }) => (
+  <Base size={size}>
+    <circle cx="12" cy="12" r="9" />
+    <circle cx="12" cy="10" r="3" />
+    <path d="M6.5 18.5c1-2.5 3-3.5 5.5-3.5s4.5 1 5.5 3.5" />
+  </Base>
+);
+
 export const IconSettings = ({ size = 18 }: { size?: number }) => (
   <Base size={size}>
     <circle cx="12" cy="12" r="3" />
