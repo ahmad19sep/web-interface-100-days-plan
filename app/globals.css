@@ -358,3 +358,48 @@ select {
     transform: none !important;
   }
 }
+
+/* ── 3D extruded display title (landing) ────────────────────────────────── */
+.text3d {
+  color: #35d399;
+  text-shadow:
+    0 1px 0 #23b083,
+    0 2px 0 #1ca173,
+    0 3px 0 #169264,
+    0 4px 0 #118355,
+    0 5px 0 #0d7449,
+    0 6px 0 #0a653e,
+    0 7px 0 #085634,
+    0 8px 0 #06472a,
+    0 9px 0 #053a22,
+    0 10px 0 #042e1b,
+    0 26px 42px rgba(0, 0, 0, 0.65);
+}
+.text3d-amber {
+  color: #f5b54b;
+  text-shadow:
+    0 1px 0 #d99b36,
+    0 2px 0 #c28a2c,
+    0 3px 0 #ab7923,
+    0 4px 0 #94681b,
+    0 5px 0 #7d5814,
+    0 6px 0 #66470e,
+    0 7px 0 #503809,
+    0 8px 0 #3a2905,
+    0 9px 0 #2e2004,
+    0 10px 0 #221803,
+    0 26px 42px rgba(0, 0, 0, 0.65);
+}
+@keyframes floatTitle {
+  0%,
+  100% {
+    transform: perspective(800px) rotateX(10deg) translateY(0);
+  }
+  50% {
+    transform: perspective(800px) rotateX(10deg) translateY(-10px);
+  }
+}
+.anim-float-title {
+  transform: perspective(800px) rotateX(10deg);
+  animation: floatTitle 5.5s ease-in-out infinite;
+}

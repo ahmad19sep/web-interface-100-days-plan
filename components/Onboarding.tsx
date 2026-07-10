@@ -105,17 +105,28 @@ export default function Onboarding() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  // The 3-step course setup only opens when the Courses page asks for it
+  // (/start?setup=1). A plain login/signup goes straight to /courses.
+  const [setupRequested, setSetupRequested] = useState(false);
+  useEffect(() => {
+    setSetupRequested(
+      new URLSearchParams(window.location.search).get("setup") === "1"
+    );
+  }, []);
+
   const phase: Phase = !ready
     ? "boot"
     : activeId
-      ? onboarded
-        ? "boot" // logged in and done — redirecting to /today below
+      ? onboarded || !setupRequested
+        ? "boot" // logged in — redirecting below
         : "setup"
       : (subPhase ?? "entry");
 
   useEffect(() => {
-    if (ready && activeId && onboarded) router.replace("/today");
-  }, [ready, activeId, onboarded, router]);
+    if (!ready || !activeId) return;
+    if (onboarded) router.replace("/today");
+    else if (!setupRequested) router.replace("/courses");
+  }, [ready, activeId, onboarded, setupRequested, router]);
 
   // ── actions ───────────────────────────────────────────────────────────────
 
@@ -414,8 +425,8 @@ function SetupSteps() {
   async function start() {
     setBusy(true);
     await completeOnboarding({ startToday, reminder, visibility, name });
-    // land on Courses — the user picks the course there and starts
-    router.push("/courses");
+    // course started — Today / Journey / Projects unlock now
+    router.push("/today");
   }
 
   return (

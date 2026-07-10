@@ -24,8 +24,11 @@ export default function CoursesBoard() {
   const state = useProgress();
   const done = Object.keys(state.checkins).length;
   const day = Math.min(currentDay(state.checkins), TOTAL_DAYS);
-  const started = done > 0;
+  const started = state.onboarded;
   const complete = done >= TOTAL_DAYS;
+  // Not started → clicking the course opens its 3-step setup, which
+  // unlocks Today / Journey / Projects.
+  const target = complete ? "/complete" : started ? "/today" : "/start?setup=1";
   const streak = computeStreak(state.checkins);
   const shipped = shippedCount(state.checkins);
   const pct = Math.round((done / TOTAL_DAYS) * 100);
@@ -41,7 +44,7 @@ export default function CoursesBoard() {
 
       <Tilt max={5} className="max-w-[760px] rounded-[20px]">
       <Link
-        href="/today"
+        href={target}
         className="card-grad block p-6 !text-ink sm:p-8"
       >
         <div className="mb-4 flex items-center gap-3.5">

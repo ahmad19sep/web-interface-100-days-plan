@@ -49,9 +49,15 @@ export default function Sidebar() {
   const day = Math.min(currentDay(state.checkins), TOTAL_DAYS);
   const { streak } = computeStreak(state.checkins);
   const name = state.name || "Your track";
+  // Course tabs unlock once the user starts the course (onboarding done);
+  // until then the sidebar is the platform: Courses, About me, community.
+  const COURSE_TABS = ["today", "journey", "projects"];
+  const base = state.onboarded
+    ? NAV
+    : NAV.filter((n) => !COURSE_TABS.includes(n.key));
   const nav = state.isOwner
-    ? [...NAV, { key: "creator", href: "/creator", label: "Creator", Icon: IconCreator }]
-    : NAV;
+    ? [...base, { key: "creator", href: "/creator", label: "Creator", Icon: IconCreator }]
+    : base;
 
   return (
     <>
