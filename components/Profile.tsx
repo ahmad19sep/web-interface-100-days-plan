@@ -16,8 +16,10 @@ import {
   shippedCount,
   useProgress,
 } from "@/lib/store";
+import { useState } from "react";
 import Avatar3D from "./Avatar3D";
-import { IconGitHub, IconShare } from "./icons";
+import { SettingsPanel } from "./Settings";
+import { IconGitHub, IconSettings, IconShare } from "./icons";
 
 function joinedLabel(iso: string | null): string {
   if (!iso) return "THIS MONTH";
@@ -29,6 +31,7 @@ function joinedLabel(iso: string | null): string {
 
 export default function Profile() {
   const state = useProgress();
+  const [showSettings, setShowSettings] = useState(false);
   const streak = computeStreak(state.checkins);
   const done = Object.keys(state.checkins).length;
   const day = Math.min(currentDay(state.checkins), TOTAL_DAYS);
@@ -62,12 +65,32 @@ export default function Profile() {
 
   return (
     <div>
-      <div className="mb-[22px]">
-        <div className="text-sm text-mut2">Your explorer, your record</div>
-        <h1 className="font-display text-[26px] font-bold tracking-[-.02em]">
-          Explorer Profile
-        </h1>
+      <div className="mb-[22px] flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <div className="text-sm text-mut2">Your explorer, your record</div>
+          <h1 className="font-display text-[26px] font-bold tracking-[-.02em]">
+            Explorer Profile
+          </h1>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowSettings((v) => !v)}
+          className={`flex cursor-pointer items-center gap-2 rounded-[11px] border px-4 py-2.5 font-mono text-[11px] tracking-[.1em] transition-colors ${
+            showSettings
+              ? "border-[rgba(34,211,238,.4)] bg-[rgba(34,211,238,.1)] text-accent"
+              : "border-edge2 bg-card2 text-mut2 hover:text-ink"
+          }`}
+        >
+          <IconSettings size={15} />
+          SETTINGS {showSettings ? "▴" : "▾"}
+        </button>
       </div>
+
+      {showSettings && (
+        <div className="anim-rise mb-6">
+          <SettingsPanel />
+        </div>
+      )}
 
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
         {/* ── the explorer card ── */}

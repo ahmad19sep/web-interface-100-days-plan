@@ -13,7 +13,6 @@ import {
   IconLeaderboard,
   IconProfile,
   IconProjects,
-  IconSettings,
   IconToday,
   Logo,
 } from "./icons";
@@ -25,8 +24,7 @@ const NAV = [
   { key: "courses", href: "/courses", label: "Courses", Icon: IconCourses },
   { key: "leaderboard", href: "/leaderboard", label: "Leaderboard", Icon: IconLeaderboard },
   { key: "about", href: "/about", label: "About me", Icon: IconAbout },
-  { key: "profile", href: "/profile", label: "Profile", Icon: IconProfile },
-  { key: "settings", href: "/settings", label: "Settings", Icon: IconSettings },
+  { key: "profile", href: "/profile", label: "Profile & settings", Icon: IconProfile },
 ];
 
 function activeKey(pathname: string): string {
@@ -36,8 +34,13 @@ function activeKey(pathname: string): string {
   if (pathname.startsWith("/courses")) return "courses";
   if (pathname.startsWith("/leaderboard")) return "leaderboard";
   if (pathname.startsWith("/about")) return "about";
-  if (pathname.startsWith("/profile") || pathname.startsWith("/complete")) return "profile";
-  if (pathname.startsWith("/settings")) return "settings";
+  if (
+    pathname.startsWith("/profile") ||
+    pathname.startsWith("/complete") ||
+    pathname.startsWith("/settings")
+  ) {
+    return "profile";
+  }
   if (pathname.startsWith("/creator")) return "creator";
   return "today";
 }

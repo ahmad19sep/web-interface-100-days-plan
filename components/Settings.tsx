@@ -22,19 +22,13 @@ const REMINDERS: { key: Reminder; label: string }[] = [
   { key: "none", label: "No reminder" },
 ];
 
-export default function Settings() {
+/** The settings cards without page chrome — embedded in the Profile tab. */
+export function SettingsPanel() {
   const router = useRouter();
   const state = useProgress();
 
   return (
     <div>
-      <div className="mb-[22px]">
-        <div className="text-sm text-mut2">Your track, your rules</div>
-        <h1 className="font-display text-[26px] font-bold tracking-[-.02em]">
-          Settings
-        </h1>
-      </div>
-
       <div className="flex max-w-[640px] flex-col gap-3.5">
         <div className="card-std p-[22px]">
           <div className="mb-3">
@@ -174,6 +168,21 @@ export default function Settings() {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+/** The /settings route keeps working (old links); it just shows the panel. */
+export default function Settings() {
+  return (
+    <div>
+      <div className="mb-[22px]">
+        <div className="text-sm text-mut2">Your track, your rules</div>
+        <h1 className="font-display text-[26px] font-bold tracking-[-.02em]">
+          Settings
+        </h1>
+      </div>
+      <SettingsPanel />
     </div>
   );
 }
