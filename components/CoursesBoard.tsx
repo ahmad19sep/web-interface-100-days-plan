@@ -28,7 +28,7 @@ export default function CoursesBoard() {
   const complete = done >= TOTAL_DAYS;
   // Not started → clicking the course opens its 3-step setup, which
   // unlocks Today / Journey / Projects.
-  const target = complete ? "/complete" : started ? "/today" : "/start?setup=1";
+  const target = complete ? "/certificate" : started ? "/today" : "/start?setup=1";
   const streak = computeStreak(state.checkins);
   const shipped = shippedCount(state.checkins);
   const pct = Math.round((done / TOTAL_DAYS) * 100);

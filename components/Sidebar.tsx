@@ -11,6 +11,7 @@ import { usePathname } from "next/navigation";
 import { TOTAL_DAYS } from "@/lib/plan";
 import { computeStreak, currentDay, useProgress } from "@/lib/store";
 import {
+  IconCertificate,
   IconCreator,
   IconJourney,
   IconLeaderboard,
@@ -25,6 +26,7 @@ const NAV = [
   { key: "today", href: "/today", label: "Today's lesson", Icon: IconToday },
   { key: "projects", href: "/projects", label: "Project Landmarks", Icon: IconProjects },
   { key: "leaderboard", href: "/leaderboard", label: "Leaderboard", Icon: IconLeaderboard },
+  { key: "certificate", href: "/certificate", label: "Certification", Icon: IconCertificate },
   { key: "profile", href: "/profile", label: "Profile & settings", Icon: IconProfile },
 ];
 
@@ -34,6 +36,7 @@ function activeKey(pathname: string): string {
   if (pathname.startsWith("/projects")) return "projects";
   if (pathname.startsWith("/courses")) return "courses";
   if (pathname.startsWith("/leaderboard")) return "leaderboard";
+  if (pathname.startsWith("/certificate")) return "certificate";
   if (pathname.startsWith("/about")) return "about";
   if (pathname.startsWith("/profile") || pathname.startsWith("/complete")) return "profile";
   if (pathname.startsWith("/settings")) return "settings";
