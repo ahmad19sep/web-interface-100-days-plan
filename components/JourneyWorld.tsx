@@ -170,10 +170,10 @@ export default function JourneyWorld() {
       );
       // the revealed road (up to a week ahead) — rebuilt as you progress
       const roadMat = new T.MeshStandardMaterial({
-        color: 0x18233a,
-        roughness: 0.9,
-        emissive: 0x0b1524,
-        emissiveIntensity: 0.5,
+        color: 0x24354f,
+        roughness: 0.85,
+        emissive: 0x14304d,
+        emissiveIntensity: 0.9,
       });
       let roadMesh: InstanceType<ThreeNS["Mesh"]> | null = null;
 
@@ -357,12 +357,12 @@ export default function JourneyWorld() {
         cx.font = '700 34px "JetBrains Mono", monospace';
         cx.textAlign = "center";
         cx.textBaseline = "middle";
-        cx.fillStyle = "#9fb0c8";
+        cx.fillStyle = "#8fa2bd";
         cx.fillText(String(n), 64, 32);
         const sp = new T.Sprite(
-          new T.SpriteMaterial({ map: new T.CanvasTexture(cv), transparent: true, opacity: 0.9 })
+          new T.SpriteMaterial({ map: new T.CanvasTexture(cv), transparent: true, opacity: 0.72 })
         );
-        sp.scale.set(4.4, 2.2, 1);
+        sp.scale.set(3.4, 1.7, 1);
         sp.position.y = SHIP_DAYS.has(n) ? (n === TOTAL_DAYS ? 20 : 11.5) : plan?.isRest ? 2.4 : 5.8;
         g.add(sp);
         g.userData.day = n;
@@ -375,7 +375,7 @@ export default function JourneyWorld() {
       const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
       for (const w of WEEKS) {
         const color = weekColor(w.week);
-        for (let k = 0; k < 6; k++) {
+        for (let k = 0; k < 4; k++) {
           const dayF = w.start + rnd() * (w.end - w.start);
           const t = Math.min(0.999, Math.max(0.001, dayT(dayF)));
           const pos = curve.getPointAt(t);
@@ -385,10 +385,10 @@ export default function JourneyWorld() {
           const m = new T.Mesh(
             new T.BoxGeometry(2.5 + rnd() * 3, h, 2.5 + rnd() * 3),
             new T.MeshStandardMaterial({
-              color: 0x131b2b,
+              color: 0x0f1626,
               roughness: 1,
               emissive: color,
-              emissiveIntensity: 0.045,
+              emissiveIntensity: 0.018,
             })
           );
           m.position.copy(pos).add(norm.multiplyScalar((15 + rnd() * 38) * (rnd() > 0.5 ? 1 : -1)));
@@ -434,8 +434,9 @@ export default function JourneyWorld() {
       explorer.add(ring);
       scene.add(explorer);
 
-      // completed-trail line, rebuilt whenever progress changes
+      // completed-trail + revealed-guide lines, rebuilt with progress
       let doneLine: InstanceType<ThreeNS["Line"]> | null = null;
+      let guideLine: InstanceType<ThreeNS["Line"]> | null = null;
       const markerPos = (n: number) => markers[n - 1].g.position as V3;
 
       // walking state — the explorer's position along the road [0..1]
@@ -455,10 +456,26 @@ export default function JourneyWorld() {
           revealPts.push(curve.getPointAt((i / 110) * revealT));
         }
         roadMesh = new T.Mesh(
-          new T.TubeGeometry(new T.CatmullRomCurve3(revealPts), 220, 0.55, 8),
+          new T.TubeGeometry(new T.CatmullRomCurve3(revealPts), 220, 0.8, 10),
           roadMat
         );
         scene.add(roadMesh);
+        // dim teal thread over the not-yet-walked part of the reveal
+        if (guideLine) {
+          scene.remove(guideLine);
+          guideLine.geometry.dispose();
+        }
+        const doneT = dayT(Math.max(1, Object.keys(done).length || 1));
+        const guidePts: V3[] = [];
+        for (let i = 0; i <= 60; i++) {
+          const gp = curve.getPointAt(doneT + (i / 60) * Math.max(0, revealT - doneT));
+          guidePts.push(new T.Vector3(gp.x, gp.y + 0.85, gp.z));
+        }
+        guideLine = new T.Line(
+          new T.BufferGeometry().setFromPoints(guidePts),
+          new T.LineBasicMaterial({ color: 0x0e7490, transparent: true, opacity: 0.55 })
+        );
+        scene.add(guideLine);
 
         for (const m of markers) {
           // fog of war: the path ahead stays hidden — except the summit
