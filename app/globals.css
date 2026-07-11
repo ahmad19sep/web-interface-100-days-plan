@@ -86,6 +86,20 @@ a {
 a:hover {
   color: var(--accent2);
 }
+/* links dressed as buttons keep the button's ink — the unlayered `a`
+   color above would otherwise beat the layered button classes */
+a.btn-primary,
+a.btn-primary:hover {
+  color: #06121a;
+}
+a.btn-amber,
+a.btn-amber:hover {
+  color: #1a1204;
+}
+a.btn-ghost,
+a.btn-ghost:hover {
+  color: var(--ink);
+}
 
 ::selection {
   background: rgba(34, 211, 238, 0.28);

@@ -323,7 +323,7 @@ export default function DashboardHome() {
               <div className="mt-auto">
                 <Link
                   href={`/day/${day}`}
-                  className="btn-primary w-full px-4 py-[15px] text-[15px] !font-bold"
+                  className="btn-amber w-full px-4 py-[15px] text-[15px] !font-bold"
                 >
                   Start Day {day} →
                 </Link>
