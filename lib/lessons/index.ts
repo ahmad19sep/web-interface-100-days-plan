@@ -16,6 +16,11 @@ import { DAY_005 } from "./day-005";
 import { DAY_006 } from "./day-006";
 import { DAY_007 } from "./day-007";
 import {
+  buildReading,
+  PROJECT_SIGNAL,
+  readingDataFor,
+} from "./reading";
+import {
   STAGE_ORDER,
   WATCH_THRESHOLD,
   type EvidenceField,
@@ -248,11 +253,51 @@ function scaffoldFrom(plan: DayPlan): Lesson {
   };
 }
 
-/** The lesson for a day — authored when available, scaffold otherwise. */
+/**
+ * Merge the course reading pack into a lesson's Understand stage.
+ *  - scaffold days: the reading IS the written lesson (it replaces the
+ *    auto-generated sections; the owner's code-side note is re-attached)
+ *  - authored days: the reading is appended after the authored sections,
+ *    so nothing from either source is lost
+ * References merge (deduped by URL) into the collapsed optional block.
+ */
+function withReading(lesson: Lesson, plan: DayPlan): Lesson {
+  const data = readingDataFor(lesson.day);
+  if (!data) return lesson;
+  const phase = projectPhaseOf(lesson.day);
+  const reading = buildReading(
+    data,
+    phase ? { id: phase.project.id, name: phase.project.name } : undefined
+  );
+  if (!lesson.authored && plan.ownerNote) {
+    reading.sections[0].blocks.push({
+      t: "callout",
+      kind: "info",
+      title: "Note from Ahmad",
+      text: plan.ownerNote,
+    });
+  }
+  const references = [...lesson.references, ...reading.references].filter(
+    (r, i, all) => all.findIndex((x) => x.url === r.url) === i
+  );
+  return {
+    ...lesson,
+    sections: lesson.authored
+      ? [...lesson.sections, ...reading.sections]
+      : reading.sections,
+    references,
+    jobRelevance:
+      lesson.jobRelevance ??
+      (phase ? PROJECT_SIGNAL[phase.project.id] : undefined),
+  };
+}
+
+/** The lesson for a day — authored when available, scaffold otherwise,
+ *  with the course reading pack merged into the Understand stage. */
 export function lessonFor(day: number): Lesson | null {
   const plan = DAYS[day - 1];
   if (!plan) return null;
-  return AUTHORED[day] ?? scaffoldFrom(plan);
+  return withReading(AUTHORED[day] ?? scaffoldFrom(plan), plan);
 }
 
 // ── live owner content (👑 CREATOR panel → /api/day-content) ─────────────────
