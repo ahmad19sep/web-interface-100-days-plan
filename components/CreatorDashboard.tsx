@@ -62,12 +62,41 @@ export default function CreatorDashboard() {
   const [deleted, setDeleted] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState("");
+  const [resetting, setResetting] = useState(false);
+  const [resetMsg, setResetMsg] = useState("");
 
   useEffect(() => {
     if (handle && !isOwner) router.replace("/today");
   }, [handle, isOwner, router]);
 
   if (!handle || !isOwner) return null;
+
+  async function resetMyTrack() {
+    const sure = window.confirm(
+      "Reset YOUR track back to Day 1?\n\nYour check-ins, quiz answers and workspace progress are cleared, and Day 1 becomes today. Your account, avatar and private notes are kept. Other accounts are untouched.\n\nThis cannot be undone."
+    );
+    if (!sure) return;
+    setResetting(true);
+    setResetMsg("");
+    try {
+      const res = await fetch("/api/progress/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: "RESET" }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setResetMsg(body.error ?? "Couldn't reset your track.");
+        setResetting(false);
+        return;
+      }
+      // hard reload so every derived view (world, HUD, journey) re-reads
+      window.location.href = "/today";
+    } catch {
+      setResetMsg("Couldn't reach the server.");
+      setResetting(false);
+    }
+  }
 
   async function deleteUser(target: string) {
     const sure = window.confirm(
@@ -124,6 +153,32 @@ export default function CreatorDashboard() {
             <StatCard label="Total sign-ups" value={fetchState.stats.totalProfiles} />
             <StatCard label="Public profiles" value={fetchState.stats.publicProfiles} />
             <StatCard label="Active streaks" value={fetchState.stats.activeStreaks} />
+          </div>
+
+          <div className="mb-5 flex flex-wrap items-center gap-3 rounded-[14px] border border-[rgba(245,158,11,.3)] bg-[rgba(245,158,11,.05)] p-4">
+            <div className="min-w-0 flex-1">
+              <div className="mb-0.5 text-[14px] font-semibold">
+                Reset my own track
+              </div>
+              <div className="text-[12.5px] leading-[1.6] text-mut2">
+                Clears your check-ins, quiz answers and workspace progress, and
+                makes Day 1 today. Keeps your account, avatar and private notes.
+                No other account is touched.
+              </div>
+              {resetMsg && (
+                <div className="mt-1.5 text-[12.5px] text-[#fca5a5]">
+                  {resetMsg}
+                </div>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => void resetMyTrack()}
+              disabled={resetting}
+              className="btn-amber shrink-0 px-5 py-2.5 text-[13.5px] disabled:opacity-60"
+            >
+              {resetting ? "Resetting…" : "↺ Reset to Day 1"}
+            </button>
           </div>
 
           <Funnel funnel={fetchState.stats.funnel} />
