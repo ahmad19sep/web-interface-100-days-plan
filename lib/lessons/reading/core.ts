@@ -14,7 +14,17 @@ import type { Block, LessonSection } from "../types";
 
 // ── the production rules (section 2 closes with one of these) ───────────────
 
-export type RuleKey = "boundary" | "eval" | "authority" | "provenance";
+export type RuleKey =
+  | "boundary"
+  | "eval"
+  | "authority"
+  | "provenance"
+  | "benchmark"
+  | "session"
+  | "operations"
+  | "untrusted"
+  | "interop"
+  | "narrow";
 
 const RULES: Record<RuleKey, string> = {
   boundary:
@@ -24,6 +34,18 @@ const RULES: Record<RuleKey, string> = {
     "The model proposes; deterministic code authorizes, executes, records and verifies. Keep authority outside the model.",
   provenance:
     "Preserve provenance from document ingestion to final citation, and evaluate retrieval separately from generation.",
+  benchmark:
+    "Benchmark the real task on the real hardware and include operations, licensing and total cost in the decision.",
+  session:
+    "Model the session as events with explicit ordering, cancellation and recovery. Voice UX fails when state is implicit.",
+  operations:
+    "Design every state transition for restart, duplicate delivery and partial failure. \"Works once\" is not an operational guarantee.",
+  untrusted:
+    "Treat retrieved content, tool output and memory as untrusted data. Permissions and validation belong in code at every trust boundary.",
+  interop:
+    "Interoperability expands the trust boundary. Expose the smallest capability set and verify every remote action and artifact.",
+  narrow:
+    "A narrow, measured, deployed product is stronger evidence than a wide unfinished platform.",
 };
 
 // ── the failure-mode triples (section 6 uses one of these sets) ──────────────
@@ -35,7 +57,13 @@ export type FailureKey =
   | "retrieval"
   | "http"
   | "documents"
-  | "cost";
+  | "cost"
+  | "voice"
+  | "open-models"
+  | "security"
+  | "protocol"
+  | "ops"
+  | "capstone";
 
 const FAILURES: Record<FailureKey, string[]> = {
   "happy-path": [
@@ -73,6 +101,36 @@ const FAILURES: Record<FailureKey, string[]> = {
     "Adding summaries that silently delete constraints.",
     "Routing uncertain work without a safe fallback.",
   ],
+  voice: [
+    "Ignoring disconnect and interruption states.",
+    "Measuring transcript quality but not task success.",
+    "Letting tool latency freeze the conversation without feedback.",
+  ],
+  "open-models": [
+    "Comparing models with different prompts or datasets.",
+    "Fine-tuning before establishing a strong baseline.",
+    "Ignoring license and operational cost.",
+  ],
+  security: [
+    "Relying on a system prompt as the only defense.",
+    "Giving the model permissions that code does not independently enforce.",
+    "Fixing a vulnerability without adding a regression test.",
+  ],
+  protocol: [
+    "Exposing overly broad tools.",
+    "Assuming protocol compliance guarantees safe behavior.",
+    "Adding distributed agents without measuring whether delegation helps.",
+  ],
+  ops: [
+    "Keeping critical state only in memory.",
+    "Using retries that duplicate side effects.",
+    "Shipping without dashboards, health checks or rollback.",
+  ],
+  capstone: [
+    "Choosing a problem too broad to finish.",
+    "Showing features without measurable outcomes.",
+    "Hiding limitations instead of documenting engineering trade-offs.",
+  ],
 };
 
 // ── per-project framing (belongs-to paragraph + employer signal) ─────────────
@@ -87,6 +145,18 @@ export const PROJECT_PURPOSE: Record<string, string> = {
   P7: "PDF/image ingestion to validated business schemas, confidence handling, retries, batching, and human review.",
   P8: "Prompt chaining, routing, parallelization, orchestrator-workers, and evaluator-optimizer patterns with metrics.",
   P9: "A transparent think-act-observe loop with typed tools, error recovery, state, approval checkpoints, and trajectory evals.",
+  P10: "Durable task state, initializer-worker harness, checkpoints, background jobs, reflection, verification, budgets, and restart recovery.",
+  P11: "A goal-directed autonomous loop with explicit state, verifiers, repair cycles, durable checkpoints, budgets, stopping conditions, approvals and loop-level telemetry.",
+  P12: "FastAPI, PostgreSQL, Redis, auth, secrets, rate limits, Docker, observability, tests, CI/CD, and staging deployment.",
+  P13: "Images, scans, tables and forms; multimodal retrieval; grounded extraction; computer-use sandbox; multimodal evals.",
+  P14: "WebRTC/WebSocket voice, interruption handling, multilingual Urdu-English support, tool calls, latency and task-success evals.",
+  P15: "Model selection, local inference, quantization, dataset curation, PEFT/LoRA/QLoRA, vLLM serving, and hosted-vs-open comparison.",
+  P16: "MCP tools, resources and prompts over a real database, current Streamable HTTP transport, authentication, least privilege, tool-use evals and an optional interactive MCP App surface.",
+  P17: "Two specialized agents with agent cards, task delegation, streaming artifacts, cross-framework communication, and delegation evals.",
+  P18: "Threat models, injection/exfiltration tests, least privilege, memory poisoning tests, automated scanners, and security regression CI.",
+  P19: "A trace-to-feedback-to-eval-to-harness improvement flywheel using repair loops, record/replay, skills, tool search, subagents and isolated worktrees, with measured before/after performance.",
+  P20: "One narrow, deployed AI product combining retrieval, deterministic workflows, agents or loops only where justified, evals, security, observability, cost controls, user testing and a public case study.",
+  CAP: "One narrow, deployed AI product combining retrieval, deterministic workflows, agents or loops only where justified, evals, security, observability, cost controls, user testing and a public case study.",
 };
 
 export const PROJECT_SIGNAL: Record<string, string> = {
@@ -99,6 +169,18 @@ export const PROJECT_SIGNAL: Record<string, string> = {
   P7: "Document AI, structured outputs, practical business automation.",
   P8: "Reliable orchestration before agents; workflow design and trade-offs.",
   P9: "Agent architecture, tool calling, debugging, framework literacy.",
+  P10: "Long-running agent systems and reliable task execution.",
+  P11: "Modern agent harness design, verification, reliable autonomy and failure containment.",
+  P12: "Backend, cloud, DevOps, MLOps, and production readiness.",
+  P13: "Vision-language systems and document automation.",
+  P14: "Realtime systems, voice UX, event-driven integrations.",
+  P15: "Open-source models, GPU/inference literacy, fine-tuning decisions.",
+  P16: "Current agent-tool interoperability, secure protocol deployment and product integration.",
+  P17: "Agent interoperability and distributed agent architecture.",
+  P18: "AI security, governance, secure agent deployment.",
+  P19: "Operating and continuously improving AI agents rather than merely prompting them.",
+  P20: "Complete hiring centerpiece with product judgment and production evidence.",
+  CAP: "Complete hiring centerpiece with product judgment and production evidence.",
 };
 
 // ── fixed skeleton texts ──────────────────────────────────────────────────────
