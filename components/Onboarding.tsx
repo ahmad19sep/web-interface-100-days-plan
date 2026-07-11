@@ -11,7 +11,7 @@
 // username + code.
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { COHORT_START_DATE } from "@/lib/plan";
 import {
@@ -99,14 +99,12 @@ export default function Onboarding() {
   const { ready, activeId } = useProfiles();
   const { onboarded } = useProgress();
 
-  // read ?setup=1 / ?signup=1 synchronously — deciding them in an effect
-  // let the logged-in redirect below fire first and bounce the user
-  // straight back to /courses before the flag ever landed
-  const [subPhase, setSubPhase] = useState<"login" | "signup" | null>(() =>
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).get("signup") === "1"
-      ? "signup"
-      : null
+  // ?setup=1 / ?signup=1 come from useSearchParams — they match the route
+  // being rendered even mid client-navigation, where window.location can
+  // still hold the previous URL and would bounce the user back to /courses
+  const params = useSearchParams();
+  const [subPhase, setSubPhase] = useState<"login" | "signup" | null>(
+    params.get("signup") === "1" ? "signup" : null
   );
 
   const [handle, setHandle] = useState("");
@@ -119,11 +117,7 @@ export default function Onboarding() {
 
   // The 3-step course setup only opens when the Courses page asks for it
   // (/start?setup=1). A plain login/signup goes straight to /courses.
-  const [setupRequested] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      new URLSearchParams(window.location.search).get("setup") === "1"
-  );
+  const setupRequested = params.get("setup") === "1";
 
   const phase: Phase = !ready
     ? "boot"
