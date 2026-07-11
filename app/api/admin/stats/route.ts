@@ -11,6 +11,7 @@ interface Row {
   handle: string;
   name: string;
   visibility: "public" | "private";
+  is_owner: boolean;
   joined: string;
   checkins: Record<number, string> | null;
   quiz_answers: StoredAnswer[] | null;
@@ -20,6 +21,7 @@ export interface AdminMember {
   handle: string;
   name: string;
   visibility: "public" | "private";
+  isOwner: boolean;
   joined: string;
   day: number;
   streak: number;
@@ -43,7 +45,7 @@ export async function GET() {
     // checkins/quiz-answers aggregates. No visibility filter: the owner
     // sees every account, public or private.
     const rows = await query<Row>(
-      `select p.handle, p.name, p.visibility, p.joined::text as joined,
+      `select p.handle, p.name, p.visibility, p.is_owner, p.joined::text as joined,
               coalesce(ck.checkins, '{}'::jsonb) as checkins,
               coalesce(qz.answers, '[]'::jsonb) as quiz_answers
        from profiles p
@@ -69,6 +71,7 @@ export async function GET() {
         handle: r.handle,
         name: r.name,
         visibility: r.visibility,
+        isOwner: r.is_owner,
         joined: r.joined,
         day: Math.min(currentDay(checkins), CHALLENGE.totalDays),
         streak: streak.streak,

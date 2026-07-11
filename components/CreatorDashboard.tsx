@@ -58,12 +58,42 @@ export default function CreatorDashboard() {
   const router = useRouter();
   const { isOwner, handle } = useProgress();
   const fetchState = useStats(Boolean(handle));
+  // handles deleted this session — filtered out without a refetch
+  const [deleted, setDeleted] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     if (handle && !isOwner) router.replace("/today");
   }, [handle, isOwner, router]);
 
   if (!handle || !isOwner) return null;
+
+  async function deleteUser(target: string) {
+    const sure = window.confirm(
+      `Delete @${target} permanently?\n\nTheir check-ins, notes, quiz answers and workspace progress are erased with the account. This cannot be undone.`
+    );
+    if (!sure) return;
+    setDeleting(target);
+    setDeleteError("");
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ handle: target }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setDeleteError(body.error ?? "Couldn't delete the account.");
+      } else {
+        setDeleted((s) => new Set(s).add(target));
+      }
+    } catch {
+      setDeleteError("Couldn't reach the server.");
+    } finally {
+      setDeleting(null);
+    }
+  }
 
   return (
     <div>
@@ -102,6 +132,11 @@ export default function CreatorDashboard() {
             <div className="border-b border-edge p-[18px] font-display text-[15px] font-semibold">
               Every account
             </div>
+            {deleteError && (
+              <div className="border-b border-edge bg-[rgba(248,113,113,.06)] px-[18px] py-2.5 text-[12.5px] text-[#fca5a5]">
+                {deleteError}
+              </div>
+            )}
             <div className="overflow-x-auto">
               <table className="w-full text-left text-[13px]">
                 <thead>
@@ -114,12 +149,22 @@ export default function CreatorDashboard() {
                     <th className="px-[18px] py-2.5 font-normal">Days done</th>
                     <th className="px-[18px] py-2.5 font-normal">Quiz</th>
                     <th className="px-[18px] py-2.5 font-normal">Joined</th>
+                    <th className="px-[18px] py-2.5 font-normal" />
                   </tr>
                 </thead>
                 <tbody>
-                  {fetchState.stats.members.map((m) => (
+                  {fetchState.stats.members
+                    .filter((m) => !deleted.has(m.handle))
+                    .map((m) => (
                     <tr key={m.handle} className="border-t border-edge3">
-                      <td className="px-[18px] py-2.5 font-mono text-ink">@{m.handle}</td>
+                      <td className="px-[18px] py-2.5 font-mono text-ink">
+                        @{m.handle}
+                        {m.isOwner && (
+                          <span className="ml-1.5 text-[11px]" title="Owner account">
+                            👑
+                          </span>
+                        )}
+                      </td>
                       <td className="px-[18px] py-2.5">{m.name}</td>
                       <td className="px-[18px] py-2.5 text-mut2">{m.visibility}</td>
                       <td className="px-[18px] py-2.5 font-mono">{m.day}</td>
@@ -129,11 +174,24 @@ export default function CreatorDashboard() {
                         {m.quizScore === null ? "—" : `${m.quizScore}%`}
                       </td>
                       <td className="px-[18px] py-2.5 text-mut3">{m.joined}</td>
+                      <td className="px-[18px] py-2.5 text-right">
+                        {!m.isOwner && (
+                          <button
+                            type="button"
+                            onClick={() => void deleteUser(m.handle)}
+                            disabled={deleting === m.handle}
+                            title={`Delete @${m.handle} permanently`}
+                            className="cursor-pointer rounded-[8px] border border-[rgba(248,113,113,.35)] bg-[rgba(248,113,113,.06)] px-2.5 py-1.5 font-mono text-[10px] tracking-[.06em] text-[#fca5a5] hover:bg-[rgba(248,113,113,.14)] disabled:cursor-default disabled:opacity-50"
+                          >
+                            {deleting === m.handle ? "…" : "🗑 DELETE"}
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                   {fetchState.stats.members.length === 0 && (
                     <tr>
-                      <td colSpan={8} className="px-[18px] py-6 text-center text-mut3">
+                      <td colSpan={9} className="px-[18px] py-6 text-center text-mut3">
                         No sign-ups yet.
                       </td>
                     </tr>
