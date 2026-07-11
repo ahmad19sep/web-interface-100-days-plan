@@ -53,3 +53,26 @@ export function ensureAvatarColumn(): Promise<unknown> {
   }
   return avatarColumnReady;
 }
+
+// Self-healing migration for the learning-workspace progress table (same
+// reasoning as above — schema.sql can't be run by hand against production).
+// One jsonb blob per (user, day): stage position, video seconds, section /
+// lab completion, hints unlocked, verification values, reflections, evidence.
+let dayProgressReady: Promise<unknown> | null = null;
+export function ensureDayProgressTable(): Promise<unknown> {
+  if (!dayProgressReady) {
+    dayProgressReady = query(
+      `create table if not exists day_progress (
+        profile_id  uuid not null references profiles(id) on delete cascade,
+        day         int not null,
+        data        jsonb not null default '{}'::jsonb,
+        updated_at  timestamptz not null default now(),
+        primary key (profile_id, day)
+      )`
+    ).catch((err) => {
+      dayProgressReady = null; // retry on the next request
+      throw err;
+    });
+  }
+  return dayProgressReady;
+}

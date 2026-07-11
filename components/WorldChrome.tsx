@@ -20,6 +20,20 @@ export default function WorldChrome({
   // Day lessons open like the design's "lesson room" — a floating centered
   // card over the dimmed world instead of a full-page overlay.
   const isLesson = /^\/day\//.test(pathname);
+  // The daily learning workspace is a full-page app of its own — near-opaque
+  // over the world, no width cap, and it manages its own internal scrolling.
+  const isWorkspace = pathname.startsWith("/learn/");
+
+  if (isWorkspace) {
+    return (
+      <>
+        <JourneyWorld />
+        <div className="fixed inset-x-0 bottom-0 top-[52px] z-40 bg-[rgba(6,9,18,.94)] backdrop-blur-[10px] lg:left-[68px] lg:top-0">
+          {children}
+        </div>
+      </>
+    );
+  }
 
   if (isLesson) {
     return (

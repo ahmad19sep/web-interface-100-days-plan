@@ -12,6 +12,7 @@ import {
   youTubeSearchUrl,
 } from "@/lib/plan";
 import type { QuizQuestion } from "@/lib/challenges/types";
+import { projectPhaseOf } from "@/lib/lessons";
 import {
   computeStreak,
   isLocked,
@@ -125,7 +126,7 @@ function QuizResultModal({
   );
 }
 
-function QuizCard({
+export function QuizCard({
   day,
   quiz,
   saved,
@@ -594,9 +595,15 @@ export default function DayDetail({ day }: { day: number }) {
         </span>
         {project && (
           <span className="hidden whitespace-nowrap rounded-[6px] border border-[rgba(167,139,250,.35)] px-2 py-0.5 font-mono text-[10px] tracking-[.08em] text-[#c4b5fd] sm:block">
-            {project.id} · SHIP DAY
+            {project.id} · {projectPhaseOf(day)?.label ?? "BUILD"}
           </span>
         )}
+        <Link
+          href={`/learn/day/${day}`}
+          className="ml-auto hidden whitespace-nowrap rounded-[9px] border border-[rgba(245,158,11,.45)] bg-[rgba(245,158,11,.09)] px-3 py-1.5 font-mono text-[10px] tracking-[.1em] !text-today hover:bg-[rgba(245,158,11,.16)] sm:block"
+        >
+          ⚒ ENTER FULL WORKSPACE →
+        </Link>
       </div>
 
       <div className="flex flex-col lg:flex-row">

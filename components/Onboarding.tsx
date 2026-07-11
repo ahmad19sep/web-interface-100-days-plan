@@ -15,7 +15,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { COHORT_START_DATE } from "@/lib/plan";
 import {
-  HANDLE_RE,
   MIN_CODE_LENGTH,
   login,
   signup,

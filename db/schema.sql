@@ -83,6 +83,18 @@ create table if not exists day_content (
 alter table day_content add column if not exists quiz jsonb;
 alter table day_content add column if not exists links jsonb;
 
+-- Learning-workspace progress (see lib/lessons/, /learn/day/N). One jsonb
+-- blob per (user, day): last stage, video seconds, section/lab completion,
+-- hints unlocked, verification values, reflections, ship evidence.
+-- Shape: lib/lessons/types.ts → WorkspaceProgress.
+create table if not exists day_progress (
+  profile_id  uuid not null references profiles(id) on delete cascade,
+  day         int not null,
+  data        jsonb not null default '{}'::jsonb,
+  updated_at  timestamptz not null default now(),
+  primary key (profile_id, day)
+);
+
 create index if not exists sessions_profile_id_idx on sessions(profile_id);
 create index if not exists checkins_profile_id_idx on checkins(profile_id);
 create index if not exists quiz_answers_profile_id_idx on quiz_answers(profile_id);
