@@ -99,7 +99,15 @@ export default function Onboarding() {
   const { ready, activeId } = useProfiles();
   const { onboarded } = useProgress();
 
-  const [subPhase, setSubPhase] = useState<"login" | "signup" | null>(null);
+  // read ?setup=1 / ?signup=1 synchronously — deciding them in an effect
+  // let the logged-in redirect below fire first and bounce the user
+  // straight back to /courses before the flag ever landed
+  const [subPhase, setSubPhase] = useState<"login" | "signup" | null>(() =>
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("signup") === "1"
+      ? "signup"
+      : null
+  );
 
   const [handle, setHandle] = useState("");
   const [name, setName] = useState("");
@@ -111,13 +119,11 @@ export default function Onboarding() {
 
   // The 3-step course setup only opens when the Courses page asks for it
   // (/start?setup=1). A plain login/signup goes straight to /courses.
-  const [setupRequested, setSetupRequested] = useState(false);
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setSetupRequested(params.get("setup") === "1");
-    // the landing page's "Create your access code" jumps straight to signup
-    if (params.get("signup") === "1") setSubPhase("signup");
-  }, []);
+  const [setupRequested] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("setup") === "1"
+  );
 
   const phase: Phase = !ready
     ? "boot"
