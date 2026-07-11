@@ -9,6 +9,12 @@
 
 import { DAYS, PROJECTS, getDay, type DayPlan, type Project } from "../plan";
 import { DAY_001 } from "./day-001";
+import { DAY_002 } from "./day-002";
+import { DAY_003 } from "./day-003";
+import { DAY_004 } from "./day-004";
+import { DAY_005 } from "./day-005";
+import { DAY_006 } from "./day-006";
+import { DAY_007 } from "./day-007";
 import {
   STAGE_ORDER,
   WATCH_THRESHOLD,
@@ -23,6 +29,12 @@ export * from "./types";
 
 const AUTHORED: Record<number, Lesson> = {
   1: DAY_001,
+  2: DAY_002,
+  3: DAY_003,
+  4: DAY_004,
+  5: DAY_005,
+  6: DAY_006,
+  7: DAY_007,
 };
 
 // ── project phases ───────────────────────────────────────────────────────────
