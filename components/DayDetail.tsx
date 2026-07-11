@@ -384,7 +384,7 @@ function textToLinks(text: string): { label: string; url: string }[] {
 }
 
 /** Owner-only panel to set this day's video/GitHub link/note/links/quiz live, from the app. */
-function CreatorDayPanel({
+export function CreatorDayPanel({
   day,
   content,
   onSaved,

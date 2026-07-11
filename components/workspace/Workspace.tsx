@@ -10,7 +10,9 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { CreatorDayPanel } from "../DayDetail";
 import {
+  applyDayContent,
   gateChecklist,
   labDone,
   lessonFor,
@@ -59,11 +61,20 @@ const STATE_LABEL: Record<string, string> = {
 
 export default function Workspace({ day }: { day: number }) {
   const state = useProgress();
-  const { content: dayContent, ready: contentReady } = useDayContent(day);
+  const {
+    content: dayContent,
+    ready: contentReady,
+    setContent: setDayContent,
+  } = useDayContent(day);
   const ws = useWorkspaceProgress(day);
 
   const plan = getDay(day);
-  const lesson = useMemo(() => lessonFor(day), [day]);
+  // whatever the owner attaches live (video/note/links) merges into the
+  // lesson here — publishing content never needs a code change
+  const lesson = useMemo(() => {
+    const base = lessonFor(day);
+    return base ? applyDayContent(base, dayContent) : null;
+  }, [day, dayContent]);
   const effectiveQuiz = dayContent.quiz ?? plan?.quiz;
   const hasQuiz = Boolean(effectiveQuiz && effectiveQuiz.length > 0);
   const savedAnswers = state.quizAnswers[day] ?? {};
@@ -338,6 +349,21 @@ export default function Workspace({ day }: { day: number }) {
                   ))}
                 </ul>
               </details>
+            )}
+
+            {/* 👑 owner: attach video / note / links / quiz for this day —
+                live for every user and merged into this lesson instantly */}
+            {state.isOwner && (
+              <div className="mt-10">
+                <div className="mb-2 font-mono text-[10px] tracking-[.24em] text-mut3">
+                  👑 CREATOR · ATTACH CONTENT TO DAY {pad3(day)}
+                </div>
+                <CreatorDayPanel
+                  day={day}
+                  content={dayContent}
+                  onSaved={setDayContent}
+                />
+              </div>
             )}
           </div>
         </main>

@@ -74,9 +74,28 @@ const STANDARD_REFLECTIONS = [
   "What interview question could be asked from today's topic?",
 ];
 
+/** "2-3 h" → 150 minutes (midpoint); undefined when unparseable. */
+function minutesFromTime(time?: string): number | undefined {
+  const m = time?.match(/(\d+(?:\.\d+)?)\s*(?:-\s*(\d+(?:\.\d+)?))?\s*h/i);
+  if (!m) return undefined;
+  const lo = Number(m[1]);
+  const hi = m[2] ? Number(m[2]) : lo;
+  return Math.round(((lo + hi) / 2) * 60);
+}
+
+/** Split "topic A; topic B; topic C." into clean bullet items. */
+function splitItems(text: string, sep: RegExp): string[] {
+  return text
+    .split(sep)
+    .map((s) => s.trim().replace(/[.;]$/, ""))
+    .filter((s) => s.length > 2);
+}
+
 function scaffoldFrom(plan: DayPlan): Lesson {
   const phase = projectPhaseOf(plan.day);
   const isShip = phase?.label === "SHIP DAY";
+  const topics = splitItems(plan.resource, /;/);
+  const buildSteps = splitItems(plan.build, /(?<=\.)\s+/);
 
   const verifyFields: EvidenceField[] = plan.isRest
     ? []
@@ -130,31 +149,37 @@ function scaffoldFrom(plan: DayPlan): Lesson {
     module: "Production AI Engineering",
     projectId: phase?.project.id,
     projectPhase: phase?.label,
-    durationMinutes: undefined,
+    durationMinutes: minutesFromTime(plan.time),
     difficulty: plan.difficulty,
-    prerequisites: [],
-    objectives: plan.about ? [plan.about] : [plan.resource],
+    prerequisites:
+      plan.day > 1 ? [`Day ${plan.day - 1} checked in`] : [],
+    objectives: [
+      ...(plan.about ? [plan.about] : []),
+      ...topics.map((t) => `Understand: ${t}`),
+    ].slice(0, 6),
     whyItMatters: plan.why,
     jobRelevance: undefined,
     missionBrief: plan.about ?? plan.build,
     finalEvidence: plan.proof,
-    videos: plan.video
-      ? [
-          {
-            id: "lesson",
-            title: plan.videoTitle ?? plan.title,
-            url: plan.video,
-            kind: "concept",
-            required: true,
-          },
-        ]
-      : [],
+    // the owner's live video (👑 CREATOR panel) merges in via
+    // applyDayContent(); an empty required slot here means "coming soon"
+    videos: [
+      {
+        id: "lesson",
+        title: plan.videoTitle ?? plan.title,
+        url: plan.video,
+        kind: "concept",
+        required: true,
+      },
+    ],
     sections: [
       {
         id: "learn",
         title: "What to learn today",
         blocks: [
-          { t: "p", text: plan.resource },
+          ...(topics.length > 1
+            ? ([{ t: "list", items: topics }] as const)
+            : ([{ t: "p", text: plan.resource }] as const)),
           ...(plan.why
             ? ([
                 {
@@ -177,13 +202,36 @@ function scaffoldFrom(plan: DayPlan): Lesson {
             : []),
         ],
       },
+      ...(plan.isRest
+        ? []
+        : [
+            {
+              id: "build-plan",
+              title: "Today's build, step by step",
+              blocks: [
+                ...(buildSteps.length > 1
+                  ? ([{ t: "list", items: buildSteps, ordered: true }] as const)
+                  : ([{ t: "p", text: plan.build }] as const)),
+                ...(plan.doneWhen
+                  ? ([
+                      {
+                        t: "callout",
+                        kind: "info",
+                        title: "Done when",
+                        text: plan.doneWhen,
+                      },
+                    ] as const)
+                  : []),
+              ],
+            },
+          ]),
     ],
     lab: undefined,
     build: plan.isRest
       ? { brief: plan.build, requirements: [], acceptance: [] }
       : {
           brief: plan.build,
-          requirements: [],
+          requirements: buildSteps.length > 1 ? buildSteps : [],
           acceptance: plan.doneWhen ? [plan.doneWhen] : [],
           submission: plan.proof ? [plan.proof] : undefined,
         },
@@ -205,6 +253,73 @@ export function lessonFor(day: number): Lesson | null {
   const plan = DAYS[day - 1];
   if (!plan) return null;
   return AUTHORED[day] ?? scaffoldFrom(plan);
+}
+
+// ── live owner content (👑 CREATOR panel → /api/day-content) ─────────────────
+
+export interface LiveDayContent {
+  videoUrl?: string | null;
+  note?: string | null;
+  links?: { label: string; url: string }[] | null;
+}
+
+/**
+ * Merge what the owner attached live from the app into the lesson, so the
+ * creator never needs a code change to publish a video, note or links:
+ *  - videoUrl fills the first empty video slot (or becomes a new required
+ *    video on days that had none — the Watch stage appears automatically)
+ *  - note is appended to the first section as a "Note from Ahmad" callout
+ *  - links merge into the optional references
+ * Always returns a copy — authored lessons are module constants.
+ */
+export function applyDayContent(
+  lesson: Lesson,
+  content?: LiveDayContent | null
+): Lesson {
+  const hasVideo = Boolean(content?.videoUrl);
+  const hasNote = Boolean(content?.note?.trim());
+  const hasLinks = Boolean(content?.links?.length);
+  if (!content || (!hasVideo && !hasNote && !hasLinks)) return lesson;
+
+  const videos = lesson.videos.map((v) => ({ ...v }));
+  if (hasVideo) {
+    const url = content.videoUrl!;
+    if (!videos.some((v) => v.url === url)) {
+      const slot = videos.find((v) => !v.url && v.required) ?? videos.find((v) => !v.url);
+      if (slot) slot.url = url;
+      else
+        videos.push({
+          id: "live-video",
+          title: "Lesson video",
+          kind: "concept",
+          required: true,
+          url,
+        });
+    }
+  }
+
+  const sections = lesson.sections.map((s) => ({ ...s, blocks: [...s.blocks] }));
+  if (hasNote && sections.length > 0) {
+    const note = content.note!.trim();
+    const already = sections.some((s) =>
+      s.blocks.some((b) => b.t === "callout" && b.text === note)
+    );
+    if (!already)
+      sections[0].blocks.push({
+        t: "callout",
+        kind: "info",
+        title: "Note from Ahmad",
+        text: note,
+      });
+  }
+
+  const references = [...lesson.references];
+  for (const l of content.links ?? []) {
+    if (l?.url && !references.some((r) => r.url === l.url))
+      references.push({ label: l.label || l.url, url: l.url });
+  }
+
+  return { ...lesson, videos, sections, references };
 }
 
 // ── stage availability + completion ──────────────────────────────────────────
