@@ -60,7 +60,7 @@ export default function Sidebar() {
   const nav = [
     // the clock opens today's actual lesson, straight into the room
     ...base.map((n) =>
-      n.key === "today" ? { ...n, href: `/day/${day}` } : n
+      n.key === "today" ? { ...n, href: `/learn/day/${day}` } : n
     ),
     // the crown — the design's Creator Studio slot, always last
     state.isOwner

@@ -123,7 +123,7 @@ function ThisWeekCard({
             return (
               <Link
                 key={d.day}
-                href={`/day/${d.day}`}
+                href={`/learn/day/${d.day}`}
                 className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-0.5 transition-colors hover:bg-card2"
               >
                 <span className="flex h-[22px] w-[22px] items-center justify-center rounded-md bg-accent-deep">
@@ -139,7 +139,7 @@ function ThisWeekCard({
             return (
               <Link
                 key={d.day}
-                href={`/day/${d.day}`}
+                href={`/learn/day/${d.day}`}
                 className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-0.5 transition-colors hover:bg-card2"
               >
                 <span className="flex h-[22px] w-[22px] items-center justify-center rounded-md border border-[rgba(245,181,75,.5)] bg-[rgba(245,181,75,.16)] font-mono text-[10px] text-today">
@@ -154,7 +154,7 @@ function ThisWeekCard({
           return (
             <Link
               key={d.day}
-              href={`/day/${d.day}`}
+              href={`/learn/day/${d.day}`}
               className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-0.5 opacity-50 transition-colors hover:bg-card2"
             >
               <span className="h-[22px] w-[22px] rounded-md bg-locked" />
@@ -396,7 +396,7 @@ export default function DashboardHome() {
               </p>
               <div className="mt-auto">
                 <Link
-                  href={`/day/${day}`}
+                  href={`/learn/day/${day}`}
                   className="btn-primary w-full px-4 py-[15px] text-[15px] !font-bold"
                 >
                   Resume Day {day} →
@@ -428,7 +428,7 @@ export default function DashboardHome() {
               counts rest days too.
             </p>
             <Link
-              href={`/day/${day}`}
+              href={`/learn/day/${day}`}
               className="btn-primary px-6 py-3.5 text-[15px] !font-bold"
             >
               Open rest Day {day} →
@@ -532,7 +532,7 @@ export default function DashboardHome() {
               </p>
               <div className="mt-auto flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href={`/day/${day}`}
+                  href={`/learn/day/${day}`}
                   className="btn-primary flex-1 px-4 py-[15px] text-[15px] !font-bold"
                 >
                   Resume Day {day} →

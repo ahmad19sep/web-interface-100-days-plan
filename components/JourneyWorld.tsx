@@ -59,13 +59,13 @@ export default function JourneyWorld() {
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!world || reduced) {
-      router.push(`/day/${n}`);
+      router.push(`/learn/day/${n}`);
       return;
     }
     setSelected(n);
     world.selectExternally(n);
     setWalking(n);
-    world.walkTo(n, () => router.push(`/day/${n}`));
+    world.walkTo(n, () => router.push(`/learn/day/${n}`));
   };
 
   const today = Math.min(currentDay(state.checkins), TOTAL_DAYS);

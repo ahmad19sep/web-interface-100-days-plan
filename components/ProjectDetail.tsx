@@ -80,7 +80,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
                 return (
                   <Link
                     key={d.day}
-                    href={`/day/${d.day}`}
+                    href={`/learn/day/${d.day}`}
                     className="flex items-center gap-3 rounded-[9px] px-2 py-2.5"
                     style={{
                       background: dCurrent ? "rgba(245,181,75,.08)" : "transparent",
@@ -161,7 +161,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
               Ships as a standalone portfolio piece on Day {project.shipDay}.
             </div>
             <Link
-              href={`/day/${nextInProject}`}
+              href={`/learn/day/${nextInProject}`}
               className="btn-ghost w-full py-3 text-[13.5px] !rounded-[11px]"
             >
               Go to {nextInProject === current ? "today's" : "the next"} task

@@ -262,7 +262,7 @@ export default function Certificate() {
             </div>
 
             <Link
-              href={`/day/${day}`}
+              href={`/learn/day/${day}`}
               className="btn-amber w-full py-3.5 text-center text-[14.5px]"
             >
               Continue — Day {day} →
