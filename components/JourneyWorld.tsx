@@ -125,11 +125,13 @@ export default function JourneyWorld() {
       (grid.material as { transparent: boolean; opacity: number }).opacity = 0.35;
       scene.add(grid);
 
-      // the road
+      // the road — a staircase into the sky: every bend climbs higher,
+      // Day 1 at the valley floor, the capstone throne at the summit
       const pts = [
-        [0, 0], [42, -62], [-46, -132], [36, -202], [-52, -282],
-        [32, -362], [-42, -442], [22, -522], [0, -580],
-      ].map(([x, z]) => new T.Vector3(x, 0, z));
+        [0, 0, 0], [42, -62, 4], [-46, -132, 9], [36, -202, 14],
+        [-52, -282, 20], [32, -362, 26], [-42, -442, 32],
+        [22, -522, 38], [0, -580, 44],
+      ].map(([x, z, y]) => new T.Vector3(x, y, z));
       const curve = new T.CatmullRomCurve3(pts);
       scene.add(
         new T.Mesh(
@@ -143,6 +145,97 @@ export default function JourneyWorld() {
         )
       );
       const dayT = (n: number) => (Math.min(n, TOTAL_DAYS) - 0.5) / TOTAL_DAYS;
+
+      // ── landmark builders ──
+      const GOLD = 0xf5c518;
+      const goldMat = (glow = 0.35) =>
+        new T.MeshStandardMaterial({
+          color: GOLD,
+          metalness: 0.75,
+          roughness: 0.3,
+          emissive: 0xf59e0b,
+          emissiveIntensity: glow,
+        });
+
+      /** A trophy cup — bowl, stem, base, two handles. Returns its glow mat. */
+      const makeCup = (scale: number) => {
+        const g = new T.Group();
+        const mat = goldMat();
+        const bowl = new T.Mesh(new T.CylinderGeometry(0.85, 0.45, 1.0, 18), mat);
+        bowl.position.y = 1.15;
+        g.add(bowl);
+        const stem = new T.Mesh(new T.CylinderGeometry(0.14, 0.2, 0.55, 10), mat);
+        stem.position.y = 0.42;
+        g.add(stem);
+        const base = new T.Mesh(new T.CylinderGeometry(0.5, 0.6, 0.18, 14), mat);
+        base.position.y = 0.09;
+        g.add(base);
+        for (const side of [-1, 1]) {
+          const handle = new T.Mesh(new T.TorusGeometry(0.34, 0.07, 8, 14), mat);
+          handle.position.set(side * 0.92, 1.2, 0);
+          g.add(handle);
+        }
+        g.scale.setScalar(scale);
+        return { group: g, glow: mat };
+      };
+
+      /** A tiny resting bench for the project plaza. */
+      const makeBench = () => {
+        const g = new T.Group();
+        const wood = new T.MeshStandardMaterial({ color: 0x6b4a2a, roughness: 0.85 });
+        const seat = new T.Mesh(new T.BoxGeometry(1.7, 0.14, 0.55), wood);
+        seat.position.y = 0.55;
+        g.add(seat);
+        const back = new T.Mesh(new T.BoxGeometry(1.7, 0.55, 0.1), wood);
+        back.position.set(0, 0.95, -0.24);
+        g.add(back);
+        for (const sx of [-0.7, 0.7]) {
+          const leg = new T.Mesh(new T.BoxGeometry(0.12, 0.55, 0.5), wood);
+          leg.position.set(sx, 0.27, 0);
+          g.add(leg);
+        }
+        return g;
+      };
+
+      /** The king's taj — a jeweled golden crown for the summit. */
+      const makeCrown = () => {
+        const g = new T.Group();
+        const mat = goldMat(0.5);
+        const band = new T.Mesh(new T.CylinderGeometry(2.1, 2.3, 1.1, 24), mat);
+        g.add(band);
+        for (let k = 0; k < 8; k++) {
+          const a = (k / 8) * Math.PI * 2;
+          const spike = new T.Mesh(new T.ConeGeometry(0.42, 1.7, 8), mat);
+          spike.position.set(Math.cos(a) * 2.0, 1.35, Math.sin(a) * 2.0);
+          g.add(spike);
+          const jewel = new T.Mesh(
+            new T.SphereGeometry(0.22, 10, 8),
+            new T.MeshStandardMaterial({
+              color: k % 2 ? 0x22d3ee : 0xef4444,
+              emissive: k % 2 ? 0x22d3ee : 0xef4444,
+              emissiveIntensity: 0.8,
+              roughness: 0.2,
+            })
+          );
+          jewel.position.set(Math.cos(a) * 2.25, 0, Math.sin(a) * 2.25);
+          g.add(jewel);
+        }
+        const gem = new T.Mesh(
+          new T.OctahedronGeometry(0.55),
+          new T.MeshStandardMaterial({
+            color: 0x22d3ee,
+            emissive: 0x22d3ee,
+            emissiveIntensity: 1,
+            roughness: 0.15,
+          })
+        );
+        gem.position.y = 2.5;
+        g.add(gem);
+        return { group: g, glow: mat };
+      };
+      let crown: InstanceType<ThreeNS["Group"]> | null = null;
+      // ship-day order decides cup size: P1 small, growing to the capstone
+      const shipOrder = [...SHIP_DAYS].sort((a, b) => a - b);
 
       // day markers
       type Marker = {
@@ -166,19 +259,40 @@ export default function JourneyWorld() {
         const mat = new T.MeshStandardMaterial({ color: 0x151c2c, roughness: 0.6, metalness: 0.15 });
         const marker: Marker = { g, mat, n };
         if (SHIP_DAYS.has(n)) {
-          const h = n === TOTAL_DAYS ? 15 : 8;
+          const isSummit = n === TOTAL_DAYS;
+          const h = isSummit ? 13 : 7;
           const tower = new T.Mesh(new T.BoxGeometry(3.6, h, 3.6), mat);
           tower.position.y = h / 2;
           g.add(tower);
-          const beaconMat = new T.MeshStandardMaterial({
-            color: 0x2a2440,
-            emissive: 0xa78bfa,
-            emissiveIntensity: 0.2,
-          });
-          const beacon = new T.Mesh(new T.SphereGeometry(0.85, 16, 12), beaconMat);
-          beacon.position.y = h + 1.3;
-          g.add(beacon);
-          marker.beacon = beaconMat;
+          // a little plaza to breathe on, with a bench facing the road
+          const plaza = new T.Mesh(
+            new T.CylinderGeometry(4.4, 4.7, 0.3, 26),
+            new T.MeshStandardMaterial({ color: 0x141d31, roughness: 0.9 })
+          );
+          plaza.position.y = 0.15;
+          g.add(plaza);
+          const bench = makeBench();
+          bench.position.set(-3.1 * side, 0.3, 1.4);
+          bench.rotation.y = side > 0 ? 0.7 : -0.7;
+          g.add(bench);
+          if (isSummit) {
+            // the king's taj at the end of the road
+            const taj = makeCrown();
+            taj.group.position.y = h + 2.2;
+            g.add(taj.group);
+            crown = taj.group;
+            marker.beacon = taj.glow;
+            const halo = new T.PointLight(0xf5c518, 60, 30);
+            halo.position.y = h + 5;
+            g.add(halo);
+          } else {
+            // the trophy grows with every project you reach
+            const idx = shipOrder.indexOf(n);
+            const cup = makeCup(0.55 + (idx / Math.max(1, shipOrder.length - 1)) * 1.25);
+            cup.group.position.y = h + 0.05;
+            g.add(cup.group);
+            marker.beacon = cup.glow;
+          }
         } else if (plan?.isRest) {
           const pad = new T.Mesh(new T.CylinderGeometry(1.9, 2.1, 0.7, 20), mat);
           pad.position.y = 0.35;
@@ -195,6 +309,15 @@ export default function JourneyWorld() {
         );
         base.position.y = 0.05;
         g.add(base);
+        // stair pillar — carries the platform down to the valley floor
+        if (pos.y > 0.6) {
+          const col = new T.Mesh(
+            new T.CylinderGeometry(1.15, 1.5, pos.y, 10),
+            new T.MeshStandardMaterial({ color: 0x0f1626, roughness: 1 })
+          );
+          col.position.y = -pos.y / 2;
+          g.add(col);
+        }
         // floating day number
         const cv = document.createElement("canvas");
         cv.width = 128;
@@ -209,7 +332,7 @@ export default function JourneyWorld() {
           new T.SpriteMaterial({ map: new T.CanvasTexture(cv), transparent: true, opacity: 0.9 })
         );
         sp.scale.set(4.4, 2.2, 1);
-        sp.position.y = SHIP_DAYS.has(n) ? (n === TOTAL_DAYS ? 18 : 11) : plan?.isRest ? 2.4 : 5.8;
+        sp.position.y = SHIP_DAYS.has(n) ? (n === TOTAL_DAYS ? 20 : 11.5) : plan?.isRest ? 2.4 : 5.8;
         g.add(sp);
         g.userData.day = n;
         markerGroup.add(g);
@@ -309,7 +432,7 @@ export default function JourneyWorld() {
           }
         }
         const tp = markerPos(todayN);
-        amber.position.set(tp.x, 7, tp.z);
+        amber.position.set(tp.x, tp.y + 7, tp.z);
         // send the explorer home to today's marker — unless mid-walk
         if (!walk.onArrive && walk.t === walk.target) {
           walk.t = walk.target = dayT(todayN);
@@ -324,7 +447,7 @@ export default function JourneyWorld() {
           const linePts: V3[] = [];
           for (let i = 0; i <= 120; i++) {
             const p = curve.getPointAt((i / 120) * frac);
-            linePts.push(new T.Vector3(p.x, 0.75, p.z));
+            linePts.push(new T.Vector3(p.x, p.y + 0.75, p.z));
           }
           doneLine = new T.Line(
             new T.BufferGeometry().setFromPoints(linePts),
@@ -442,7 +565,8 @@ export default function JourneyWorld() {
         const ap = curve.getPointAt(wt);
         explorer.position.set(
           ap.x,
-          reduced ? 0 : moving ? Math.abs(Math.sin(clock * 8)) * 0.22 : Math.sin(clock * 2.2) * 0.16,
+          ap.y +
+            (reduced ? 0 : moving ? Math.abs(Math.sin(clock * 8)) * 0.22 : Math.sin(clock * 2.2) * 0.16),
           ap.z
         );
         if (moving) {
@@ -461,6 +585,7 @@ export default function JourneyWorld() {
             cur.mat.emissiveIntensity = 0.65 + Math.sin(clock * 3) * 0.3;
           }
           particles.rotation.y = Math.sin(clock * 0.05) * 0.02;
+          if (crown) crown.rotation.y = clock * 0.4;
         } else {
           charTick(0);
         }
