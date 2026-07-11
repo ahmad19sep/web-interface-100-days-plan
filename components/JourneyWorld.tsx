@@ -125,26 +125,57 @@ export default function JourneyWorld() {
       (grid.material as { transparent: boolean; opacity: number }).opacity = 0.35;
       scene.add(grid);
 
-      // the road — a staircase into the sky: every bend climbs higher,
-      // Day 1 at the valley floor, the capstone throne at the summit
-      const pts = [
-        [0, 0, 0], [42, -62, 4], [-46, -132, 9], [36, -202, 14],
-        [-52, -282, 20], [32, -362, 26], [-42, -442, 32],
-        [22, -522, 38], [0, -580, 44],
-      ].map(([x, z, y]) => new T.Vector3(x, y, z));
-      const curve = new T.CatmullRomCurve3(pts);
+      // the road — a real staircase: every curriculum week is a flat
+      // terrace, and the road steps up onto the next one at the boundary
+      const xz = [
+        [0, 0], [42, -62], [-46, -132], [36, -202], [-52, -282],
+        [32, -362], [-42, -442], [22, -522], [0, -580],
+      ].map(([x, z]) => new T.Vector3(x, 0, z));
+      const baseCurve = new T.CatmullRomCurve3(xz);
+      const STEP = 3.4;
+      const elevAt = (t: number) => {
+        const day = Math.min(TOTAL_DAYS, Math.max(1, t * TOTAL_DAYS + 0.5));
+        let y = 0;
+        for (const w of WEEKS) {
+          if (day >= w.end + 1) {
+            y += STEP; // whole terraces already climbed
+            continue;
+          }
+          if (day > w.end - 0.8) y += STEP * ((day - (w.end - 0.8)) / 1.8);
+          break;
+        }
+        return y;
+      };
+      // bake the stepped elevation into a dense curve
+      const samples: V3[] = [];
+      for (let i = 0; i <= 240; i++) {
+        const t = i / 240;
+        const pt = baseCurve.getPoint(t);
+        pt.y = elevAt(t);
+        samples.push(pt);
+      }
+      const curve = new T.CatmullRomCurve3(samples);
+      const dayT = (n: number) => (Math.min(n, TOTAL_DAYS) - 0.5) / TOTAL_DAYS;
+
+      // the unknown road ahead — only a faint ghost line in the dark
       scene.add(
         new T.Mesh(
-          new T.TubeGeometry(curve, 280, 0.55, 8),
-          new T.MeshStandardMaterial({
-            color: 0x18233a,
-            roughness: 0.9,
-            emissive: 0x0b1524,
-            emissiveIntensity: 0.5,
+          new T.TubeGeometry(curve, 300, 0.28, 8),
+          new T.MeshBasicMaterial({
+            color: 0x1c2846,
+            transparent: true,
+            opacity: 0.16,
           })
         )
       );
-      const dayT = (n: number) => (Math.min(n, TOTAL_DAYS) - 0.5) / TOTAL_DAYS;
+      // the revealed road (up to a week ahead) — rebuilt as you progress
+      const roadMat = new T.MeshStandardMaterial({
+        color: 0x18233a,
+        roughness: 0.9,
+        emissive: 0x0b1524,
+        emissiveIntensity: 0.5,
+      });
+      let roadMesh: InstanceType<ThreeNS["Mesh"]> | null = null;
 
       // ── landmark builders ──
       const GOLD = 0xf5c518;
@@ -411,8 +442,28 @@ export default function JourneyWorld() {
       const startT = (Math.min(currentDay(checkinsRef.current), TOTAL_DAYS) - 0.5) / TOTAL_DAYS;
       const walk = { t: startT, target: startT, onArrive: null as null | (() => void) };
 
+      const LOOKAHEAD = 7; // days of road visible past today
       const refreshStates = (done: Record<number, string>, todayN: number) => {
+        // rebuild the revealed stretch of road
+        const revealT = dayT(Math.min(TOTAL_DAYS, todayN + LOOKAHEAD));
+        if (roadMesh) {
+          scene.remove(roadMesh);
+          roadMesh.geometry.dispose();
+        }
+        const revealPts: V3[] = [];
+        for (let i = 0; i <= 110; i++) {
+          revealPts.push(curve.getPointAt((i / 110) * revealT));
+        }
+        roadMesh = new T.Mesh(
+          new T.TubeGeometry(new T.CatmullRomCurve3(revealPts), 220, 0.55, 8),
+          roadMat
+        );
+        scene.add(roadMesh);
+
         for (const m of markers) {
+          // fog of war: the path ahead stays hidden — except the summit
+          // taj, always shining in the distance as the goal
+          m.g.visible = m.n <= todayN + LOOKAHEAD || m.n === TOTAL_DAYS;
           const plan = DAYS[m.n - 1];
           if (done[m.n]) {
             m.mat.color.setHex(SHIP_DAYS.has(m.n) ? 0x241f42 : 0x123642);
