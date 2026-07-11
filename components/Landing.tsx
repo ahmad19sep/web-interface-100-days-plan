@@ -54,9 +54,10 @@ export default function Landing() {
           {/* speech bubble */}
           <div className="relative mb-3 rounded-[16px] border border-[rgba(245,158,11,.3)] bg-[rgba(245,158,11,.06)] px-5 py-4">
             <div className="text-[14.5px] leading-[1.6] text-ink">
-              👋 <span className="font-semibold">Assalam-o-Alaikum!</span> I&apos;m
-              Ahmad — welcome to my world. 120 days, 20 shipped projects, one
-              glowing road. Log in and let&apos;s walk it together.
+              👋 <span className="font-semibold">Hi, I&apos;m Ahmad.</span> AI
+              won&apos;t replace you — but a person who builds with it will.
+              My mission is simple: don&apos;t just watch the future happen,
+              build it with your own hands.
             </div>
             <span className="absolute -bottom-[9px] left-10 h-4 w-4 rotate-45 border-b border-r border-[rgba(245,158,11,.3)] bg-[#181712]" />
           </div>
