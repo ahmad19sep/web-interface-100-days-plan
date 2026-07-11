@@ -22,14 +22,9 @@ import {
   useProfiles,
 } from "@/lib/profiles";
 import { AVATARS } from "@/lib/avatars";
+import { nameToHandle } from "@/lib/handle";
 import Avatar3D from "./Avatar3D";
 
-/** People sign in with their NAME — we derive the unique handle from it. */
-function nameToHandle(raw: string): string {
-  const cleaned = raw.trim().toLowerCase();
-  if (HANDLE_RE.test(cleaned)) return cleaned;
-  return cleaned.replace(/[^a-z0-9]+/g, "").slice(0, 24);
-}
 import {
   completeOnboarding,
   expectedDay,
@@ -118,9 +113,10 @@ export default function Onboarding() {
   // (/start?setup=1). A plain login/signup goes straight to /courses.
   const [setupRequested, setSetupRequested] = useState(false);
   useEffect(() => {
-    setSetupRequested(
-      new URLSearchParams(window.location.search).get("setup") === "1"
-    );
+    const params = new URLSearchParams(window.location.search);
+    setSetupRequested(params.get("setup") === "1");
+    // the landing page's "Create your access code" jumps straight to signup
+    if (params.get("signup") === "1") setSubPhase("signup");
   }, []);
 
   const phase: Phase = !ready
