@@ -36,7 +36,7 @@ export default function AuthGate({
 
   useEffect(() => {
     if (!ready || allowed) return;
-    if (!loggedIn) router.replace("/start");
+    if (!loggedIn) router.replace("/"); // the landing IS the login screen
     else router.replace("/courses"); // logged in, course not started yet
   }, [ready, allowed, loggedIn, router]);
 

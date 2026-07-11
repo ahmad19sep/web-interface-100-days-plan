@@ -92,7 +92,7 @@ function Pill({
 const inputClass =
   "w-full rounded-xl border border-edge3 bg-panel px-4 py-3 text-sm text-ink placeholder:text-dim focus:border-[rgba(34,211,238,.5)] focus:outline-none";
 
-type Phase = "boot" | "entry" | "login" | "signup" | "setup";
+type Phase = "boot" | "login" | "signup" | "setup";
 
 export default function Onboarding() {
   const router = useRouter();
@@ -125,7 +125,7 @@ export default function Onboarding() {
       ? onboarded || !setupRequested
         ? "boot" // logged in — redirecting below
         : "setup"
-      : (subPhase ?? "entry");
+      : (subPhase ?? "signup");
 
   useEffect(() => {
     if (!ready || !activeId) return;
@@ -191,9 +191,7 @@ export default function Onboarding() {
       ? "Welcome back"
       : phase === "signup"
         ? "Create your access code"
-        : phase === "entry"
-          ? "Your access code"
-          : "Set up your course";
+        : "Set up your course";
 
   return (
     <div className="flex min-h-screen items-center justify-center p-5 sm:p-10">
@@ -222,35 +220,6 @@ export default function Onboarding() {
         {phase === "boot" && (
           <div className="card-std rounded-[20px] p-[30px] text-center text-[13px] text-mut3">
             Opening…
-          </div>
-        )}
-
-        {/* ── ENTRY ── */}
-        {phase === "entry" && (
-          <div className="anim-fade-up card-std rounded-[20px] p-6 sm:p-[30px]">
-            <div className="mb-1 font-display text-base font-semibold">
-              One code, everything
-            </div>
-            <div className="mb-5 text-[13px] text-mut2">
-              Your name + access code opens your courses, streak and notes on
-              any phone or laptop.
-            </div>
-            <div className="flex flex-col gap-2.5">
-              <button
-                type="button"
-                onClick={() => goTo("signup")}
-                className="btn-primary w-full py-[13px] text-sm"
-              >
-                ✨ Create access code →
-              </button>
-              <button
-                type="button"
-                onClick={() => goTo("login")}
-                className="btn-ghost w-full py-[13px] text-sm"
-              >
-                🔑 Write access code
-              </button>
-            </div>
           </div>
         )}
 
@@ -395,13 +364,12 @@ export default function Onboarding() {
                 {busy ? "Creating…" : "Create & enter →"}
               </button>
             </form>
-            <button
-              type="button"
-              onClick={() => goTo("login")}
-              className="mt-3 cursor-pointer text-[12.5px] text-mut3 hover:text-ink"
+            <Link
+              href="/"
+              className="mt-3 block text-[12.5px] !text-mut3 hover:!text-ink"
             >
-              ← Already have a code? Write it
-            </button>
+              ← Already have a code? Log in
+            </Link>
           </div>
         )}
 

@@ -155,7 +155,7 @@ export function SettingsPanel() {
             <button
               type="button"
               onClick={() => {
-                void logout().then(() => router.push("/start"));
+                void logout().then(() => router.push("/"));
               }}
               className="cursor-pointer rounded-[10px] border border-edge2 bg-card2 px-4 py-2.5 text-[13px] text-mut2 hover:text-ink"
             >
