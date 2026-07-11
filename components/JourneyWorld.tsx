@@ -443,7 +443,9 @@ export default function JourneyWorld() {
       const startT = (Math.min(currentDay(checkinsRef.current), TOTAL_DAYS) - 0.5) / TOTAL_DAYS;
       const walk = { t: startT, target: startT, onArrive: null as null | (() => void) };
 
-      const LOOKAHEAD = 7; // days of road visible past today
+      // the whole road stays visible end to end — the guide thread and
+      // marker states already tell the user where they are on it
+      const LOOKAHEAD = TOTAL_DAYS;
       const refreshStates = (done: Record<number, string>, todayN: number) => {
         // rebuild the revealed stretch of road
         const revealT = dayT(Math.min(TOTAL_DAYS, todayN + LOOKAHEAD));
@@ -478,9 +480,7 @@ export default function JourneyWorld() {
         scene.add(guideLine);
 
         for (const m of markers) {
-          // fog of war: the path ahead stays hidden — except the summit
-          // taj, always shining in the distance as the goal
-          m.g.visible = m.n <= todayN + LOOKAHEAD || m.n === TOTAL_DAYS;
+          m.g.visible = true;
           const plan = DAYS[m.n - 1];
           if (done[m.n]) {
             m.mat.color.setHex(SHIP_DAYS.has(m.n) ? 0x241f42 : 0x123642);
