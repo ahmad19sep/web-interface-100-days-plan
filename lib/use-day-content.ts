@@ -8,6 +8,8 @@
 import { useEffect, useState } from "react";
 import type { QuizQuestion } from "./challenges/types";
 
+import type { DayDoc, DayVideo } from "./day-content";
+
 export interface DayLink {
   label: string;
   url: string;
@@ -19,6 +21,10 @@ export interface DayContent {
   note: string | null;
   quiz: QuizQuestion[] | null;
   links: DayLink[] | null;
+  /** extra lesson videos the owner attached (link or uploaded file) */
+  videos: DayVideo[] | null;
+  /** documents the owner attached (PDF, slides, notebook, dataset…) */
+  docs: DayDoc[] | null;
 }
 
 const EMPTY_CONTENT: DayContent = {
@@ -27,6 +33,8 @@ const EMPTY_CONTENT: DayContent = {
   note: null,
   quiz: null,
   links: null,
+  videos: null,
+  docs: null,
 };
 
 /**

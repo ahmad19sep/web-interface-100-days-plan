@@ -4,8 +4,10 @@ import { DbNotConfiguredError, query } from "@/lib/db";
 import {
   ensureLinksColumn,
   getDayContentRow,
+  sanitizeDocsInput,
   sanitizeLinksInput,
   sanitizeQuizInput,
+  sanitizeVideosInput,
 } from "@/lib/day-content";
 import { currentProfile } from "@/lib/session";
 
@@ -31,6 +33,8 @@ export async function GET(
         note: null,
         quiz: null,
         links: null,
+        videos: null,
+        docs: null,
       });
     }
     throw err;
@@ -56,17 +60,21 @@ export async function PUT(
     const note = typeof body?.note === "string" ? body.note.trim() || null : null;
     const quiz = sanitizeQuizInput(body?.quiz);
     const links = sanitizeLinksInput(body?.links);
+    const videos = sanitizeVideosInput(body?.videos);
+    const docs = sanitizeDocsInput(body?.docs);
 
     await ensureLinksColumn();
     await query(
-      `insert into day_content (day, video_url, github_url, note, quiz, links, updated_at)
-       values ($1, $2, $3, $4, $5, $6, now())
+      `insert into day_content (day, video_url, github_url, note, quiz, links, videos, docs, updated_at)
+       values ($1, $2, $3, $4, $5, $6, $7, $8, now())
        on conflict (day) do update set
          video_url = excluded.video_url,
          github_url = excluded.github_url,
          note = excluded.note,
          quiz = excluded.quiz,
          links = excluded.links,
+         videos = excluded.videos,
+         docs = excluded.docs,
          updated_at = now()`,
       [
         day,
@@ -75,10 +83,12 @@ export async function PUT(
         note,
         quiz ? JSON.stringify(quiz) : null,
         links ? JSON.stringify(links) : null,
+        videos ? JSON.stringify(videos) : null,
+        docs ? JSON.stringify(docs) : null,
       ]
     );
 
-    return NextResponse.json({ videoUrl, githubUrl, note, quiz, links });
+    return NextResponse.json({ videoUrl, githubUrl, note, quiz, links, videos, docs });
   } catch (err) {
     if (err instanceof DbNotConfiguredError) {
       return NextResponse.json({ error: err.message }, { status: 503 });

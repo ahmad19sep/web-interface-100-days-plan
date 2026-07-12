@@ -12,12 +12,30 @@ export interface DayLink {
   url: string;
 }
 
+/** One lesson video the owner attached — YouTube link or an uploaded file. */
+export interface DayVideo {
+  title: string;
+  url: string;
+  kind: "concept" | "walkthrough" | "mistakes" | "briefing";
+  required: boolean;
+}
+
+/** One document/handout the owner attached — a link or an uploaded file. */
+export interface DayDoc {
+  label: string;
+  url: string;
+  /** file extension or kind, shown as a chip (pdf, md, zip, ipynb…) */
+  kind: string;
+}
+
 export interface DayContent {
   videoUrl: string | null;
   githubUrl: string | null;
   note: string | null;
   quiz: QuizQuestion[] | null;
   links: DayLink[] | null;
+  videos: DayVideo[] | null;
+  docs: DayDoc[] | null;
 }
 
 interface Row {
@@ -26,6 +44,8 @@ interface Row {
   note: string | null;
   quiz: QuizQuestion[] | null;
   links: DayLink[] | null;
+  videos: DayVideo[] | null;
+  docs: DayDoc[] | null;
 }
 
 // Self-healing migration: `links` was added after the first production
@@ -35,9 +55,12 @@ interface Row {
 let linksColumnReady: Promise<unknown> | null = null;
 export function ensureLinksColumn(): Promise<unknown> {
   if (!linksColumnReady) {
-    linksColumnReady = query(
-      "alter table day_content add column if not exists links jsonb"
-    ).catch((err) => {
+    linksColumnReady = Promise.all([
+      query("alter table day_content add column if not exists links jsonb"),
+      // multi-video and multi-document attachments (👑 CREATOR panel)
+      query("alter table day_content add column if not exists videos jsonb"),
+      query("alter table day_content add column if not exists docs jsonb"),
+    ]).catch((err) => {
       linksColumnReady = null; // retry on the next request
       throw err;
     });
@@ -49,7 +72,7 @@ export function ensureLinksColumn(): Promise<unknown> {
 export async function getDayContentRow(day: number): Promise<DayContent> {
   await ensureLinksColumn();
   const rows = await query<Row>(
-    "select video_url, github_url, note, quiz, links from day_content where day = $1",
+    "select video_url, github_url, note, quiz, links, videos, docs from day_content where day = $1",
     [day]
   );
   const row = rows[0];
@@ -58,6 +81,8 @@ export async function getDayContentRow(day: number): Promise<DayContent> {
     githubUrl: row?.github_url ?? null,
     note: row?.note ?? null,
     quiz: row?.quiz ?? null,
+    videos: row?.videos ?? null,
+    docs: row?.docs ?? null,
     links: row?.links ?? null,
   };
 }
@@ -99,6 +124,64 @@ export function sanitizeLinksInput(raw: unknown): DayLink[] | null {
     if (links.length >= 12) break;
   }
   return links.length > 0 ? links : null;
+}
+
+const VIDEO_KINDS = new Set(["concept", "walkthrough", "mistakes", "briefing"]);
+
+/** Validates owner-submitted lesson videos; drops rows without a real URL. */
+export function sanitizeVideosInput(raw: unknown): DayVideo[] | null {
+  if (!Array.isArray(raw)) return null;
+  const videos: DayVideo[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const v = item as Record<string, unknown>;
+    const url = typeof v.url === "string" ? v.url.trim() : "";
+    if (!/^https?:\/\//i.test(url)) continue;
+    const kindRaw = typeof v.kind === "string" ? v.kind : "concept";
+    videos.push({
+      url,
+      title:
+        typeof v.title === "string" && v.title.trim()
+          ? v.title.trim().slice(0, 140)
+          : "Lesson video",
+      kind: (VIDEO_KINDS.has(kindRaw) ? kindRaw : "concept") as DayVideo["kind"],
+      required: v.required !== false,
+    });
+    if (videos.length >= 8) break;
+  }
+  return videos.length > 0 ? videos : null;
+}
+
+/** Guess a doc's kind chip from its URL when the owner didn't set one. */
+function kindFromUrl(url: string): string {
+  const ext = url.split("?")[0].split(".").pop()?.toLowerCase() ?? "";
+  return /^[a-z0-9]{1,5}$/.test(ext) ? ext : "link";
+}
+
+/** Validates owner-submitted documents; drops rows without a real URL. */
+export function sanitizeDocsInput(raw: unknown): DayDoc[] | null {
+  if (!Array.isArray(raw)) return null;
+  const docs: DayDoc[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const d = item as Record<string, unknown>;
+    const url = typeof d.url === "string" ? d.url.trim() : "";
+    if (!/^https?:\/\//i.test(url)) continue;
+    const kind =
+      typeof d.kind === "string" && d.kind.trim()
+        ? d.kind.trim().toLowerCase().slice(0, 8)
+        : kindFromUrl(url);
+    docs.push({
+      url,
+      label:
+        typeof d.label === "string" && d.label.trim()
+          ? d.label.trim().slice(0, 140)
+          : url.split("/").pop() || "Document",
+      kind,
+    });
+    if (docs.length >= 12) break;
+  }
+  return docs.length > 0 ? docs : null;
 }
 
 /** Validates + trims owner-submitted quiz JSON; drops malformed questions. */

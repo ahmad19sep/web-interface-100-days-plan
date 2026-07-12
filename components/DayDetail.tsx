@@ -22,6 +22,8 @@ import {
   useProgress,
 } from "@/lib/store";
 import { useDayContent, type DayContent } from "@/lib/use-day-content";
+import type { DayDoc, DayVideo } from "@/lib/day-content";
+import { DocRows, VideoRows } from "./creator/Attachments";
 import { Toast, useToast } from "./Toast";
 import { IconCheck } from "./icons";
 
@@ -398,6 +400,8 @@ export function CreatorDayPanel({
   const [note, setNoteText] = useState(content.note ?? "");
   const [linksText, setLinksText] = useState(linksToText(content.links));
   const [quiz, setQuiz] = useState<QuizDraft[]>(content.quiz ?? []);
+  const [videos, setVideos] = useState<DayVideo[]>(content.videos ?? []);
+  const [docs, setDocs] = useState<DayDoc[]>(content.docs ?? []);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -413,6 +417,8 @@ export function CreatorDayPanel({
         note,
         quiz,
         links: textToLinks(linksText),
+        videos,
+        docs,
       }),
     });
     const body = (await res.json()) as DayContent;
@@ -480,6 +486,11 @@ export function CreatorDayPanel({
             className={`${inputClass} resize-y font-mono`}
           />
         </label>
+
+        <div className="my-1 h-px bg-[rgba(245,181,75,.2)]" />
+        <VideoRows videos={videos} onChange={setVideos} />
+        <DocRows docs={docs} onChange={setDocs} />
+        <div className="my-1 h-px bg-[rgba(245,181,75,.2)]" />
 
         <div>
           <span className="mb-1.5 block text-xs text-mut3">

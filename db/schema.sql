@@ -82,6 +82,9 @@ create table if not exists day_content (
 
 alter table day_content add column if not exists quiz jsonb;
 alter table day_content add column if not exists links jsonb;
+-- multi-attachment support: [{title,url,kind,required}] and [{label,url,kind}]
+alter table day_content add column if not exists videos jsonb;
+alter table day_content add column if not exists docs jsonb;
 
 -- Learning-workspace progress (see lib/lessons/, /learn/day/N). One jsonb
 -- blob per (user, day): last stage, video seconds, section/lab completion,

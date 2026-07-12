@@ -159,6 +159,8 @@ export interface Lesson {
   reflectionPrompts: string[];
   shipFields: EvidenceField[];
   references: { label: string; url: string }[];
+  /** owner-attached handouts (PDF, slides, notebook, dataset…) — 👑 CREATOR */
+  docs?: { label: string; url: string; kind: string }[];
   nextDayPreview?: string;
   /** true = hand-written full lesson; false = scaffold from the DayPlan */
   authored: boolean;

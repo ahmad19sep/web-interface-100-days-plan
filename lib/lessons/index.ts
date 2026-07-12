@@ -306,6 +306,15 @@ export interface LiveDayContent {
   videoUrl?: string | null;
   note?: string | null;
   links?: { label: string; url: string }[] | null;
+  videos?:
+    | {
+        title: string;
+        url: string;
+        kind: "concept" | "walkthrough" | "mistakes" | "briefing";
+        required: boolean;
+      }[]
+    | null;
+  docs?: { label: string; url: string; kind: string }[] | null;
 }
 
 /**
@@ -324,7 +333,13 @@ export function applyDayContent(
   const hasVideo = Boolean(content?.videoUrl);
   const hasNote = Boolean(content?.note?.trim());
   const hasLinks = Boolean(content?.links?.length);
-  if (!content || (!hasVideo && !hasNote && !hasLinks)) return lesson;
+  const hasVideos = Boolean(content?.videos?.length);
+  const hasDocs = Boolean(content?.docs?.length);
+  if (
+    !content ||
+    (!hasVideo && !hasNote && !hasLinks && !hasVideos && !hasDocs)
+  )
+    return lesson;
 
   const videos = lesson.videos.map((v) => ({ ...v }));
   if (hasVideo) {
@@ -340,6 +355,27 @@ export function applyDayContent(
           required: true,
           url,
         });
+    }
+  }
+  // the owner's attached videos: fill matching empty slots first (so an
+  // authored "Concept" slot gets the concept video), then append the rest
+  for (const [i, v] of (content.videos ?? []).entries()) {
+    if (!v?.url || videos.some((x) => x.url === v.url)) continue;
+    const slot =
+      videos.find((x) => !x.url && x.kind === v.kind) ??
+      videos.find((x) => !x.url);
+    if (slot) {
+      slot.url = v.url;
+      slot.title = v.title || slot.title;
+      slot.required = v.required;
+    } else {
+      videos.push({
+        id: `live-${i}`,
+        title: v.title || "Lesson video",
+        kind: v.kind,
+        required: v.required,
+        url: v.url,
+      });
     }
   }
 
@@ -364,7 +400,13 @@ export function applyDayContent(
       references.push({ label: l.label || l.url, url: l.url });
   }
 
-  return { ...lesson, videos, sections, references };
+  return {
+    ...lesson,
+    videos,
+    sections,
+    references,
+    docs: content.docs?.length ? content.docs : lesson.docs,
+  };
 }
 
 // ── stage availability + completion ──────────────────────────────────────────

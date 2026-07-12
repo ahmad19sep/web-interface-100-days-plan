@@ -153,6 +153,34 @@ export function MissionStage({ lesson, goNext }: StageProps) {
         </div>
       )}
 
+      {lesson.docs && lesson.docs.length > 0 && (
+        <div className="mb-4 rounded-[14px] border border-edge2 bg-card2 p-4">
+          <div className="mb-2.5 font-mono text-[10px] tracking-[.2em] text-mut3">
+            📎 DAY MATERIALS
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {lesson.docs.map((d) => (
+              <a
+                key={d.url}
+                href={d.url}
+                target="_blank"
+                rel="noreferrer"
+                download
+                className="flex items-center gap-2.5 rounded-[10px] border border-edge3 bg-panel px-3 py-2.5 text-[13px] !text-ink2 transition-colors hover:border-[rgba(34,211,238,.4)] hover:!text-ink"
+              >
+                <span className="shrink-0 rounded-[6px] border border-edge2 px-1.5 py-[2px] font-mono text-[9px] uppercase tracking-[.08em] text-mut3">
+                  {d.kind || "link"}
+                </span>
+                <span className="min-w-0 flex-1 truncate">{d.label}</span>
+                <span className="shrink-0 font-mono text-[10px] text-mut3">
+                  OPEN ↗
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
       {lesson.finalEvidence && (
         <div className="text-[12.5px] text-mut2">
           <span className="font-mono text-[10px] tracking-[.14em] text-mut3">
@@ -301,6 +329,56 @@ function TrackedVideo({
   );
 }
 
+/** Uploaded file (mp4/webm/mov) — a real player that reports watch progress. */
+function UploadedVideo({
+  url,
+  saved,
+  onProgress,
+}: {
+  url: string;
+  saved: VideoProgress | undefined;
+  onProgress: (vp: VideoProgress) => void;
+}) {
+  const latest = useRef<VideoProgress>(
+    saved ?? { seconds: 0, duration: 0, done: false }
+  );
+  const report = useRef(onProgress);
+  useEffect(() => {
+    report.current = onProgress;
+  }, [onProgress]);
+
+  return (
+    <video
+      src={url}
+      controls
+      controlsList="nodownload"
+      preload="metadata"
+      className="aspect-video w-full rounded-[14px] border border-edge2 bg-black"
+      onLoadedMetadata={(e) => {
+        // resume where the learner left off
+        const el = e.currentTarget;
+        const at = latest.current.seconds;
+        if (at > 3 && at < el.duration - 3) el.currentTime = at;
+      }}
+      onTimeUpdate={(e) => {
+        const el = e.currentTarget;
+        if (!el.duration) return;
+        const prev = latest.current;
+        const seconds = Math.max(prev.seconds, Math.floor(el.currentTime));
+        const done = prev.done || seconds / el.duration >= WATCH_THRESHOLD;
+        if (seconds > prev.seconds + 4 || done !== prev.done) {
+          latest.current = { seconds, duration: Math.floor(el.duration), done };
+          report.current(latest.current);
+        }
+      }}
+      onEnded={() => {
+        latest.current = { ...latest.current, done: true };
+        report.current(latest.current);
+      }}
+    />
+  );
+}
+
 const VIDEO_KIND_LABEL = {
   concept: "CONCEPT",
   walkthrough: "CODE WALKTHROUGH",
@@ -350,9 +428,17 @@ export function WatchStage({ lesson, progress, update, goNext }: StageProps) {
                 </span>
               )}
             </div>
-            {v.url ? (
+            {v.url && ytIdOf(v.url) ? (
               <TrackedVideo
                 video={v}
+                saved={progress.video?.[v.id]}
+                onProgress={(vp) =>
+                  update({ video: { ...(progress.video ?? {}), [v.id]: vp } })
+                }
+              />
+            ) : v.url ? (
+              <UploadedVideo
+                url={v.url}
                 saved={progress.video?.[v.id]}
                 onProgress={(vp) =>
                   update({ video: { ...(progress.video ?? {}), [v.id]: vp } })
